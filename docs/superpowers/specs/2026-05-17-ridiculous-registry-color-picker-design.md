@@ -86,7 +86,7 @@ ridiculous/
 ├── tsconfig.node.json
 ├── vite.config.ts
 ├── vitest.config.ts
-├── eslint.config.js
+├── biome.json                     ← biome config (lint + format)
 ├── components.json                ← shadcn config for our demo app's own use
 ├── registry.json                  ← shadcn registry source-of-truth
 ├── postcss.config.js              (if Tailwind v4 setup requires it)
@@ -442,7 +442,11 @@ export default defineConfig({
     "test": "vitest run",
     "test:watch": "vitest watch",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "lint": "eslint ."
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "ci:check": "biome ci ."
   }
 }
 ```
@@ -481,7 +485,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
+      - run: pnpm ci:check
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
