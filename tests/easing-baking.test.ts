@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest"
 import {
-  sampleSpring,
   bakeLinear,
   sampleBounce,
+  sampleSpring,
   sampleWiggle,
 } from "@/components/ui/easing-picker/easing-picker"
 

@@ -3,16 +3,19 @@
 
 import { useMemo, useState } from "react"
 import {
+  bakeLinear,
   EasingPreview,
   SpringControls,
-  bakeLinear,
   sampleSpring,
 } from "@/components/ui/easing-picker"
 
 export function SubComponentSpringExample() {
   const [spring, setSpring] = useState({ stiffness: 100, damping: 10, mass: 1 })
   const easing = useMemo(
-    () => bakeLinear(sampleSpring(spring.stiffness, spring.damping, spring.mass, 60)),
+    () =>
+      bakeLinear(
+        sampleSpring(spring.stiffness, spring.damping, spring.mass, 60),
+      ),
     [spring],
   )
   return (

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react"
+import { fireEvent, render, screen } from "@testing-library/react"
 import { describe, expect, test, vi } from "vitest"
 import {
   BezierCanvas,
@@ -43,15 +43,21 @@ describe("BezierCanvas", () => {
 
 describe("StepsControls", () => {
   test("renders n input and position select", () => {
-    render(<StepsControls value={{ n: 3, position: "end" }} onChange={() => {}} />)
+    render(
+      <StepsControls value={{ n: 3, position: "end" }} onChange={() => {}} />,
+    )
     expect(screen.getByLabelText(/steps/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/position/i)).toBeInTheDocument()
   })
 
   test("emits onChange when n changes", () => {
     const onChange = vi.fn()
-    render(<StepsControls value={{ n: 3, position: "end" }} onChange={onChange} />)
-    fireEvent.change(screen.getByLabelText(/steps/i), { target: { value: "5" } })
+    render(
+      <StepsControls value={{ n: 3, position: "end" }} onChange={onChange} />,
+    )
+    fireEvent.change(screen.getByLabelText(/steps/i), {
+      target: { value: "5" },
+    })
     expect(onChange).toHaveBeenCalledWith({ n: 5, position: "end" })
   })
 })
@@ -68,20 +74,31 @@ describe("SpringControls", () => {
     const sliders = screen.getAllByRole("slider")
     expect(sliders).toHaveLength(3)
     fireEvent.change(sliders[0], { target: { value: "200" } })
-    expect(onChange).toHaveBeenCalledWith({ stiffness: 200, damping: 10, mass: 1 })
+    expect(onChange).toHaveBeenCalledWith({
+      stiffness: 200,
+      damping: 10,
+      mass: 1,
+    })
   })
 })
 
 describe("BounceControls", () => {
   test("renders 2 sliders", () => {
-    render(<BounceControls value={{ bounces: 3, stiffness: 0.5 }} onChange={() => {}} />)
+    render(
+      <BounceControls
+        value={{ bounces: 3, stiffness: 0.5 }}
+        onChange={() => {}}
+      />,
+    )
     expect(screen.getAllByRole("slider")).toHaveLength(2)
   })
 })
 
 describe("WiggleControls", () => {
   test("renders 2 sliders", () => {
-    render(<WiggleControls value={{ wiggles: 4, damping: 5 }} onChange={() => {}} />)
+    render(
+      <WiggleControls value={{ wiggles: 4, damping: 5 }} onChange={() => {}} />,
+    )
     expect(screen.getAllByRole("slider")).toHaveLength(2)
   })
 })
@@ -103,7 +120,10 @@ describe("PresetGallery", () => {
     const onChange = vi.fn()
     render(<PresetGallery onChange={onChange} />)
     screen.getByTitle("ease").click()
-    expect(onChange).toHaveBeenCalledWith("ease", "cubic-bezier(0.25, 0.1, 0.25, 1)")
+    expect(onChange).toHaveBeenCalledWith(
+      "ease",
+      "cubic-bezier(0.25, 0.1, 0.25, 1)",
+    )
   })
 })
 
@@ -112,7 +132,9 @@ describe("EasingPreview", () => {
     const { container } = render(
       <EasingPreview easing="cubic-bezier(0.42, 0, 0.58, 1)" />,
     )
-    const target = container.querySelector("[data-preview-target]") as HTMLElement
+    const target = container.querySelector(
+      "[data-preview-target]",
+    ) as HTMLElement
     expect(target).not.toBeNull()
     expect(target.style.animation).toContain("cubic-bezier(0.42, 0, 0.58, 1)")
   })
@@ -126,10 +148,14 @@ describe("EasingPreview", () => {
 
   test("Replay button increments the animation key", () => {
     const { container } = render(<EasingPreview easing="ease" />)
-    const target = container.querySelector("[data-preview-target]") as HTMLElement
+    const target = container.querySelector(
+      "[data-preview-target]",
+    ) as HTMLElement
     const initialKey = target.dataset.animationKey
     fireEvent.click(screen.getByRole("button", { name: /replay/i }))
-    const newKey = container.querySelector("[data-preview-target]")?.getAttribute("data-animation-key")
+    const newKey = container
+      .querySelector("[data-preview-target]")
+      ?.getAttribute("data-animation-key")
     expect(newKey).not.toBe(initialKey)
   })
 })
@@ -138,7 +164,10 @@ describe("EasingPanel integration", () => {
   test("changing basis tab updates emitted output", async () => {
     const onChange = vi.fn()
     render(
-      <EasingPanel value="cubic-bezier(0.42, 0, 0.58, 1)" onChange={onChange} />,
+      <EasingPanel
+        value="cubic-bezier(0.42, 0, 0.58, 1)"
+        onChange={onChange}
+      />,
     )
     // Click "spring" tab
     fireEvent.click(screen.getByText(/spring/i))
@@ -151,7 +180,12 @@ describe("EasingPanel integration", () => {
 
   test("preset click emits underlying bezier", () => {
     const onChange = vi.fn()
-    render(<EasingPanel value="cubic-bezier(0.42, 0, 0.58, 1)" onChange={onChange} />)
+    render(
+      <EasingPanel
+        value="cubic-bezier(0.42, 0, 0.58, 1)"
+        onChange={onChange}
+      />,
+    )
     fireEvent.click(screen.getByTitle("ease"))
     expect(onChange).toHaveBeenCalledWith("cubic-bezier(0.25, 0.1, 0.25, 1)")
   })
@@ -171,7 +205,10 @@ describe("EasingPanel integration", () => {
 describe("EasingPicker popover", () => {
   test("trigger button renders curve thumbnail + name label", () => {
     render(
-      <EasingPicker value="cubic-bezier(0.42, 0, 0.58, 1)" onChange={() => {}} />,
+      <EasingPicker
+        value="cubic-bezier(0.42, 0, 0.58, 1)"
+        onChange={() => {}}
+      />,
     )
     expect(screen.getByRole("button")).toBeInTheDocument()
     // Matches "ease-in-out" preset, so trigger should show that label

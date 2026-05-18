@@ -1,10 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import {
-  EasingPicker,
-  type EasingString,
-} from "@/components/ui/easing-picker"
+import { EasingPicker, type EasingString } from "@/components/ui/easing-picker"
 
 export function BasicUsageExample() {
   const [easing, setEasing] = useState<EasingString>(

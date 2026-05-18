@@ -57,7 +57,12 @@ describe("formatEasing", () => {
   })
 
   test("formatEasing spring emits a linear() string", () => {
-    const result = formatEasing({ basis: "spring", stiffness: 100, damping: 10, mass: 1 })
+    const result = formatEasing({
+      basis: "spring",
+      stiffness: 100,
+      damping: 10,
+      mass: 1,
+    })
     expect(result).toMatch(/^linear\(/)
     expect(result).toMatch(/\)$/)
   })

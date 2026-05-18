@@ -135,7 +135,8 @@ export type EasingLiteral<S extends string> =
   | LinearLiteral<S>
 
 /** Call-site validator helper. Mirrors `color()` from color-picker. */
-export const easing = <S extends string>(value: S & EasingLiteral<S>): S => value
+export const easing = <S extends string>(value: S & EasingLiteral<S>): S =>
+  value
 
 // =====================================================================
 // 3. SUGGESTION STRINGS — non-generic, for IntelliSense + onChange returns

@@ -1,17 +1,27 @@
 import { describe, expect, test } from "vitest"
 import {
-  PRESETS,
   bezierFromPreset,
   matchPreset,
+  PRESETS,
 } from "@/components/ui/easing-picker/easing-picker"
 
 describe("PRESETS table", () => {
   test("contains the 5 CSS keyword entries with canonical coefficients", () => {
-    expect(PRESETS.find((p) => p.name === "linear")?.bezier).toEqual([0, 0, 1, 1])
-    expect(PRESETS.find((p) => p.name === "ease")?.bezier).toEqual([0.25, 0.1, 0.25, 1])
-    expect(PRESETS.find((p) => p.name === "ease-in")?.bezier).toEqual([0.42, 0, 1, 1])
-    expect(PRESETS.find((p) => p.name === "ease-out")?.bezier).toEqual([0, 0, 0.58, 1])
-    expect(PRESETS.find((p) => p.name === "ease-in-out")?.bezier).toEqual([0.42, 0, 0.58, 1])
+    expect(PRESETS.find((p) => p.name === "linear")?.bezier).toEqual([
+      0, 0, 1, 1,
+    ])
+    expect(PRESETS.find((p) => p.name === "ease")?.bezier).toEqual([
+      0.25, 0.1, 0.25, 1,
+    ])
+    expect(PRESETS.find((p) => p.name === "ease-in")?.bezier).toEqual([
+      0.42, 0, 1, 1,
+    ])
+    expect(PRESETS.find((p) => p.name === "ease-out")?.bezier).toEqual([
+      0, 0, 0.58, 1,
+    ])
+    expect(PRESETS.find((p) => p.name === "ease-in-out")?.bezier).toEqual([
+      0.42, 0, 0.58, 1,
+    ])
   })
 
   test("has no duplicate names", () => {

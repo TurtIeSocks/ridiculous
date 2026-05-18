@@ -1,4 +1,5 @@
 import { expectTypeOf, test } from "vitest"
+import type { EasingPicker } from "@/components/ui/easing-picker"
 import type {
   BasisOfString,
   CubicBezierString,
@@ -14,7 +15,6 @@ import type {
   StepsString,
 } from "@/components/ui/easing-picker/easing-picker.types"
 import { easing } from "@/components/ui/easing-picker/easing-picker.types"
-import { EasingPicker } from "@/components/ui/easing-picker"
 
 test("EasingKeyword enumerates the 7 CSS keywords", () => {
   expectTypeOf<EasingKeyword>().toEqualTypeOf<
@@ -30,12 +30,7 @@ test("EasingKeyword enumerates the 7 CSS keywords", () => {
 
 test("StepPosition enumerates 6 jump terms", () => {
   expectTypeOf<StepPosition>().toEqualTypeOf<
-    | "start"
-    | "end"
-    | "jump-start"
-    | "jump-end"
-    | "jump-both"
-    | "jump-none"
+    "start" | "end" | "jump-start" | "jump-end" | "jump-both" | "jump-none"
   >()
 })
 
@@ -93,9 +88,9 @@ test("EasingLiteral rejects cubic-bezier with x1 > 1", () => {
 
 test("EasingLiteral accepts steps with and without position", () => {
   expectTypeOf<EasingLiteral<"steps(3)">>().toEqualTypeOf<"steps(3)">()
-  expectTypeOf<EasingLiteral<"steps(4, jump-end)">>().toEqualTypeOf<
-    "steps(4, jump-end)"
-  >()
+  expectTypeOf<
+    EasingLiteral<"steps(4, jump-end)">
+  >().toEqualTypeOf<"steps(4, jump-end)">()
 })
 
 test("EasingLiteral rejects steps with non-positive n", () => {
@@ -126,7 +121,9 @@ test("BasisOfString returns ambiguous union for linear()", () => {
   expectTypeOf<BasisOfString<"linear(0, 0.5, 1)">>().toEqualTypeOf<
     "spring" | "bounce" | "wiggle"
   >()
-  expectTypeOf<BasisOfString<"cubic-bezier(0.5, 0, 0.5, 1)">>().toEqualTypeOf<"bezier">()
+  expectTypeOf<
+    BasisOfString<"cubic-bezier(0.5, 0, 0.5, 1)">
+  >().toEqualTypeOf<"bezier">()
   expectTypeOf<BasisOfString<"steps(3)">>().toEqualTypeOf<"steps">()
 })
 
@@ -148,7 +145,9 @@ test("EasingState discriminates by basis", () => {
   }
   // Use EasingState["basis"] — accessing .basis on a narrowed discriminated-union
   // variable yields the narrowed literal, not the full union.
-  expectTypeOf<EasingState["basis"]>().toEqualTypeOf<"bezier" | "spring" | "bounce" | "wiggle" | "steps">()
+  expectTypeOf<EasingState["basis"]>().toEqualTypeOf<
+    "bezier" | "spring" | "bounce" | "wiggle" | "steps"
+  >()
   // Verify the variables are valid EasingState members
   expectTypeOf(bezier).toMatchTypeOf<EasingState>()
   expectTypeOf(spring).toMatchTypeOf<EasingState>()
@@ -156,7 +155,9 @@ test("EasingState discriminates by basis", () => {
 
 test("EasingPicker basis='bezier' narrows onChange to CubicBezierString", () => {
   type Props = Parameters<typeof EasingPicker<"bezier">>[0]
-  expectTypeOf<Props["onChange"]>().parameter(0).toEqualTypeOf<CubicBezierString>()
+  expectTypeOf<Props["onChange"]>()
+    .parameter(0)
+    .toEqualTypeOf<CubicBezierString>()
 })
 
 test("EasingPicker basis='spring' narrows onChange to LinearString", () => {

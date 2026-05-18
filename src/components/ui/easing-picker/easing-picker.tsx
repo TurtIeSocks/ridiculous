@@ -1,13 +1,14 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
-import { cn } from "@/lib/utils"
+import type React from "react"
+import { useEffect, useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 // ---------------------------------------------------------------------------
 // Component
@@ -77,7 +78,14 @@ function computeTriggerThumb(state: EasingState | null): React.ReactNode {
   if (!state || state.basis !== "bezier") {
     return (
       <svg viewBox="0 0 48 32">
-        <line x1="0" y1="16" x2="48" y2="16" stroke="currentColor" strokeWidth="1.5" />
+        <line
+          x1="0"
+          y1="16"
+          x2="48"
+          y2="16"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
       </svg>
     )
   }
@@ -98,9 +106,7 @@ export interface EasingPanelProps<
 > {
   value: EasingString | (string & {})
   onChange: (
-    value: TBasis extends EasingBasis
-      ? EasingStringMap[TBasis]
-      : EasingString,
+    value: TBasis extends EasingBasis ? EasingStringMap[TBasis] : EasingString,
   ) => void
   basis?: TBasis
   output?: OutputFormat
@@ -222,7 +228,11 @@ export function EasingPanel<
                 }}
                 extraTop={internal.extraTop}
                 extraBottom={internal.extraBottom}
-                onChange={(v) => setAndEmit((prev) => prev.basis === "bezier" ? { ...prev, ...v } : prev)}
+                onChange={(v) =>
+                  setAndEmit((prev) =>
+                    prev.basis === "bezier" ? { ...prev, ...v } : prev,
+                  )
+                }
               />
             </div>
             <BezierInputs
@@ -306,7 +316,9 @@ function OutputPanel({ easing, format, onFormatChange }: OutputPanelProps) {
             onClick={() => onFormatChange(f)}
             className={cn(
               "px-2 py-1 rounded border",
-              format === f ? "bg-accent border-accent-foreground/20" : "border-transparent hover:bg-accent/50",
+              format === f
+                ? "bg-accent border-accent-foreground/20"
+                : "border-transparent hover:bg-accent/50",
             )}
           >
             {f}
@@ -319,7 +331,11 @@ function OutputPanel({ easing, format, onFormatChange }: OutputPanelProps) {
           <input
             type="text"
             value={varName}
-            onChange={(e) => setVarName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+            onChange={(e) =>
+              setVarName(
+                e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""),
+              )
+            }
             className="px-2 py-1 bg-muted rounded text-foreground flex-1"
           />
         </label>
@@ -338,7 +354,11 @@ function OutputPanel({ easing, format, onFormatChange }: OutputPanelProps) {
   )
 }
 
-function formatSnippet(easing: string, format: OutputFormat, varName: string): string {
+function formatSnippet(
+  easing: string,
+  format: OutputFormat,
+  varName: string,
+): string {
   switch (format) {
     case "css":
       return easing
@@ -362,7 +382,13 @@ interface BasisTabsProps {
   available?: readonly EasingBasis[]
 }
 
-const ALL_BASES: readonly EasingBasis[] = ["bezier", "spring", "bounce", "wiggle", "steps"] as const
+const ALL_BASES: readonly EasingBasis[] = [
+  "bezier",
+  "spring",
+  "bounce",
+  "wiggle",
+  "steps",
+] as const
 
 function BasisTabs({ value, onChange, available = ALL_BASES }: BasisTabsProps) {
   return (
@@ -374,7 +400,9 @@ function BasisTabs({ value, onChange, available = ALL_BASES }: BasisTabsProps) {
           onClick={() => onChange(basis)}
           className={cn(
             "px-3 py-1.5 capitalize transition-colors",
-            value === basis ? "border-b-2 border-primary text-foreground" : "text-muted-foreground hover:text-foreground",
+            value === basis
+              ? "border-b-2 border-primary text-foreground"
+              : "text-muted-foreground hover:text-foreground",
           )}
         >
           {basis}
@@ -394,7 +422,17 @@ export interface PresetGalleryProps {
   className?: string
 }
 
-function PresetThumb({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
+function PresetThumb({
+  x1,
+  y1,
+  x2,
+  y2,
+}: {
+  x1: number
+  y1: number
+  x2: number
+  y2: number
+}) {
   const path = `M 0 32 C ${x1 * 48} ${(1 - y1) * 32}, ${x2 * 48} ${(1 - y2) * 32}, 48 0`
   return (
     <svg viewBox="0 0 48 32" className="size-full">
@@ -408,15 +446,29 @@ export function PresetGallery({
   onChange,
   className,
 }: PresetGalleryProps) {
-  const keywords = PRESETS.filter((p) => !p.family && p.name !== "anticipate" && p.name !== "smoothStep")
+  const keywords = PRESETS.filter(
+    (p) => !p.family && p.name !== "anticipate" && p.name !== "smoothStep",
+  )
   const polynomials = PRESETS.filter((p) => p.family)
-  const specials = PRESETS.filter((p) => p.name === "anticipate" || p.name === "smoothStep")
+  const specials = PRESETS.filter(
+    (p) => p.name === "anticipate" || p.name === "smoothStep",
+  )
 
   return (
     <div className={cn("space-y-3", className)}>
-      <PresetRow label="Keywords" presets={keywords} value={value} onChange={onChange} />
+      <PresetRow
+        label="Keywords"
+        presets={keywords}
+        value={value}
+        onChange={onChange}
+      />
       <PresetGrid presets={polynomials} value={value} onChange={onChange} />
-      <PresetRow label="Special" presets={specials} value={value} onChange={onChange} />
+      <PresetRow
+        label="Special"
+        presets={specials}
+        value={value}
+        onChange={onChange}
+      />
     </div>
   )
 }
@@ -434,10 +486,17 @@ function PresetRow({
 }) {
   return (
     <div>
-      <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">{label}</div>
+      <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">
+        {label}
+      </div>
       <div className="flex flex-wrap gap-1">
         {presets.map((p) => (
-          <PresetCard key={p.name} preset={p} active={value === p.name} onClick={() => onChange(p.name, bezierFromPreset(p.name))} />
+          <PresetCard
+            key={p.name}
+            preset={p}
+            active={value === p.name}
+            onClick={() => onChange(p.name, bezierFromPreset(p.name))}
+          />
         ))}
       </div>
     </div>
@@ -456,7 +515,12 @@ function PresetGrid({
   return (
     <div className="grid grid-cols-4 gap-1">
       {presets.map((p) => (
-        <PresetCard key={p.name} preset={p} active={value === p.name} onClick={() => onChange(p.name, bezierFromPreset(p.name))} />
+        <PresetCard
+          key={p.name}
+          preset={p}
+          active={value === p.name}
+          onClick={() => onChange(p.name, bezierFromPreset(p.name))}
+        />
       ))}
     </div>
   )
@@ -487,7 +551,9 @@ function PresetCard({
       <div className="size-10 text-muted-foreground">
         <PresetThumb x1={x1} y1={y1} x2={x2} y2={y2} />
       </div>
-      <span className="text-[10px] truncate w-full text-center">{preset.name}</span>
+      <span className="text-[10px] truncate w-full text-center">
+        {preset.name}
+      </span>
     </button>
   )
 }
@@ -580,9 +646,29 @@ export function BezierCanvas({
           strokeDasharray="2 2"
         />
       )}
-      <line x1={p0.sx} y1={p0.sy} x2={p1.sx} y2={p1.sy} stroke="currentColor" strokeOpacity={0.4} />
-      <line x1={p3.sx} y1={p3.sy} x2={p2.sx} y2={p2.sy} stroke="currentColor" strokeOpacity={0.4} />
-      <path data-curve d={pathD} fill="none" stroke="currentColor" strokeWidth="2" />
+      <line
+        x1={p0.sx}
+        y1={p0.sy}
+        x2={p1.sx}
+        y2={p1.sy}
+        stroke="currentColor"
+        strokeOpacity={0.4}
+      />
+      <line
+        x1={p3.sx}
+        y1={p3.sy}
+        x2={p2.sx}
+        y2={p2.sy}
+        stroke="currentColor"
+        strokeOpacity={0.4}
+      />
+      <path
+        data-curve
+        d={pathD}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+      />
       <circle
         data-handle="p1"
         cx={p1.sx}
@@ -630,19 +716,47 @@ interface BezierInputsProps {
 }
 
 function BezierInputs({ value, onChange }: BezierInputsProps) {
-  const set = (k: keyof BezierInputsProps["value"]) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const n = Number(e.target.value)
-    if (!Number.isFinite(n)) return
-    onChange({ ...value, [k]: n })
-  }
+  const set =
+    (k: keyof BezierInputsProps["value"]) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const n = Number(e.target.value)
+      if (!Number.isFinite(n)) return
+      onChange({ ...value, [k]: n })
+    }
   return (
     <div className="grid grid-cols-2 gap-2 text-xs">
-      <Field label="X1" value={value.x1} min={0} max={1} step={0.01} onChange={set("x1")} />
+      <Field
+        label="X1"
+        value={value.x1}
+        min={0}
+        max={1}
+        step={0.01}
+        onChange={set("x1")}
+      />
       <Field label="Y1" value={value.y1} step={0.01} onChange={set("y1")} />
-      <Field label="X2" value={value.x2} min={0} max={1} step={0.01} onChange={set("x2")} />
+      <Field
+        label="X2"
+        value={value.x2}
+        min={0}
+        max={1}
+        step={0.01}
+        onChange={set("x2")}
+      />
       <Field label="Y2" value={value.y2} step={0.01} onChange={set("y2")} />
-      <Field label="Extra Top" value={value.extraTop} min={0} step={0.05} onChange={set("extraTop")} />
-      <Field label="Extra Bottom" value={value.extraBottom} min={0} step={0.05} onChange={set("extraBottom")} />
+      <Field
+        label="Extra Top"
+        value={value.extraTop}
+        min={0}
+        step={0.05}
+        onChange={set("extraTop")}
+      />
+      <Field
+        label="Extra Bottom"
+        value={value.extraBottom}
+        min={0}
+        step={0.05}
+        onChange={set("extraBottom")}
+      />
     </div>
   )
 }
@@ -718,7 +832,10 @@ export function StepsControls({
           step={1}
           value={value.n}
           onChange={(e) => {
-            const n = Math.max(minSteps, Math.min(maxSteps, Math.floor(Number(e.target.value))))
+            const n = Math.max(
+              minSteps,
+              Math.min(maxSteps, Math.floor(Number(e.target.value))),
+            )
             if (Number.isFinite(n)) onChange({ ...value, n })
           }}
           className="px-2 py-1 bg-muted rounded text-foreground"
@@ -729,7 +846,9 @@ export function StepsControls({
         <select
           aria-label="Position"
           value={value.position}
-          onChange={(e) => onChange({ ...value, position: e.target.value as StepPosition })}
+          onChange={(e) =>
+            onChange({ ...value, position: e.target.value as StepPosition })
+          }
           className="px-2 py-1 bg-muted rounded text-foreground"
         >
           {STEP_POSITIONS_ARR.map((p) => (
@@ -787,12 +906,37 @@ export interface SpringControlsProps {
   className?: string
 }
 
-export function SpringControls({ value, onChange, className }: SpringControlsProps) {
+export function SpringControls({
+  value,
+  onChange,
+  className,
+}: SpringControlsProps) {
   return (
     <div className={cn("space-y-2", className)}>
-      <Slider label="Stiffness" value={value.stiffness} min={1} max={500} step={1} onChange={(v) => onChange({ ...value, stiffness: v })} />
-      <Slider label="Damping" value={value.damping} min={1} max={100} step={1} onChange={(v) => onChange({ ...value, damping: v })} />
-      <Slider label="Mass" value={value.mass} min={0.5} max={5} step={0.1} onChange={(v) => onChange({ ...value, mass: v })} />
+      <Slider
+        label="Stiffness"
+        value={value.stiffness}
+        min={1}
+        max={500}
+        step={1}
+        onChange={(v) => onChange({ ...value, stiffness: v })}
+      />
+      <Slider
+        label="Damping"
+        value={value.damping}
+        min={1}
+        max={100}
+        step={1}
+        onChange={(v) => onChange({ ...value, damping: v })}
+      />
+      <Slider
+        label="Mass"
+        value={value.mass}
+        min={0.5}
+        max={5}
+        step={0.1}
+        onChange={(v) => onChange({ ...value, mass: v })}
+      />
     </div>
   )
 }
@@ -803,11 +947,29 @@ export interface BounceControlsProps {
   className?: string
 }
 
-export function BounceControls({ value, onChange, className }: BounceControlsProps) {
+export function BounceControls({
+  value,
+  onChange,
+  className,
+}: BounceControlsProps) {
   return (
     <div className={cn("space-y-2", className)}>
-      <Slider label="Bounces" value={value.bounces} min={1} max={6} step={1} onChange={(v) => onChange({ ...value, bounces: v })} />
-      <Slider label="Stiffness" value={value.stiffness} min={0} max={1} step={0.01} onChange={(v) => onChange({ ...value, stiffness: v })} />
+      <Slider
+        label="Bounces"
+        value={value.bounces}
+        min={1}
+        max={6}
+        step={1}
+        onChange={(v) => onChange({ ...value, bounces: v })}
+      />
+      <Slider
+        label="Stiffness"
+        value={value.stiffness}
+        min={0}
+        max={1}
+        step={0.01}
+        onChange={(v) => onChange({ ...value, stiffness: v })}
+      />
     </div>
   )
 }
@@ -818,11 +980,29 @@ export interface WiggleControlsProps {
   className?: string
 }
 
-export function WiggleControls({ value, onChange, className }: WiggleControlsProps) {
+export function WiggleControls({
+  value,
+  onChange,
+  className,
+}: WiggleControlsProps) {
   return (
     <div className={cn("space-y-2", className)}>
-      <Slider label="Wiggles" value={value.wiggles} min={1} max={10} step={1} onChange={(v) => onChange({ ...value, wiggles: v })} />
-      <Slider label="Damping" value={value.damping} min={1} max={30} step={0.5} onChange={(v) => onChange({ ...value, damping: v })} />
+      <Slider
+        label="Wiggles"
+        value={value.wiggles}
+        min={1}
+        max={10}
+        step={1}
+        onChange={(v) => onChange({ ...value, wiggles: v })}
+      />
+      <Slider
+        label="Damping"
+        value={value.damping}
+        min={1}
+        max={30}
+        step={0.5}
+        onChange={(v) => onChange({ ...value, damping: v })}
+      />
     </div>
   )
 }
@@ -886,7 +1066,8 @@ export function parseEasing(value: string): EasingState | null {
       extraBottom: DEFAULT_EXTRA,
     }
   }
-  if (v === "step-start") return { basis: "steps", n: 1, position: "jump-start" }
+  if (v === "step-start")
+    return { basis: "steps", n: 1, position: "jump-start" }
   if (v === "step-end") return { basis: "steps", n: 1, position: "jump-end" }
 
   // cubic-bezier(...)
@@ -955,7 +1136,9 @@ export function formatEasing(state: EasingState): EasingString {
     }
     case "spring": {
       const { stiffness, damping, mass } = state
-      return bakeLinear(sampleSpring(stiffness, damping, mass, 60)) as EasingString
+      return bakeLinear(
+        sampleSpring(stiffness, damping, mass, 60),
+      ) as EasingString
     }
     case "bounce": {
       const { bounces, stiffness } = state
@@ -1142,52 +1325,212 @@ export const PRESETS: readonly PresetEntry[] = [
   { name: "ease-in-out", bezier: [0.42, 0, 0.58, 1] },
 
   // Sine
-  { name: "easeInSine", bezier: [0.12, 0, 0.39, 0], family: "Sine", direction: "In" },
-  { name: "easeOutSine", bezier: [0.61, 1, 0.88, 1], family: "Sine", direction: "Out" },
-  { name: "easeInOutSine", bezier: [0.37, 0, 0.63, 1], family: "Sine", direction: "InOut" },
-  { name: "easeOutInSine", bezier: [0.45, 1, 0.55, 0], family: "Sine", direction: "OutIn" },
+  {
+    name: "easeInSine",
+    bezier: [0.12, 0, 0.39, 0],
+    family: "Sine",
+    direction: "In",
+  },
+  {
+    name: "easeOutSine",
+    bezier: [0.61, 1, 0.88, 1],
+    family: "Sine",
+    direction: "Out",
+  },
+  {
+    name: "easeInOutSine",
+    bezier: [0.37, 0, 0.63, 1],
+    family: "Sine",
+    direction: "InOut",
+  },
+  {
+    name: "easeOutInSine",
+    bezier: [0.45, 1, 0.55, 0],
+    family: "Sine",
+    direction: "OutIn",
+  },
 
   // Quad
-  { name: "easeInQuad", bezier: [0.11, 0, 0.5, 0], family: "Quad", direction: "In" },
-  { name: "easeOutQuad", bezier: [0.5, 1, 0.89, 1], family: "Quad", direction: "Out" },
-  { name: "easeInOutQuad", bezier: [0.45, 0, 0.55, 1], family: "Quad", direction: "InOut" },
-  { name: "easeOutInQuad", bezier: [0.5, 1, 0.5, 0], family: "Quad", direction: "OutIn" },
+  {
+    name: "easeInQuad",
+    bezier: [0.11, 0, 0.5, 0],
+    family: "Quad",
+    direction: "In",
+  },
+  {
+    name: "easeOutQuad",
+    bezier: [0.5, 1, 0.89, 1],
+    family: "Quad",
+    direction: "Out",
+  },
+  {
+    name: "easeInOutQuad",
+    bezier: [0.45, 0, 0.55, 1],
+    family: "Quad",
+    direction: "InOut",
+  },
+  {
+    name: "easeOutInQuad",
+    bezier: [0.5, 1, 0.5, 0],
+    family: "Quad",
+    direction: "OutIn",
+  },
 
   // Cubic
-  { name: "easeInCubic", bezier: [0.32, 0, 0.67, 0], family: "Cubic", direction: "In" },
-  { name: "easeOutCubic", bezier: [0.33, 1, 0.68, 1], family: "Cubic", direction: "Out" },
-  { name: "easeInOutCubic", bezier: [0.65, 0, 0.35, 1], family: "Cubic", direction: "InOut" },
-  { name: "easeOutInCubic", bezier: [0.5, 1, 0.5, 0], family: "Cubic", direction: "OutIn" },
+  {
+    name: "easeInCubic",
+    bezier: [0.32, 0, 0.67, 0],
+    family: "Cubic",
+    direction: "In",
+  },
+  {
+    name: "easeOutCubic",
+    bezier: [0.33, 1, 0.68, 1],
+    family: "Cubic",
+    direction: "Out",
+  },
+  {
+    name: "easeInOutCubic",
+    bezier: [0.65, 0, 0.35, 1],
+    family: "Cubic",
+    direction: "InOut",
+  },
+  {
+    name: "easeOutInCubic",
+    bezier: [0.5, 1, 0.5, 0],
+    family: "Cubic",
+    direction: "OutIn",
+  },
 
   // Quart
-  { name: "easeInQuart", bezier: [0.5, 0, 0.75, 0], family: "Quart", direction: "In" },
-  { name: "easeOutQuart", bezier: [0.25, 1, 0.5, 1], family: "Quart", direction: "Out" },
-  { name: "easeInOutQuart", bezier: [0.76, 0, 0.24, 1], family: "Quart", direction: "InOut" },
-  { name: "easeOutInQuart", bezier: [0.5, 1, 0.5, 0], family: "Quart", direction: "OutIn" },
+  {
+    name: "easeInQuart",
+    bezier: [0.5, 0, 0.75, 0],
+    family: "Quart",
+    direction: "In",
+  },
+  {
+    name: "easeOutQuart",
+    bezier: [0.25, 1, 0.5, 1],
+    family: "Quart",
+    direction: "Out",
+  },
+  {
+    name: "easeInOutQuart",
+    bezier: [0.76, 0, 0.24, 1],
+    family: "Quart",
+    direction: "InOut",
+  },
+  {
+    name: "easeOutInQuart",
+    bezier: [0.5, 1, 0.5, 0],
+    family: "Quart",
+    direction: "OutIn",
+  },
 
   // Quint
-  { name: "easeInQuint", bezier: [0.64, 0, 0.78, 0], family: "Quint", direction: "In" },
-  { name: "easeOutQuint", bezier: [0.22, 1, 0.36, 1], family: "Quint", direction: "Out" },
-  { name: "easeInOutQuint", bezier: [0.83, 0, 0.17, 1], family: "Quint", direction: "InOut" },
-  { name: "easeOutInQuint", bezier: [0.5, 1, 0.5, 0], family: "Quint", direction: "OutIn" },
+  {
+    name: "easeInQuint",
+    bezier: [0.64, 0, 0.78, 0],
+    family: "Quint",
+    direction: "In",
+  },
+  {
+    name: "easeOutQuint",
+    bezier: [0.22, 1, 0.36, 1],
+    family: "Quint",
+    direction: "Out",
+  },
+  {
+    name: "easeInOutQuint",
+    bezier: [0.83, 0, 0.17, 1],
+    family: "Quint",
+    direction: "InOut",
+  },
+  {
+    name: "easeOutInQuint",
+    bezier: [0.5, 1, 0.5, 0],
+    family: "Quint",
+    direction: "OutIn",
+  },
 
   // Expo
-  { name: "easeInExpo", bezier: [0.7, 0, 0.84, 0], family: "Expo", direction: "In" },
-  { name: "easeOutExpo", bezier: [0.16, 1, 0.3, 1], family: "Expo", direction: "Out" },
-  { name: "easeInOutExpo", bezier: [0.87, 0, 0.13, 1], family: "Expo", direction: "InOut" },
-  { name: "easeOutInExpo", bezier: [0.5, 1, 0.5, 0], family: "Expo", direction: "OutIn" },
+  {
+    name: "easeInExpo",
+    bezier: [0.7, 0, 0.84, 0],
+    family: "Expo",
+    direction: "In",
+  },
+  {
+    name: "easeOutExpo",
+    bezier: [0.16, 1, 0.3, 1],
+    family: "Expo",
+    direction: "Out",
+  },
+  {
+    name: "easeInOutExpo",
+    bezier: [0.87, 0, 0.13, 1],
+    family: "Expo",
+    direction: "InOut",
+  },
+  {
+    name: "easeOutInExpo",
+    bezier: [0.5, 1, 0.5, 0],
+    family: "Expo",
+    direction: "OutIn",
+  },
 
   // Circ
-  { name: "easeInCirc", bezier: [0.55, 0, 1, 0.45], family: "Circ", direction: "In" },
-  { name: "easeOutCirc", bezier: [0, 0.55, 0.45, 1], family: "Circ", direction: "Out" },
-  { name: "easeInOutCirc", bezier: [0.85, 0, 0.15, 1], family: "Circ", direction: "InOut" },
-  { name: "easeOutInCirc", bezier: [0.5, 1, 0.5, 0], family: "Circ", direction: "OutIn" },
+  {
+    name: "easeInCirc",
+    bezier: [0.55, 0, 1, 0.45],
+    family: "Circ",
+    direction: "In",
+  },
+  {
+    name: "easeOutCirc",
+    bezier: [0, 0.55, 0.45, 1],
+    family: "Circ",
+    direction: "Out",
+  },
+  {
+    name: "easeInOutCirc",
+    bezier: [0.85, 0, 0.15, 1],
+    family: "Circ",
+    direction: "InOut",
+  },
+  {
+    name: "easeOutInCirc",
+    bezier: [0.5, 1, 0.5, 0],
+    family: "Circ",
+    direction: "OutIn",
+  },
 
   // Back (overshoot)
-  { name: "easeInBack", bezier: [0.36, 0, 0.66, -0.56], family: "Back", direction: "In" },
-  { name: "easeOutBack", bezier: [0.34, 1.56, 0.64, 1], family: "Back", direction: "Out" },
-  { name: "easeInOutBack", bezier: [0.68, -0.6, 0.32, 1.6], family: "Back", direction: "InOut" },
-  { name: "easeOutInBack", bezier: [0.5, 1.6, 0.5, -0.6], family: "Back", direction: "OutIn" },
+  {
+    name: "easeInBack",
+    bezier: [0.36, 0, 0.66, -0.56],
+    family: "Back",
+    direction: "In",
+  },
+  {
+    name: "easeOutBack",
+    bezier: [0.34, 1.56, 0.64, 1],
+    family: "Back",
+    direction: "Out",
+  },
+  {
+    name: "easeInOutBack",
+    bezier: [0.68, -0.6, 0.32, 1.6],
+    family: "Back",
+    direction: "InOut",
+  },
+  {
+    name: "easeOutInBack",
+    bezier: [0.5, 1.6, 0.5, -0.6],
+    family: "Back",
+    direction: "OutIn",
+  },
 
   // Special
   { name: "anticipate", bezier: [0.45, -0.5, 0.55, 1] },
@@ -1245,8 +1588,14 @@ export interface EasingPreviewProps {
 }
 
 const PROP_KEYFRAMES: Record<PreviewProperty, { from: string; to: string }> = {
-  moveX: { from: "transform: translateX(0)", to: "transform: translateX(200px)" },
-  moveY: { from: "transform: translateY(0)", to: "transform: translateY(100px)" },
+  moveX: {
+    from: "transform: translateX(0)",
+    to: "transform: translateX(200px)",
+  },
+  moveY: {
+    from: "transform: translateY(0)",
+    to: "transform: translateY(100px)",
+  },
   scale: { from: "transform: scale(0.5)", to: "transform: scale(1.5)" },
   rotate: { from: "transform: rotate(0)", to: "transform: rotate(360deg)" },
   opacity: { from: "opacity: 0", to: "opacity: 1" },
@@ -1265,7 +1614,12 @@ export function EasingPreview({
   const animName = `easing-preview-${property}`
 
   return (
-    <div className={cn("relative w-full h-[120px] bg-muted/30 rounded overflow-hidden", className)}>
+    <div
+      className={cn(
+        "relative w-full h-[120px] bg-muted/30 rounded overflow-hidden",
+        className,
+      )}
+    >
       <style>
         {`@keyframes ${animName} {
           from { ${PROP_KEYFRAMES[property].from}; }

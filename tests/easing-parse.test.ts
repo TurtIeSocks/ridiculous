@@ -13,12 +13,44 @@ describe("parseEasing", () => {
       extraTop: 0.25,
       extraBottom: 0.25,
     })
-    expect(parseEasing("ease")).toMatchObject({ basis: "bezier", x1: 0.25, y1: 0.1, x2: 0.25, y2: 1 })
-    expect(parseEasing("ease-in")).toMatchObject({ basis: "bezier", x1: 0.42, y1: 0, x2: 1, y2: 1 })
-    expect(parseEasing("ease-out")).toMatchObject({ basis: "bezier", x1: 0, y1: 0, x2: 0.58, y2: 1 })
-    expect(parseEasing("ease-in-out")).toMatchObject({ basis: "bezier", x1: 0.42, y1: 0, x2: 0.58, y2: 1 })
-    expect(parseEasing("step-start")).toEqual<EasingState>({ basis: "steps", n: 1, position: "jump-start" })
-    expect(parseEasing("step-end")).toEqual<EasingState>({ basis: "steps", n: 1, position: "jump-end" })
+    expect(parseEasing("ease")).toMatchObject({
+      basis: "bezier",
+      x1: 0.25,
+      y1: 0.1,
+      x2: 0.25,
+      y2: 1,
+    })
+    expect(parseEasing("ease-in")).toMatchObject({
+      basis: "bezier",
+      x1: 0.42,
+      y1: 0,
+      x2: 1,
+      y2: 1,
+    })
+    expect(parseEasing("ease-out")).toMatchObject({
+      basis: "bezier",
+      x1: 0,
+      y1: 0,
+      x2: 0.58,
+      y2: 1,
+    })
+    expect(parseEasing("ease-in-out")).toMatchObject({
+      basis: "bezier",
+      x1: 0.42,
+      y1: 0,
+      x2: 0.58,
+      y2: 1,
+    })
+    expect(parseEasing("step-start")).toEqual<EasingState>({
+      basis: "steps",
+      n: 1,
+      position: "jump-start",
+    })
+    expect(parseEasing("step-end")).toEqual<EasingState>({
+      basis: "steps",
+      n: 1,
+      position: "jump-end",
+    })
   })
 
   test("parses cubic-bezier in comma form", () => {

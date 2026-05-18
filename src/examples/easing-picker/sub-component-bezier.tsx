@@ -10,7 +10,8 @@ export function SubComponentBezierExample() {
     <div className="space-y-2 w-60">
       <BezierCanvas value={value} onChange={setValue} />
       <div className="text-xs font-mono">
-        cubic-bezier({value.x1.toFixed(2)}, {value.y1.toFixed(2)}, {value.x2.toFixed(2)}, {value.y2.toFixed(2)})
+        cubic-bezier({value.x1.toFixed(2)}, {value.y1.toFixed(2)},{" "}
+        {value.x2.toFixed(2)}, {value.y2.toFixed(2)})
       </div>
     </div>
   )

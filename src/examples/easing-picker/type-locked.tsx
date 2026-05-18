@@ -2,14 +2,16 @@
 
 import { useState } from "react"
 import {
-  EasingPicker,
   type CubicBezierString,
+  EasingPicker,
   type LinearString,
   type StepsString,
 } from "@/components/ui/easing-picker"
 
 export function TypeLockedExample() {
-  const [bezier, setBezier] = useState<CubicBezierString>("cubic-bezier(0.42, 0, 0.58, 1)")
+  const [bezier, setBezier] = useState<CubicBezierString>(
+    "cubic-bezier(0.42, 0, 0.58, 1)",
+  )
   const [spring, setSpring] = useState<LinearString>("linear(0, 1)")
   const [steps, setSteps] = useState<StepsString>("steps(4)")
 
