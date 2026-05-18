@@ -123,3 +123,23 @@ describe("oklchToSrgb / srgbToOklch", () => {
     expect(oklch.c).toBeCloseTo(0, 3)
   })
 })
+
+import {
+  oklabToOklch,
+  oklchToOklab,
+} from "@/components/ui/color-picker/color-picker"
+
+describe("oklch ↔ oklab", () => {
+  it("round-trips polar/cartesian", () => {
+    const oklab = oklchToOklab(0.5, 0.18, 240)
+    const back = oklabToOklch(oklab.l, oklab.a, oklab.b)
+    expect(back.l).toBeCloseTo(0.5, 6)
+    expect(back.c).toBeCloseTo(0.18, 6)
+    expect(back.h).toBeCloseTo(240, 4)
+  })
+  it("h=0 → a=c, b=0", () => {
+    const oklab = oklchToOklab(0.5, 0.1, 0)
+    expect(oklab.a).toBeCloseTo(0.1, 6)
+    expect(oklab.b).toBeCloseTo(0, 6)
+  })
+})

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
   formatHex,
   formatHsl,
+  formatOklab,
   formatRgb,
 } from "@/components/ui/color-picker/color-picker"
 
@@ -40,6 +41,23 @@ describe("formatHsl", () => {
   it("emits alpha when a < 1", () => {
     expect(formatHsl({ l: 0.5, c: 0.18, h: 0, a: 0.5 })).toMatch(
       /^hsl\(\d+ \d+% \d+% \/ \d+%\)$/,
+    )
+  })
+})
+
+describe("formatOklab", () => {
+  it("emits oklab(L a b)", () => {
+    expect(formatOklab({ l: 0.5, c: 0.1, h: 0, a: 1 })).toMatch(
+      /^oklab\(\d+(\.\d+)? \d+(\.\d+)? \d+(\.\d+)?\)$/,
+    )
+  })
+  it("emits negative b for cool colors", () => {
+    // h=240 → roughly negative b (blueward in oklab)
+    expect(formatOklab({ l: 0.5, c: 0.18, h: 240, a: 1 })).toMatch(/-/)
+  })
+  it("emits alpha < 1", () => {
+    expect(formatOklab({ l: 0.5, c: 0.1, h: 0, a: 0.5 })).toMatch(
+      / \/ \d+%\)$/,
     )
   })
 })

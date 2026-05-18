@@ -180,6 +180,44 @@ export function formatHsl(oklch: {
   return `${base} / ${Math.round(oklch.a * 100)}%)`
 }
 
+const OKLAB_RE =
+  /^oklab\(\s*([\d.]+%?)\s+(-?[\d.]+%?)\s+(-?[\d.]+%?)\s*(?:\/\s*([\d.]+%?)\s*)?\)$/i
+
+export function parseOklab(value: string): {
+  l: number
+  a: number
+  b: number
+  alpha: number
+} | null {
+  const match = value.match(OKLAB_RE)
+  if (!match) return null
+  const l = match[1].endsWith("%")
+    ? parseFloat(match[1]) / 100
+    : parseFloat(match[1])
+  // Per CSS Color 4, oklab a/b percentages are relative to 0.4 (signed).
+  const a = match[2].endsWith("%")
+    ? (parseFloat(match[2]) / 100) * 0.4
+    : parseFloat(match[2])
+  const b = match[3].endsWith("%")
+    ? (parseFloat(match[3]) / 100) * 0.4
+    : parseFloat(match[3])
+  const alpha = match[4] != null ? parseAlphaToken(match[4]) : 1
+  if ([l, a, b].some((n) => Number.isNaN(n))) return null
+  return { l, a, b, alpha }
+}
+
+export function formatOklab(oklch: {
+  l: number
+  c: number
+  h: number
+  a: number
+}): string {
+  const { a, b } = oklchToOklab(oklch.l, oklch.c, oklch.h)
+  const base = `oklab(${trimNumber(oklch.l)} ${trimNumber(a)} ${trimNumber(b)}`
+  if (oklch.a >= 1) return `${base})`
+  return `${base} / ${trimNumber(oklch.a * 100)}%)`
+}
+
 // ---------------------------------------------------------------------------
 // Color space conversions
 // ---------------------------------------------------------------------------
@@ -291,4 +329,24 @@ export function srgbToOklch(
   if (H < 0) H += 360
 
   return { l: L, c: C, h: H, a: alpha }
+}
+
+export function oklchToOklab(
+  L: number,
+  C: number,
+  hDeg: number,
+): { l: number; a: number; b: number } {
+  const hRad = (hDeg * Math.PI) / 180
+  return { l: L, a: C * Math.cos(hRad), b: C * Math.sin(hRad) }
+}
+
+export function oklabToOklch(
+  L: number,
+  a: number,
+  b: number,
+): { l: number; c: number; h: number } {
+  const C = Math.sqrt(a * a + b * b)
+  let H = (Math.atan2(b, a) * 180) / Math.PI
+  if (H < 0) H += 360
+  return { l: L, c: C, h: H }
 }
