@@ -46,13 +46,14 @@ export type PolarSpace = Extract<InterpolationSpace, "oklch" | "hsl" | "hwb">
  * @example
  * type T = GradientTypeOf<"linear-gradient(red, blue)">  // "linear"
  */
-export type GradientTypeOf<S extends string> = S extends `linear-gradient(${string}`
-  ? "linear"
-  : S extends `radial-gradient(${string}`
-    ? "radial"
-    : S extends `conic-gradient(${string}`
-      ? "conic"
-      : never
+export type GradientTypeOf<S extends string> =
+  S extends `linear-gradient(${string}`
+    ? "linear"
+    : S extends `radial-gradient(${string}`
+      ? "radial"
+      : S extends `conic-gradient(${string}`
+        ? "conic"
+        : never
 
 /**
  * Extract interpolation space from a literal, if declared.
@@ -67,5 +68,18 @@ export type InterpolationOf<S extends string> =
     : never
 
 // =====================================================================
-// 4. INTERNAL STOP REPRESENTATION
+// 4. INTERNAL STOP REPRESENTATION (exported for advanced use)
 // =====================================================================
+
+import type { ColorString } from "@/components/ui/color-picker"
+
+/**
+ * A single color stop in the editor's internal representation.
+ * Reuses ColorString from the color-picker registry item.
+ */
+export interface GradientStop {
+  /** Color in any of the 6 supported color modes. */
+  color: ColorString
+  /** Position 0..100. */
+  position: number
+}
