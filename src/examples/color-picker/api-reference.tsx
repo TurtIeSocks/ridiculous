@@ -135,7 +135,7 @@ function PropsTable({
 }) {
   return (
     <div className="rounded-lg border border-white/10 overflow-hidden">
-      <div className="grid grid-cols-[minmax(7rem,auto)_minmax(10rem,auto)_1fr] gap-x-4 px-4 py-2 bg-black/40 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
+      <div className="grid grid-cols-[minmax(7rem,auto)_minmax(12rem,auto)_1fr] gap-x-4 px-4 py-2 bg-black/40 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
         <div>Prop</div>
         <div>Type</div>
         <div>Description</div>
@@ -144,7 +144,7 @@ function PropsTable({
         {rows.map((r) => (
           <div
             key={r.name}
-            className="grid grid-cols-[minmax(7rem,auto)_minmax(10rem,auto)_1fr] gap-x-4 px-4 py-3 items-baseline text-sm"
+            className="grid grid-cols-[minmax(7rem,auto)_minmax(12rem,auto)_1fr] gap-x-4 px-4 py-3 items-baseline text-sm"
           >
             <code className="font-mono text-foreground">{r.name}</code>
             <code className="font-mono text-xs text-cyan-glow break-all">

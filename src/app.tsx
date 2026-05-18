@@ -8,7 +8,7 @@ import { TierStrict } from "./examples/color-picker/tier-strict"
 
 export function App() {
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden px-12">
       <div
         aria-hidden="true"
         className="bg-mesh pointer-events-none fixed inset-0 -z-10"
@@ -48,14 +48,14 @@ export function App() {
             </a>
             <a
               href="#install"
-              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-violet-glow to-pink-glow px-4 py-2 text-sm font-semibold text-background shadow-[0_4px_24px_oklch(0.5_0.2_300_/_0.35)] transition hover:brightness-110"
+              className="inline-flex items-center gap-2 rounded-full bg-linear-to-br from-violet-glow to-pink-glow px-4 py-2 text-sm font-semibold text-background shadow-[0_4px_24px_oklch(0.5_0.2_300/0.35)] transition hover:brightness-110"
             >
               Install
             </a>
           </div>
         </div>
         <div className="container mx-auto max-w-6xl px-6">
-          <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+          <div className="h-px bg-linear-to-r from-transparent via-white/15 to-transparent" />
         </div>
       </header>
 
