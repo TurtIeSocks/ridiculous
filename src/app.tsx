@@ -1,3 +1,4 @@
+import { ApiReference } from "./examples/color-picker/api-reference"
 import { BasicUsage } from "./examples/color-picker/basic-usage"
 import { ModeLocked } from "./examples/color-picker/mode-locked"
 import { Native } from "./examples/color-picker/native"
@@ -81,6 +82,16 @@ export function App() {
             <TierCasual />
             <TierIntellisense />
             <TierStrict />
+          </div>
+
+          <SectionHeader
+            className="mt-32"
+            eyebrow="api"
+            title="API"
+            description="Public surface — component props, runtime helpers, and the type exports. Strict validator internals are intentionally not expanded here; they read better in the source."
+          />
+          <div className="mt-8">
+            <ApiReference />
           </div>
 
           <SectionHeader
