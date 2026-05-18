@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import type { ColorString } from "@/components/ui/color-picker"
 import { parseColor } from "@/components/ui/color-picker/color-picker"
 import { cn } from "@/lib/utils"
@@ -173,6 +174,7 @@ export function formatStop(stop: GradientStop): string {
 
 const INTERPOLATION_SPACES = ["srgb", "oklch", "oklab", "hsl", "hwb"] as const
 const POLAR_SPACES: readonly PolarSpace[] = ["oklch", "hsl", "hwb"]
+const GRADIENT_TYPES: readonly GradientType[] = ["linear", "radial", "conic"]
 
 interface Interpolation {
   space: InterpolationSpace
@@ -705,6 +707,38 @@ export function ConicControls({
         y={position.y}
         onChange={(pos) => onChange({ fromAngle, position: pos })}
       />
+    </div>
+  )
+}
+
+export function TypeSwitcher({
+  type,
+  onChange,
+}: {
+  type: GradientType
+  onChange: (next: GradientType) => void
+}) {
+  return (
+    <div
+      role="tablist"
+      aria-label="Gradient type"
+      className="flex gap-1"
+      data-slot="gradient-editor-types"
+    >
+      {GRADIENT_TYPES.map((t) => (
+        <Button
+          key={t}
+          type="button"
+          role="tab"
+          aria-selected={t === type}
+          size="sm"
+          variant={t === type ? "secondary" : "ghost"}
+          onClick={() => onChange(t)}
+          className="h-7 px-2 font-mono text-xs"
+        >
+          {t}
+        </Button>
+      ))}
     </div>
   )
 }
