@@ -65,3 +65,37 @@ describe("linearToSrgb / srgbToLinear", () => {
     expect(srgbToLinear(0.04045)).toBeCloseTo(0.0031308, 6)
   })
 })
+
+import {
+  hslToSrgb,
+  srgbToHsl,
+} from "@/components/ui/color-picker/color-picker"
+
+describe("hslToSrgb / srgbToHsl", () => {
+  it("round-trips pure red", () => {
+    const rgb = hslToSrgb(0, 1, 0.5)
+    expect(rgb.r).toBeCloseTo(1, 6)
+    expect(rgb.g).toBeCloseTo(0, 6)
+    expect(rgb.b).toBeCloseTo(0, 6)
+    const hsl = srgbToHsl(rgb.r, rgb.g, rgb.b)
+    expect(hsl.h).toBeCloseTo(0, 4)
+    expect(hsl.s).toBeCloseTo(1, 4)
+    expect(hsl.l).toBeCloseTo(0.5, 4)
+  })
+  it("handles grayscale (saturation = 0)", () => {
+    const rgb = hslToSrgb(0, 0, 0.5)
+    expect(rgb.r).toBeCloseTo(0.5, 6)
+    expect(rgb.g).toBeCloseTo(0.5, 6)
+    expect(rgb.b).toBeCloseTo(0.5, 6)
+    const hsl = srgbToHsl(0.5, 0.5, 0.5)
+    expect(hsl.h).toBe(0)
+    expect(hsl.s).toBe(0)
+    expect(hsl.l).toBe(0.5)
+  })
+  it("wraps hue 360 to 0", () => {
+    const rgb = hslToSrgb(360, 1, 0.5)
+    expect(rgb.r).toBeCloseTo(1, 6)
+    expect(rgb.g).toBeCloseTo(0, 6)
+    expect(rgb.b).toBeCloseTo(0, 6)
+  })
+})

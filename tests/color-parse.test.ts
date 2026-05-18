@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
   parseHex,
+  parseHsl,
   parseRgb,
 } from "@/components/ui/color-picker/color-picker"
 
@@ -67,5 +68,35 @@ describe("parseRgb", () => {
   it("returns null for invalid", () => {
     expect(parseRgb("rgb()")).toBeNull()
     expect(parseRgb("not-rgb")).toBeNull()
+  })
+})
+
+describe("parseHsl", () => {
+  it("parses space-separated", () => {
+    expect(parseHsl("hsl(0 100% 50%)")).toEqual({
+      h: 0,
+      s: 1,
+      l: 0.5,
+      a: 1,
+    })
+  })
+  it("parses comma-separated", () => {
+    expect(parseHsl("hsl(120, 100%, 50%)")).toEqual({
+      h: 120,
+      s: 1,
+      l: 0.5,
+      a: 1,
+    })
+  })
+  it("parses alpha", () => {
+    expect(parseHsl("hsl(240 50% 50% / 0.5)")).toEqual({
+      h: 240,
+      s: 0.5,
+      l: 0.5,
+      a: 0.5,
+    })
+  })
+  it("returns null for invalid", () => {
+    expect(parseHsl("hsl(garbage)")).toBeNull()
   })
 })
