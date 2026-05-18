@@ -1,0 +1,32 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "ridiculous",
+  "homepage": "https://turtiesocks.github.io/ridiculous",
+  "items": [
+    {
+      "name": "color-picker",
+      "type": "registry:ui",
+      "title": "Color Picker",
+      "description": "Ridiculously typed color picker with oklch L×C pad, hue/alpha strips, and 6-mode round-trip (oklch, oklab, hex, rgb, hsl, hwb).",
+      "registryDependencies": ["button", "popover"],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/color-picker/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/index.ts"
+        },
+        {
+          "path": "src/components/ui/color-picker/color-picker.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/color-picker.tsx"
+        },
+        {
+          "path": "src/components/ui/color-picker/color-picker.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/color-picker.types.ts"
+        }
+      ]
+    }
+  ]
+}
