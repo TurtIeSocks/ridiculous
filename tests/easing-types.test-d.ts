@@ -1,11 +1,14 @@
 import { expectTypeOf, test } from "vitest"
 import type {
+  BasisOfString,
   CubicBezierString,
   EasingBasis,
   EasingKeyword,
   EasingLiteral,
+  EasingState,
   EasingString,
   EasingStringMap,
+  FunctionOf,
   LinearString,
   StepPosition,
   StepsString,
@@ -107,4 +110,45 @@ test("easing() helper validates at call site", () => {
 
   // @ts-expect-error — not a known easing
   easing("garbage")
+})
+
+test("FunctionOf resolves to function family", () => {
+  expectTypeOf<FunctionOf<"cubic-bezier(0,0,1,1)">>().toEqualTypeOf<"bezier">()
+  expectTypeOf<FunctionOf<"steps(4, jump-end)">>().toEqualTypeOf<"steps">()
+  expectTypeOf<FunctionOf<"linear(0, 1)">>().toEqualTypeOf<"linear">()
+  expectTypeOf<FunctionOf<"ease-in">>().toEqualTypeOf<"bezier">()
+  expectTypeOf<FunctionOf<"step-start">>().toEqualTypeOf<"steps">()
+  expectTypeOf<FunctionOf<"garbage">>().toBeNever()
+})
+
+test("BasisOfString returns ambiguous union for linear()", () => {
+  expectTypeOf<BasisOfString<"linear(0, 0.5, 1)">>().toEqualTypeOf<
+    "spring" | "bounce" | "wiggle"
+  >()
+  expectTypeOf<BasisOfString<"cubic-bezier(0.5, 0, 0.5, 1)">>().toEqualTypeOf<"bezier">()
+  expectTypeOf<BasisOfString<"steps(3)">>().toEqualTypeOf<"steps">()
+})
+
+test("EasingState discriminates by basis", () => {
+  const bezier: EasingState = {
+    basis: "bezier",
+    x1: 0.42,
+    y1: 0,
+    x2: 0.58,
+    y2: 1,
+    extraTop: 0.25,
+    extraBottom: 0.25,
+  }
+  const spring: EasingState = {
+    basis: "spring",
+    stiffness: 100,
+    damping: 10,
+    mass: 1,
+  }
+  // Use EasingState["basis"] — accessing .basis on a narrowed discriminated-union
+  // variable yields the narrowed literal, not the full union.
+  expectTypeOf<EasingState["basis"]>().toEqualTypeOf<"bezier" | "spring" | "bounce" | "wiggle" | "steps">()
+  // Verify the variables are valid EasingState members
+  expectTypeOf(bezier).toMatchTypeOf<EasingState>()
+  expectTypeOf(spring).toMatchTypeOf<EasingState>()
 })

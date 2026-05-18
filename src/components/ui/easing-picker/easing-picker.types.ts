@@ -190,9 +190,58 @@ export interface EasingStringMap {
 export type EasingBasis = keyof EasingStringMap
 
 // =====================================================================
-// 4. UTILITY TYPES (Phase 2)
+// 4. UTILITY TYPES — operate on easing literals at the type level.
 // =====================================================================
 
+/**
+ * Extract CSS function type from a literal at the type level.
+ *
+ * @example
+ * type T1 = FunctionOf<"cubic-bezier(0,0,1,1)">  // "bezier"
+ * type T2 = FunctionOf<"steps(3)">                // "steps"
+ * type T3 = FunctionOf<"ease-in">                 // "bezier"
+ * type T4 = FunctionOf<"step-start">              // "steps"
+ */
+export type FunctionOf<S extends string> = S extends `cubic-bezier(${string}`
+  ? "bezier"
+  : S extends `steps(${string}`
+    ? "steps"
+    : S extends `linear(${string}`
+      ? "linear"
+      : S extends "step-start" | "step-end"
+        ? "steps"
+        : S extends EasingKeyword
+          ? "bezier"
+          : never
+
+/**
+ * Extract basis from a literal. Note: `linear()` output is ambiguous —
+ * baking erases the physics type, so spring/bounce/wiggle all collapse.
+ */
+export type BasisOfString<S extends string> = S extends LinearString
+  ? "spring" | "bounce" | "wiggle"
+  : S extends CubicBezierString | EasingKeyword
+    ? "bezier"
+    : S extends StepsString
+      ? "steps"
+      : never
+
 // =====================================================================
-// 5. INTERNAL STATE (Phase 2)
+// 5. INTERNAL STATE — discriminated union, source of truth in the editor.
+//    Exported for advanced use cases (custom serialization, dehydration).
 // =====================================================================
+
+export type EasingState =
+  | {
+      basis: "bezier"
+      x1: number
+      y1: number
+      x2: number
+      y2: number
+      extraTop: number
+      extraBottom: number
+    }
+  | { basis: "spring"; stiffness: number; damping: number; mass: number }
+  | { basis: "bounce"; bounces: number; stiffness: number }
+  | { basis: "wiggle"; wiggles: number; damping: number }
+  | { basis: "steps"; n: number; position: StepPosition }
