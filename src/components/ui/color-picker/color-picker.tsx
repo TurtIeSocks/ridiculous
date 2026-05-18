@@ -78,24 +78,29 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
       ? formatHex(parsedFromValue.oklch, false)
       : "#000000"
     return (
-      <input
-        type="color"
-        value={hex}
-        onChange={(event) => {
-          const next = parseHex(event.target.value)
-          if (!next) return
-          const oklch = srgbToOklch(next.r, next.g, next.b, next.a)
-          const formatted = formatColor(oklch, modeProp ?? "hex")
-          lastEmittedRef.current = formatted
-          onChange(formatted as Parameters<typeof onChange>[0])
-        }}
+      <span
         className={cn(
-          "h-6 w-6 cursor-pointer rounded border bg-transparent",
+          "relative inline-block h-5 w-5 shrink-0 rounded border cursor-pointer outline-hidden focus-within:ring-2 focus-within:ring-ring",
           className,
         )}
-        aria-label={ariaLabel}
-        data-slot="color-picker-native"
-      />
+        style={{ backgroundColor: value }}
+      >
+        <input
+          type="color"
+          value={hex}
+          onChange={(event) => {
+            const next = parseHex(event.target.value)
+            if (!next) return
+            const oklch = srgbToOklch(next.r, next.g, next.b, next.a)
+            const formatted = formatColor(oklch, modeProp ?? "hex")
+            lastEmittedRef.current = formatted
+            onChange(formatted as Parameters<typeof onChange>[0])
+          }}
+          aria-label={ariaLabel}
+          data-slot="color-picker-native"
+          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        />
+      </span>
     )
   }
 
