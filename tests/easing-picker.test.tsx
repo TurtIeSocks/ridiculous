@@ -1,6 +1,13 @@
 import { render, screen, fireEvent } from "@testing-library/react"
 import { describe, expect, test, vi } from "vitest"
-import { BezierCanvas, PresetGallery, StepsControls } from "@/components/ui/easing-picker/easing-picker"
+import {
+  BezierCanvas,
+  BounceControls,
+  PresetGallery,
+  SpringControls,
+  StepsControls,
+  WiggleControls,
+} from "@/components/ui/easing-picker/easing-picker"
 
 describe("BezierCanvas", () => {
   test("renders SVG with the cubic-bezier path", () => {
@@ -43,6 +50,36 @@ describe("StepsControls", () => {
     render(<StepsControls value={{ n: 3, position: "end" }} onChange={onChange} />)
     fireEvent.change(screen.getByLabelText(/steps/i), { target: { value: "5" } })
     expect(onChange).toHaveBeenCalledWith({ n: 5, position: "end" })
+  })
+})
+
+describe("SpringControls", () => {
+  test("renders 3 sliders + emits onChange", () => {
+    const onChange = vi.fn()
+    render(
+      <SpringControls
+        value={{ stiffness: 100, damping: 10, mass: 1 }}
+        onChange={onChange}
+      />,
+    )
+    const sliders = screen.getAllByRole("slider")
+    expect(sliders).toHaveLength(3)
+    fireEvent.change(sliders[0], { target: { value: "200" } })
+    expect(onChange).toHaveBeenCalledWith({ stiffness: 200, damping: 10, mass: 1 })
+  })
+})
+
+describe("BounceControls", () => {
+  test("renders 2 sliders", () => {
+    render(<BounceControls value={{ bounces: 3, stiffness: 0.5 }} onChange={() => {}} />)
+    expect(screen.getAllByRole("slider")).toHaveLength(2)
+  })
+})
+
+describe("WiggleControls", () => {
+  test("renders 2 sliders", () => {
+    render(<WiggleControls value={{ wiggles: 4, damping: 5 }} onChange={() => {}} />)
+    expect(screen.getAllByRole("slider")).toHaveLength(2)
   })
 })
 

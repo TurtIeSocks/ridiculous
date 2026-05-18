@@ -375,6 +375,90 @@ export function StepsControls({
 }
 
 // ---------------------------------------------------------------------------
+// SpringControls / BounceControls / WiggleControls (Phase 7)
+// ---------------------------------------------------------------------------
+
+function Slider({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+}: {
+  label: string
+  value: number
+  min: number
+  max: number
+  step: number
+  onChange: (v: number) => void
+}) {
+  return (
+    <label className="flex flex-col gap-0.5 text-xs">
+      <span className="flex justify-between text-muted-foreground">
+        <span>{label}</span>
+        <span>{value.toFixed(2)}</span>
+      </span>
+      <input
+        type="range"
+        aria-label={label}
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+      />
+    </label>
+  )
+}
+
+export interface SpringControlsProps {
+  value: { stiffness: number; damping: number; mass: number }
+  onChange: (v: SpringControlsProps["value"]) => void
+  className?: string
+}
+
+export function SpringControls({ value, onChange, className }: SpringControlsProps) {
+  return (
+    <div className={cn("space-y-2", className)}>
+      <Slider label="Stiffness" value={value.stiffness} min={1} max={500} step={1} onChange={(v) => onChange({ ...value, stiffness: v })} />
+      <Slider label="Damping" value={value.damping} min={1} max={100} step={1} onChange={(v) => onChange({ ...value, damping: v })} />
+      <Slider label="Mass" value={value.mass} min={0.5} max={5} step={0.1} onChange={(v) => onChange({ ...value, mass: v })} />
+    </div>
+  )
+}
+
+export interface BounceControlsProps {
+  value: { bounces: number; stiffness: number }
+  onChange: (v: BounceControlsProps["value"]) => void
+  className?: string
+}
+
+export function BounceControls({ value, onChange, className }: BounceControlsProps) {
+  return (
+    <div className={cn("space-y-2", className)}>
+      <Slider label="Bounces" value={value.bounces} min={1} max={6} step={1} onChange={(v) => onChange({ ...value, bounces: v })} />
+      <Slider label="Stiffness" value={value.stiffness} min={0} max={1} step={0.01} onChange={(v) => onChange({ ...value, stiffness: v })} />
+    </div>
+  )
+}
+
+export interface WiggleControlsProps {
+  value: { wiggles: number; damping: number }
+  onChange: (v: WiggleControlsProps["value"]) => void
+  className?: string
+}
+
+export function WiggleControls({ value, onChange, className }: WiggleControlsProps) {
+  return (
+    <div className={cn("space-y-2", className)}>
+      <Slider label="Wiggles" value={value.wiggles} min={1} max={10} step={1} onChange={(v) => onChange({ ...value, wiggles: v })} />
+      <Slider label="Damping" value={value.damping} min={1} max={30} step={0.5} onChange={(v) => onChange({ ...value, damping: v })} />
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Parsing / formatting (Phase 2)
 // ---------------------------------------------------------------------------
 
