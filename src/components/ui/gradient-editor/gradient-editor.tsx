@@ -178,6 +178,19 @@ export function GradientEditor<TType extends GradientType | undefined>({
               setSelectedStopIndex(stops.indexOf(newStop))
               emit({ ...internal, stops })
             }}
+            onDeleteStop={(i) => {
+              if (internal.stops.length <= 2) return
+              const stops = internal.stops.filter((_, idx) => idx !== i)
+              // Clamp selection to remaining range; prefer the previous
+              // sibling so the detail row tracks the deleted stop's neighbor.
+              setSelectedStopIndex(
+                Math.max(
+                  0,
+                  Math.min(selectedStopIndex, stops.length - 1, i - 1),
+                ),
+              )
+              emit({ ...internal, stops })
+            }}
             maxStops={maxStops}
           />
           <StopDetailRow
@@ -990,6 +1003,7 @@ function GradientPreview({
   onSelectStop,
   onMoveStop,
   onAddStop,
+  onDeleteStop,
   maxStops,
 }: {
   state: InternalState
@@ -997,6 +1011,7 @@ function GradientPreview({
   onSelectStop: (i: number) => void
   onMoveStop: (i: number, position: number) => void
   onAddStop: (position: number) => void
+  onDeleteStop: (i: number) => void
   maxStops: number
 }) {
   // Always render as horizontal linear during editing so the 1D stop track makes sense.
@@ -1030,6 +1045,9 @@ function GradientPreview({
             type="button"
             aria-label={`Stop ${i + 1} at ${Math.round(stop.position)}%`}
             onClick={() => onSelectStop(i)}
+            onDoubleClick={() => {
+              if (state.stops.length > 2) onDeleteStop(i)
+            }}
             onPointerDown={(event) => {
               event.stopPropagation()
               event.currentTarget.setPointerCapture(event.pointerId)
@@ -1050,8 +1068,10 @@ function GradientPreview({
               }
             }}
             className={cn(
-              "absolute bottom-1 h-4 w-4 -translate-x-1/2 cursor-grab rounded-sm border-2 border-white shadow ring-1 ring-black/40 transition",
-              i === selectedIndex && "ring-2 ring-primary scale-110",
+              "absolute inset-y-0 -translate-x-1/2 cursor-grab rounded-sm border border-black/40 shadow-[0_0_0_1px_white] transition",
+              i === selectedIndex
+                ? "w-1.5 ring-2 ring-primary z-10"
+                : "w-1 hover:w-1.5",
             )}
             style={{
               left: `${stop.position}%`,
