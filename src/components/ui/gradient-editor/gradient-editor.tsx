@@ -359,6 +359,7 @@ const POLAR_SPACES: readonly PolarSpace[] = ["oklch", "hsl", "hwb"]
 const GRADIENT_TYPES: readonly GradientType[] = ["linear", "radial", "conic"]
 
 const toDeg = (n: number) => `${Math.round(n)}deg`
+const toPct = (n: number) => `${Math.round(n)}%`
 const fromUnitString = (s: string) => {
   const n = Number.parseFloat(s)
   return Number.isNaN(n) ? 0 : n
@@ -806,31 +807,27 @@ function PositionPicker({
       <div className="flex flex-col gap-1">
         <label className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
           x:
-          <input
-            type="number"
+          <UnitInput
+            unit="%"
+            value={toPct(x)}
+            onChange={(v) => onChange({ x: fromUnitString(v), y })}
             min={0}
             max={100}
-            value={Math.round(x)}
-            onChange={(e) =>
-              onChange({ x: Number.parseInt(e.target.value, 10) || 0, y })
-            }
-            className="h-6 w-12 rounded border bg-background px-1 font-mono text-xs"
+            aria-label="Position x"
+            className="h-6 w-12"
           />
-          %
         </label>
         <label className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
           y:
-          <input
-            type="number"
+          <UnitInput
+            unit="%"
+            value={toPct(y)}
+            onChange={(v) => onChange({ x, y: fromUnitString(v) })}
             min={0}
             max={100}
-            value={Math.round(y)}
-            onChange={(e) =>
-              onChange({ x, y: Number.parseInt(e.target.value, 10) || 0 })
-            }
-            className="h-6 w-12 rounded border bg-background px-1 font-mono text-xs"
+            aria-label="Position y"
+            className="h-6 w-12"
           />
-          %
         </label>
       </div>
     </div>
