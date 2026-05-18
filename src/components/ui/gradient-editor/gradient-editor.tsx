@@ -1,13 +1,33 @@
 "use client"
 
+import type { ColorString } from "@/components/ui/color-picker"
 import { parseColor } from "@/components/ui/color-picker/color-picker"
 import type {
-  ColorString,
   GradientStop,
+  GradientType,
   InterpolationHueMethod,
   InterpolationSpace,
   PolarSpace,
 } from "./gradient-editor.types"
+
+export interface InternalState {
+  type: GradientType
+  stops: GradientStop[]
+  /** Linear only. Degrees, 0 = to top, 90 = to right, 180 = to bottom (CSS default), 270 = to left. */
+  angle: number
+  /** Radial only. */
+  shape: "circle" | "ellipse"
+  /** Radial only. */
+  size: "closest-side" | "closest-corner" | "farthest-side" | "farthest-corner"
+  /** Radial + conic. Percentages 0..100. */
+  position: { x: number; y: number }
+  /** Conic only. Degrees. */
+  fromAngle: number
+  interpolation: {
+    space: InterpolationSpace
+    hueMethod?: InterpolationHueMethod
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Component (top of file)
@@ -137,6 +157,154 @@ export function formatInterpolation(interp: Interpolation): string {
     return `in ${interp.space} ${interp.hueMethod} hue, `
   }
   return `in ${interp.space}, `
+}
+
+const SIDE_TO_ANGLE: Record<string, number> = {
+  "to top": 0,
+  "to top right": 45,
+  "to right": 90,
+  "to bottom right": 135,
+  "to bottom": 180,
+  "to bottom left": 225,
+  "to left": 270,
+  "to top left": 315,
+}
+
+const RADIAL_SHAPES = ["circle", "ellipse"] as const
+const RADIAL_SIZES = [
+  "closest-side",
+  "closest-corner",
+  "farthest-side",
+  "farthest-corner",
+] as const
+
+/**
+ * Parse a CSS gradient string into the editor's internal state.
+ * Returns null on parse failure or when the gradient has fewer than 2 stops.
+ */
+export function parseGradient(value: string): InternalState | null {
+  const trimmed = value.trim()
+  const prefixMatch = trimmed.match(/^(linear|radial|conic)-gradient\((.*)\)$/s)
+  if (!prefixMatch) return null
+  const type = prefixMatch[1] as GradientType
+  const body = prefixMatch[2]
+
+  const segments = splitTopLevelCommas(body)
+  if (segments.length === 0) return null
+
+  // Try to extract interpolation from first segment.
+  let interpolation: {
+    space: InterpolationSpace
+    hueMethod?: InterpolationHueMethod
+  } = {
+    space: "srgb",
+  }
+  let preludeAndStops = segments
+  const interpFromFirst = parseInterpolation(segments[0])
+  if (interpFromFirst) {
+    interpolation = interpFromFirst
+    preludeAndStops = segments.slice(1)
+  }
+
+  // Determine if the next segment is a prelude (angle/shape/from) or a stop.
+  let preludeIndex = 0
+  const first = preludeAndStops[0] ?? ""
+  const looksLikePrelude =
+    /^(\d+(\.\d+)?deg|to )/.test(first) || // linear angle
+    /^(circle|ellipse|closest|farthest)/.test(first) || // radial shape/size
+    first.startsWith("at ") || // radial position alone
+    first.startsWith("from ") // conic
+
+  // Type-specific prelude extraction
+  let angle = 180 // linear default = to bottom
+  let shape: InternalState["shape"] = "ellipse"
+  let size: InternalState["size"] = "farthest-corner"
+  let position = { x: 50, y: 50 }
+  let fromAngle = 0
+
+  if (looksLikePrelude && type === "linear") {
+    const prelude = preludeAndStops[0]
+    if (SIDE_TO_ANGLE[prelude] != null) {
+      angle = SIDE_TO_ANGLE[prelude]
+    } else {
+      const m = prelude.match(/^(\d+(?:\.\d+)?)deg$/)
+      if (m) angle = parseFloat(m[1])
+      else return null
+    }
+    preludeIndex = 1
+  } else if (looksLikePrelude && type === "radial") {
+    const prelude = preludeAndStops[0]
+    // Tokens: [shape] [size] [at <pos>]
+    const tokens = prelude.split(/\s+/)
+    let i = 0
+    if (RADIAL_SHAPES.includes(tokens[i] as (typeof RADIAL_SHAPES)[number])) {
+      shape = tokens[i] as InternalState["shape"]
+      i++
+    }
+    if (RADIAL_SIZES.includes(tokens[i] as (typeof RADIAL_SIZES)[number])) {
+      size = tokens[i] as InternalState["size"]
+      i++
+    }
+    if (tokens[i] === "at") {
+      i++
+      const x = parsePercent(tokens[i++])
+      const y = parsePercent(tokens[i++])
+      if (x == null || y == null) return null
+      position = { x, y }
+    }
+    preludeIndex = 1
+  } else if (looksLikePrelude && type === "conic") {
+    const prelude = preludeAndStops[0]
+    // Tokens: [from <angle>] [at <pos>]
+    const tokens = prelude.split(/\s+/)
+    let i = 0
+    if (tokens[i] === "from") {
+      i++
+      const m = tokens[i++].match(/^(-?\d+(?:\.\d+)?)deg$/)
+      if (!m) return null
+      fromAngle = parseFloat(m[1])
+    }
+    if (tokens[i] === "at") {
+      i++
+      const x = parsePercent(tokens[i++])
+      const y = parsePercent(tokens[i++])
+      if (x == null || y == null) return null
+      position = { x, y }
+    }
+    preludeIndex = 1
+  }
+
+  // Remaining segments are stops.
+  const stopSegments = preludeAndStops.slice(preludeIndex)
+  if (stopSegments.length < 2) return null
+
+  const rawStops = stopSegments.map(parseStop)
+  if (rawStops.some((s) => s == null)) return null
+
+  // Auto-distribute positions when null.
+  const count = rawStops.length
+  const stops: GradientStop[] = rawStops.map((raw, i) => ({
+    color: raw!.color,
+    position: raw!.position != null ? raw!.position : (i / (count - 1)) * 100,
+  }))
+
+  return {
+    type,
+    stops,
+    angle,
+    shape,
+    size,
+    position,
+    fromAngle,
+    interpolation,
+  }
+}
+
+function parsePercent(input: string | undefined): number | null {
+  if (!input) return null
+  if (!input.endsWith("%")) return null
+  const n = parseFloat(input.slice(0, -1))
+  return Number.isNaN(n) ? null : n
 }
 
 // ---------------------------------------------------------------------------
