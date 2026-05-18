@@ -244,3 +244,70 @@ describe("UnitInput keyboard", () => {
     expect(onChange).toHaveBeenCalledWith("45.1deg")
   })
 })
+
+describe("UnitInput defensive behavior", () => {
+  it("ignores keystrokes when disabled", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        disabled
+        aria-label="Angle"
+      />,
+    )
+    const input = container.querySelector("input") as HTMLInputElement
+    fireEvent.keyDown(input, { key: "ArrowUp" })
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it("displays 0 and warns once for an unparseable value prop", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
+    const { container } = render(
+      <UnitInput
+        value="abcdef"
+        unit="deg"
+        onChange={() => {}}
+        aria-label="Angle"
+      />,
+    )
+    const input = container.querySelector("input") as HTMLInputElement
+    expect(input.value).toBe("0")
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn.mock.calls[0][0]).toMatch(/UnitInput.*could not parse/i)
+    warn.mockRestore()
+  })
+
+  it("renders custom suffix node when provided", () => {
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={() => {}}
+        suffix={<span>°</span>}
+        aria-label="Angle"
+      />,
+    )
+    const suffix = container.querySelector(
+      '[data-slot="unit-input-suffix"]',
+    )
+    expect(suffix?.textContent).toBe("°")
+  })
+
+  it("renders prefix slot when provided", () => {
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={() => {}}
+        prefix={<span data-testid="dial">dial</span>}
+        aria-label="Angle"
+      />,
+    )
+    expect(
+      container.querySelector('[data-slot="unit-input-prefix"]'),
+    ).toBeTruthy()
+    expect(container.querySelector('[data-testid="dial"]')).toBeTruthy()
+  })
+})

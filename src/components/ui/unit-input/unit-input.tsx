@@ -30,10 +30,14 @@ export interface UnitInputProps<
   className?: string
 }
 
-function parseNumeric(value: string, unit: string): number {
+function parseNumericResult(
+  value: string,
+  unit: string,
+): { value: number; ok: boolean } {
   const stripped = value.endsWith(unit) ? value.slice(0, -unit.length) : value
   const n = Number.parseFloat(stripped)
-  return Number.isNaN(n) ? 0 : n
+  if (Number.isNaN(n)) return { value: 0, ok: false }
+  return { value: n, ok: true }
 }
 
 function clamp(n: number, min: number | undefined, max: number | undefined) {
@@ -57,7 +61,19 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
   "aria-label": ariaLabel,
 }: UnitInputProps<TUnit>) {
   const unitStr = String(unit)
-  const parsedFromValue = parseNumeric(String(value), unitStr)
+  const warnedRef = React.useRef(false)
+  const { value: parsedFromValue, ok: parseOk } = parseNumericResult(
+    String(value),
+    unitStr,
+  )
+  React.useEffect(() => {
+    if (!parseOk && !warnedRef.current) {
+      warnedRef.current = true
+      console.warn(
+        `[UnitInput] could not parse value "${String(value)}" for unit "${unitStr}". Falling back to 0.`,
+      )
+    }
+  }, [parseOk, value, unitStr])
   const [rawDraft, setRawDraft] = React.useState<string | null>(null)
   const displayed = rawDraft ?? parsedFromValue.toFixed(precision)
 
