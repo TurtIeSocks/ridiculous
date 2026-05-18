@@ -1,3 +1,5 @@
+export type { UnitInputProps } from "./unit-input"
+export { UnitInput } from "./unit-input"
 export {
   deg,
   em,
