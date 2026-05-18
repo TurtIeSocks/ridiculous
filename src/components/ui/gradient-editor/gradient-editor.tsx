@@ -10,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { UnitInput } from "@/components/ui/unit-input"
 import { cn } from "@/lib/utils"
 import type {
   ConicGradientString,
@@ -356,6 +357,12 @@ export function formatStop(stop: GradientStop): string {
 const INTERPOLATION_SPACES = ["srgb", "oklch", "oklab", "hsl", "hwb"] as const
 const POLAR_SPACES: readonly PolarSpace[] = ["oklch", "hsl", "hwb"]
 const GRADIENT_TYPES: readonly GradientType[] = ["linear", "radial", "conic"]
+
+const toDeg = (n: number) => `${Math.round(n)}deg`
+const fromUnitString = (s: string) => {
+  const n = Number.parseFloat(s)
+  return Number.isNaN(n) ? 0 : n
+}
 
 interface Interpolation {
   space: InterpolationSpace
@@ -743,16 +750,15 @@ function LinearControls({
       data-slot="gradient-editor-linear-controls"
     >
       <AngleDial angle={angle} onChange={onChange} />
-      <input
-        type="number"
+      <UnitInput
+        unit="deg"
+        value={toDeg(angle)}
+        onChange={(v) => onChange(fromUnitString(v))}
         min={0}
         max={360}
-        value={Math.round(angle)}
-        onChange={(e) => onChange(Number.parseInt(e.target.value, 10) || 0)}
-        className="h-7 w-16 rounded border bg-background px-2 font-mono text-xs"
         aria-label="Angle in degrees"
+        className="h-7 w-16"
       />
-      <span className="font-mono text-xs text-muted-foreground">deg</span>
     </div>
   )
 }
