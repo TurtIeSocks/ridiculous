@@ -3,12 +3,14 @@ import type {
   CubicBezierString,
   EasingBasis,
   EasingKeyword,
+  EasingLiteral,
   EasingString,
   EasingStringMap,
   LinearString,
   StepPosition,
   StepsString,
 } from "@/components/ui/easing-picker/easing-picker.types"
+import { easing } from "@/components/ui/easing-picker/easing-picker.types"
 
 test("EasingKeyword enumerates the 7 CSS keywords", () => {
   expectTypeOf<EasingKeyword>().toEqualTypeOf<
@@ -62,4 +64,47 @@ test("EasingStringMap maps basis to output string types", () => {
   expectTypeOf<EasingStringMap["bezier"]>().toEqualTypeOf<CubicBezierString>()
   expectTypeOf<EasingStringMap["spring"]>().toEqualTypeOf<LinearString>()
   expectTypeOf<EasingStringMap["steps"]>().toEqualTypeOf<StepsString>()
+})
+
+test("EasingLiteral accepts CSS keywords", () => {
+  expectTypeOf<EasingLiteral<"ease">>().toEqualTypeOf<"ease">()
+  expectTypeOf<EasingLiteral<"ease-in-out">>().toEqualTypeOf<"ease-in-out">()
+})
+
+test("EasingLiteral accepts cubic-bezier with x ∈ [0,1]", () => {
+  expectTypeOf<
+    EasingLiteral<"cubic-bezier(0.42, 0, 0.58, 1)">
+  >().toEqualTypeOf<"cubic-bezier(0.42, 0, 0.58, 1)">()
+})
+
+test("EasingLiteral allows overshoot y (signed decimal)", () => {
+  expectTypeOf<
+    EasingLiteral<"cubic-bezier(0.5, -0.5, 0.5, 1.5)">
+  >().toEqualTypeOf<"cubic-bezier(0.5, -0.5, 0.5, 1.5)">()
+})
+
+test("EasingLiteral rejects cubic-bezier with x1 > 1", () => {
+  expectTypeOf<EasingLiteral<"cubic-bezier(2, 0, 0.5, 1)">>().toBeNever()
+})
+
+test("EasingLiteral accepts steps with and without position", () => {
+  expectTypeOf<EasingLiteral<"steps(3)">>().toEqualTypeOf<"steps(3)">()
+  expectTypeOf<EasingLiteral<"steps(4, jump-end)">>().toEqualTypeOf<
+    "steps(4, jump-end)"
+  >()
+})
+
+test("EasingLiteral rejects steps with non-positive n", () => {
+  expectTypeOf<EasingLiteral<"steps(0)">>().toBeNever()
+})
+
+test("easing() helper validates at call site", () => {
+  const a = easing("cubic-bezier(0.42, 0, 0.58, 1)")
+  expectTypeOf(a).toEqualTypeOf<"cubic-bezier(0.42, 0, 0.58, 1)">()
+
+  // @ts-expect-error — x1 > 1
+  easing("cubic-bezier(2, 0, 0.5, 1)")
+
+  // @ts-expect-error — not a known easing
+  easing("garbage")
 })
