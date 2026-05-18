@@ -31,6 +31,21 @@ describe("BezierCanvas", () => {
   })
 })
 
+describe("StepsControls", () => {
+  test("renders n input and position select", () => {
+    render(<StepsControls value={{ n: 3, position: "end" }} onChange={() => {}} />)
+    expect(screen.getByLabelText(/steps/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/position/i)).toBeInTheDocument()
+  })
+
+  test("emits onChange when n changes", () => {
+    const onChange = vi.fn()
+    render(<StepsControls value={{ n: 3, position: "end" }} onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText(/steps/i), { target: { value: "5" } })
+    expect(onChange).toHaveBeenCalledWith({ n: 5, position: "end" })
+  })
+})
+
 describe("PresetGallery", () => {
   test("renders 39 preset buttons", () => {
     render(<PresetGallery onChange={() => {}} />)
