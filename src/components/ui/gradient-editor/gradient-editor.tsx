@@ -982,24 +982,20 @@ function StopDetailRow({
         value={stop.color}
         onChange={(next) => onChange({ ...stop, color: next })}
       />
-      <input
-        type="number"
-        min={0}
-        max={100}
-        value={Math.round(stop.position)}
-        onChange={(e) =>
+      <UnitInput
+        unit="%"
+        value={toPct(stop.position)}
+        onChange={(v) =>
           onChange({
             ...stop,
-            position: Math.max(
-              0,
-              Math.min(100, Number.parseInt(e.target.value, 10) || 0),
-            ),
+            position: Math.max(0, Math.min(100, fromUnitString(v))),
           })
         }
-        className="h-7 w-16 rounded border bg-background px-2 font-mono text-xs"
+        min={0}
+        max={100}
         aria-label="Stop position"
+        className="h-7 w-16"
       />
-      <span className="font-mono text-xs text-muted-foreground">%</span>
       <button
         type="button"
         onClick={onDelete}
