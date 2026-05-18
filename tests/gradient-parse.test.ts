@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { splitTopLevelCommas } from "@/components/ui/gradient-editor/gradient-editor"
+import {
+  parseStop,
+  splitTopLevelCommas,
+} from "@/components/ui/gradient-editor/gradient-editor"
 
 describe("splitTopLevelCommas", () => {
   it("splits a flat list", () => {
@@ -25,5 +28,32 @@ describe("splitTopLevelCommas", () => {
   })
   it("handles empty input", () => {
     expect(splitTopLevelCommas("")).toEqual([])
+  })
+})
+
+describe("parseStop", () => {
+  it("parses a hex stop without position", () => {
+    expect(parseStop("#ff0000")).toEqual({ color: "#ff0000", position: null })
+  })
+  it("parses an rgb stop with position", () => {
+    expect(parseStop("rgb(255 0 0) 50%")).toEqual({
+      color: "rgb(255 0 0)",
+      position: 50,
+    })
+  })
+  it("parses an oklch stop with position", () => {
+    expect(parseStop("oklch(0.5 0.1 240) 25%")).toEqual({
+      color: "oklch(0.5 0.1 240)",
+      position: 25,
+    })
+  })
+  it("parses oklch with comma inside, treating last token as position", () => {
+    expect(parseStop("oklch(0.5 0.1 240 / 50%) 75%")).toEqual({
+      color: "oklch(0.5 0.1 240 / 50%)",
+      position: 75,
+    })
+  })
+  it("returns null for invalid stop", () => {
+    expect(parseStop("not-a-color 50%")).toBeNull()
   })
 })
