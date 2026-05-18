@@ -1,5 +1,6 @@
-import { expectTypeOf, test } from "vitest"
+import { expect, expectTypeOf, test } from "vitest"
 import type {
+  ColorLiteral,
   HexLiteral,
   HSLLiteral,
   HWBLiteral,
@@ -8,6 +9,7 @@ import type {
   RGBALiteral,
   RGBLiteral,
 } from "@/components/ui/color-picker/color-picker.types"
+import { color } from "@/components/ui/color-picker/color-picker.types"
 
 // Type-only smoke test: ensure the file imports cleanly.
 test("color-picker.types module imports", () => {
@@ -119,4 +121,34 @@ test("HWBLiteral accepts valid forms", () => {
 test("HWBLiteral rejects bad hue/percent", () => {
   expectTypeOf<HWBLiteral<"hwb(400 0% 0%)">>().toBeNever()
   expectTypeOf<HWBLiteral<"hwb(0 200% 0%)">>().toBeNever()
+})
+
+test("ColorLiteral accepts any valid color string", () => {
+  expectTypeOf<ColorLiteral<"#ff0000">>().toEqualTypeOf<"#ff0000">()
+  expectTypeOf<ColorLiteral<"rgb(255 0 0)">>().toEqualTypeOf<"rgb(255 0 0)">()
+  expectTypeOf<ColorLiteral<"hsl(0 100% 50%)">>().toEqualTypeOf<
+    "hsl(0 100% 50%)"
+  >()
+  expectTypeOf<ColorLiteral<"oklch(0.5 0.1 240)">>().toEqualTypeOf<
+    "oklch(0.5 0.1 240)"
+  >()
+  expectTypeOf<ColorLiteral<"oklab(0.5 0.1 -0.05)">>().toEqualTypeOf<
+    "oklab(0.5 0.1 -0.05)"
+  >()
+  expectTypeOf<ColorLiteral<"hwb(0 0% 0%)">>().toEqualTypeOf<"hwb(0 0% 0%)">()
+})
+
+test("color() accepts valid literals at runtime", () => {
+  expect(color("#ff0000")).toBe("#ff0000")
+  expect(color("rgb(255 0 0)")).toBe("rgb(255 0 0)")
+  expect(color("oklch(0.5 0.1 240)")).toBe("oklch(0.5 0.1 240)")
+})
+
+test("color() rejects invalid at type level", () => {
+  // @ts-expect-error 256 > 255
+  color("rgb(256 0 0)")
+  // @ts-expect-error wrong hex length
+  color("#ff")
+  // @ts-expect-error oklch L out of range
+  color("oklch(2 0.1 240)")
 })

@@ -353,3 +353,15 @@ export type HWBLiteral<S extends string> =
           S
         >
       : never
+
+export type ColorLiteral<S extends string> =
+  | HexLiteral<S>
+  | RGBLiteral<S>
+  | RGBALiteral<S>
+  | HSLLiteral<S>
+  | OKLCHLiteral<S>
+  | OklabLiteral<S>
+  | HWBLiteral<S>
+
+/** Validate a color literal at the call site. */
+export const color = <S extends string>(value: S & ColorLiteral<S>): S => value
