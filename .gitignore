@@ -138,11 +138,5 @@ dist
 # Generated shadcn registry output (built from registry.json)
 public/r/
 
-<<<<<<< HEAD
 .superpowers/
 .claude/worktrees
-=======
-
-# Visual companion brainstorm sessions
-.superpowers/
->>>>>>> dc0fe1d (Add UnitInput design spec)
