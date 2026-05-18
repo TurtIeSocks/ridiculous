@@ -1,7 +1,6 @@
 "use client"
 
-// TEMPORARY — replaced by import from ./color-picker.types in Task 23.
-type ColorMode = "oklch" | "oklab" | "hex" | "rgb" | "hsl" | "hwb"
+import type { ColorMode } from "./color-picker.types"
 
 // ---------------------------------------------------------------------------
 // Component (top of file — filled in Phase 5)

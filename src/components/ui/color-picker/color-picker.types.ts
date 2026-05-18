@@ -365,3 +365,50 @@ export type ColorLiteral<S extends string> =
 
 /** Validate a color literal at the call site. */
 export const color = <S extends string>(value: S & ColorLiteral<S>): S => value
+
+// =====================================================================
+// 3. SUGGESTION STRINGS — non-generic, for IntelliSense + onChange returns.
+// =====================================================================
+
+export type HexString = `#${string}`
+
+export type RgbString =
+  | `rgb(${number} ${number} ${number})`
+  | `rgb(${number} ${number} ${number} / ${number}%)`
+  | `rgb(${number}, ${number}, ${number})`
+  | `rgba(${number}, ${number}, ${number}, ${number})`
+
+export type HslString =
+  | `hsl(${number} ${number}% ${number}%)`
+  | `hsl(${number} ${number}% ${number}% / ${number}%)`
+
+export type OklchString =
+  | `oklch(${number} ${number} ${number})`
+  | `oklch(${number} ${number} ${number} / ${number}%)`
+
+export type OklabString =
+  | `oklab(${number} ${number} ${number})`
+  | `oklab(${number} ${number} ${number} / ${number}%)`
+
+export type HwbString =
+  | `hwb(${number} ${number}% ${number}%)`
+  | `hwb(${number} ${number}% ${number}% / ${number}%)`
+
+export type ColorString =
+  | HexString
+  | RgbString
+  | HslString
+  | OklchString
+  | OklabString
+  | HwbString
+
+export interface ColorStringMap {
+  hex: HexString
+  rgb: RgbString
+  hsl: HslString
+  oklch: OklchString
+  oklab: OklabString
+  hwb: HwbString
+}
+
+export type ColorMode = keyof ColorStringMap

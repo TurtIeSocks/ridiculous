@@ -126,15 +126,15 @@ test("HWBLiteral rejects bad hue/percent", () => {
 test("ColorLiteral accepts any valid color string", () => {
   expectTypeOf<ColorLiteral<"#ff0000">>().toEqualTypeOf<"#ff0000">()
   expectTypeOf<ColorLiteral<"rgb(255 0 0)">>().toEqualTypeOf<"rgb(255 0 0)">()
-  expectTypeOf<ColorLiteral<"hsl(0 100% 50%)">>().toEqualTypeOf<
-    "hsl(0 100% 50%)"
-  >()
-  expectTypeOf<ColorLiteral<"oklch(0.5 0.1 240)">>().toEqualTypeOf<
-    "oklch(0.5 0.1 240)"
-  >()
-  expectTypeOf<ColorLiteral<"oklab(0.5 0.1 -0.05)">>().toEqualTypeOf<
-    "oklab(0.5 0.1 -0.05)"
-  >()
+  expectTypeOf<
+    ColorLiteral<"hsl(0 100% 50%)">
+  >().toEqualTypeOf<"hsl(0 100% 50%)">()
+  expectTypeOf<
+    ColorLiteral<"oklch(0.5 0.1 240)">
+  >().toEqualTypeOf<"oklch(0.5 0.1 240)">()
+  expectTypeOf<
+    ColorLiteral<"oklab(0.5 0.1 -0.05)">
+  >().toEqualTypeOf<"oklab(0.5 0.1 -0.05)">()
   expectTypeOf<ColorLiteral<"hwb(0 0% 0%)">>().toEqualTypeOf<"hwb(0 0% 0%)">()
 })
 
