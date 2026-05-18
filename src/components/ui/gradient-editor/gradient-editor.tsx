@@ -166,7 +166,7 @@ export function GradientEditor<TType extends GradientType | undefined>({
               emit({ ...internal, stops })
             }}
             onAddStop={(position) => {
-              if (internal.stops.length >= maxStops) return
+              if (internal.stops.length >= maxStops) return -1
               // Pick interpolated color from neighbors; fallback to last stop's color.
               const newColor =
                 internal.stops[internal.stops.length - 1]?.color ?? "#000000"
@@ -175,8 +175,10 @@ export function GradientEditor<TType extends GradientType | undefined>({
                 (a, b) => a.position - b.position,
               )
               // Find by reference (handles duplicate positions correctly).
-              setSelectedStopIndex(stops.indexOf(newStop))
+              const newIndex = stops.indexOf(newStop)
+              setSelectedStopIndex(newIndex)
               emit({ ...internal, stops })
+              return newIndex
             }}
             onDeleteStop={(i) => {
               if (internal.stops.length <= 2) return
@@ -1010,7 +1012,8 @@ function GradientPreview({
   selectedIndex: number
   onSelectStop: (i: number) => void
   onMoveStop: (i: number, position: number) => void
-  onAddStop: (position: number) => void
+  /** Returns the new stop's sorted index, or -1 if not added. */
+  onAddStop: (position: number) => number
   onDeleteStop: (i: number) => void
   maxStops: number
 }) {
@@ -1020,23 +1023,69 @@ function GradientPreview({
     type: "linear",
     angle: 90,
   })
-  const handleTrackPointer = (event: React.PointerEvent<HTMLDivElement>) => {
+
+  // Track-level pointer drag: when user clicks empty area to add a stop,
+  // continue dragging the new stop within the same press.
+  const dragStateRef = useRef<{ stopIndex: number; pointerId: number } | null>(
+    null,
+  )
+  // Across-press drag detection — needed to distinguish click-add → quick
+  // click-drag (where browser fires dblclick at the end because both clicks
+  // land near each other) from true double-clicks. Either click in the pair
+  // having a drag suppresses the dblclick-delete.
+  const wasDraggedThisPressRef = useRef(false)
+  const previousPressWasDragRef = useRef(false)
+
+  const captureDragHistoryAtPointerDown = () => {
+    previousPressWasDragRef.current = wasDraggedThisPressRef.current
+    wasDraggedThisPressRef.current = false
+  }
+
+  const computePct = (clientX: number, rect: DOMRect) =>
+    Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100))
+
+  const handleTrackPointerDown = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
     if (event.target !== event.currentTarget) return
+    captureDragHistoryAtPointerDown()
     if (state.stops.length >= maxStops) return
     const rect = event.currentTarget.getBoundingClientRect()
-    const pct = Math.max(
-      0,
-      Math.min(100, ((event.clientX - rect.left) / rect.width) * 100),
-    )
-    onAddStop(Math.round(pct))
+    const pct = computePct(event.clientX, rect)
+    const newIndex = onAddStop(Math.round(pct))
+    if (newIndex < 0) return
+    event.currentTarget.setPointerCapture(event.pointerId)
+    dragStateRef.current = {
+      stopIndex: newIndex,
+      pointerId: event.pointerId,
+    }
   }
+
+  const handleTrackPointerMove = (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) => {
+    if (!dragStateRef.current) return
+    if (event.pointerId !== dragStateRef.current.pointerId) return
+    wasDraggedThisPressRef.current = true
+    const rect = event.currentTarget.getBoundingClientRect()
+    const pct = computePct(event.clientX, rect)
+    onMoveStop(dragStateRef.current.stopIndex, Math.round(pct))
+  }
+
+  const handleTrackPointerUp = () => {
+    dragStateRef.current = null
+  }
+
   return (
     <div className="flex flex-col gap-1" data-slot="gradient-editor-preview">
       <div
         className="relative h-20 w-full rounded border"
         style={{ background: previewBg }}
         data-slot="gradient-editor-track"
-        onPointerDown={handleTrackPointer}
+        onPointerDown={handleTrackPointerDown}
+        onPointerMove={handleTrackPointerMove}
+        onPointerUp={handleTrackPointerUp}
+        onPointerCancel={handleTrackPointerUp}
       >
         {state.stops.map((stop, i) => (
           <button
@@ -1046,24 +1095,28 @@ function GradientPreview({
             aria-label={`Stop ${i + 1} at ${Math.round(stop.position)}%`}
             onClick={() => onSelectStop(i)}
             onDoubleClick={() => {
+              if (
+                wasDraggedThisPressRef.current ||
+                previousPressWasDragRef.current
+              ) {
+                // User dragged during one of the two clicks; treat as a
+                // drag gesture, not a double-click. Don't delete.
+                return
+              }
               if (state.stops.length > 2) onDeleteStop(i)
             }}
             onPointerDown={(event) => {
               event.stopPropagation()
               event.currentTarget.setPointerCapture(event.pointerId)
+              captureDragHistoryAtPointerDown()
               onSelectStop(i)
             }}
             onPointerMove={(event) => {
               if (event.buttons) {
+                wasDraggedThisPressRef.current = true
                 const trackRect =
                   event.currentTarget.parentElement!.getBoundingClientRect()
-                const pct = Math.max(
-                  0,
-                  Math.min(
-                    100,
-                    ((event.clientX - trackRect.left) / trackRect.width) * 100,
-                  ),
-                )
+                const pct = computePct(event.clientX, trackRect)
                 onMoveStop(i, Math.round(pct))
               }
             }}
