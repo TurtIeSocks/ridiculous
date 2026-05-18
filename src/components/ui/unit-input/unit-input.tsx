@@ -29,9 +29,18 @@ function parseNumericResult(
   value: string,
   unit: string,
 ): { value: number; ok: boolean } {
+  // Reject when the value isn't an empty-string AND doesn't end with the
+  // declared unit suffix. parseFloat would otherwise silently accept e.g.
+  // "45px" for unit="deg" (parses leading digits, drops trailing chars).
+  if (value !== "" && unit !== "" && !value.endsWith(unit)) {
+    return { value: 0, ok: false }
+  }
   const stripped = value.endsWith(unit) ? value.slice(0, -unit.length) : value
   const n = Number.parseFloat(stripped)
   if (Number.isNaN(n)) return { value: 0, ok: false }
+  // Final guard: the stripped portion must be entirely numeric. parseFloat
+  // accepts trailing garbage; we don't.
+  if (!/^-?\d+(\.\d+)?$/.test(stripped)) return { value: 0, ok: false }
   return { value: n, ok: true }
 }
 
@@ -121,7 +130,23 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
     active: boolean
     anchor: number
     deltaPx: number
-  }>({ active: false, anchor: 0, deltaPx: 0 })
+    lastShift: boolean
+    lastAlt: boolean
+    appliedShift: boolean
+    appliedAlt: boolean
+    hasCommitted: boolean
+  }>({
+    active: false,
+    anchor: 0,
+    deltaPx: 0,
+    lastShift: false,
+    lastAlt: false,
+    appliedShift: false,
+    appliedAlt: false,
+    hasCommitted: false,
+  })
+
+  const rafPendingRef = React.useRef(false)
 
   // `commit` and the scrub-arithmetic closures over props are rebuilt every
   // render. Stash the latest scrub-step calculator in a ref so the window-
@@ -131,11 +156,39 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
   scrubMoveRef.current = (event: PointerEvent) => {
     if (!scrubRef.current.active) return
     scrubRef.current.deltaPx += event.movementX
-    const multiplier = event.shiftKey ? 10 : event.altKey ? 0.1 : 1
-    const next =
-      scrubRef.current.anchor +
-      scrubRef.current.deltaPx * props_step * dragSensitivity * multiplier
-    commit(String(next))
+    scrubRef.current.lastShift = event.shiftKey
+    scrubRef.current.lastAlt = event.altKey
+    if (rafPendingRef.current) return
+    rafPendingRef.current = true
+    requestAnimationFrame(() => {
+      rafPendingRef.current = false
+      if (!scrubRef.current.active) return
+      const prevShift = scrubRef.current.appliedShift
+      const prevAlt = scrubRef.current.appliedAlt
+      const newShift = scrubRef.current.lastShift
+      const newAlt = scrubRef.current.lastAlt
+      if (
+        scrubRef.current.hasCommitted &&
+        (prevShift !== newShift || prevAlt !== newAlt)
+      ) {
+        // Snap the anchor forward by the already-applied delta under the prior
+        // modifier, then zero deltaPx so the new modifier applies only to motion
+        // from this frame onwards. Prevents the retroactive-multiplier jump.
+        const prevMul = prevShift ? 10 : prevAlt ? 0.1 : 1
+        scrubRef.current.anchor =
+          scrubRef.current.anchor +
+          scrubRef.current.deltaPx * props_step * dragSensitivity * prevMul
+        scrubRef.current.deltaPx = 0
+      }
+      scrubRef.current.appliedShift = newShift
+      scrubRef.current.appliedAlt = newAlt
+      scrubRef.current.hasCommitted = true
+      const multiplier = newShift ? 10 : newAlt ? 0.1 : 1
+      const next =
+        scrubRef.current.anchor +
+        scrubRef.current.deltaPx * props_step * dragSensitivity * multiplier
+      commit(String(next))
+    })
   }
 
   React.useEffect(() => {
@@ -160,6 +213,11 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
       active: true,
       anchor: parsedFromValue,
       deltaPx: 0,
+      lastShift: false,
+      lastAlt: false,
+      appliedShift: false,
+      appliedAlt: false,
+      hasCommitted: false,
     }
     event.currentTarget.requestPointerLock()
   }
@@ -168,7 +226,10 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
     suffix === undefined ? (
       <span
         data-slot="unit-input-suffix"
-        className="select-none cursor-ew-resize bg-muted/50 px-2 flex items-center text-xs font-mono text-muted-foreground"
+        className={cn(
+          "select-none bg-muted/50 px-2 flex items-center text-xs font-mono text-muted-foreground",
+          disabled ? "cursor-not-allowed" : "cursor-ew-resize",
+        )}
         aria-hidden="true"
         onPointerDown={onSuffixPointerDown}
       >

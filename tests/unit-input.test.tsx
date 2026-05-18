@@ -145,6 +145,33 @@ describe("UnitInput commit lifecycle", () => {
     fireEvent.blur(input)
     expect(onChange).not.toHaveBeenCalled()
   })
+
+  it("preserves the user's draft when value prop changes mid-edit", () => {
+    const onChange = vi.fn()
+    const { container, rerender } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const input = container.querySelector("input") as HTMLInputElement
+    fireEvent.change(input, { target: { value: "60" } })
+    // Outside source updates the value while user is editing
+    rerender(
+      <UnitInput
+        value="30deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    expect(input.value).toBe("60")
+    // Draft survives until commit; blur commits 60, not 30.
+    fireEvent.blur(input)
+    expect(onChange).toHaveBeenCalledWith("60deg")
+  })
 })
 
 describe("UnitInput keyboard", () => {
@@ -326,7 +353,7 @@ describe("UnitInput pointer-lock scrub", () => {
     expect(Element.prototype.requestPointerLock).toHaveBeenCalled()
   })
 
-  it("commits with onChange while dragging (1px = 1 step)", () => {
+  it("commits with onChange while dragging (1px = 1 step)", async () => {
     const onChange = vi.fn()
     const { container } = render(
       <UnitInput
@@ -341,10 +368,11 @@ describe("UnitInput pointer-lock scrub", () => {
     ) as HTMLElement
     fireEvent.pointerDown(suffix, { pointerId: 1 })
     fireEvent.pointerMove(window, { movementX: 5 })
+    await new Promise((r) => requestAnimationFrame(() => r(null)))
     expect(onChange).toHaveBeenCalledWith("50deg")
   })
 
-  it("applies shift ×10 multiplier during scrub", () => {
+  it("applies shift ×10 multiplier during scrub", async () => {
     const onChange = vi.fn()
     const { container } = render(
       <UnitInput
@@ -359,6 +387,7 @@ describe("UnitInput pointer-lock scrub", () => {
     ) as HTMLElement
     fireEvent.pointerDown(suffix, { pointerId: 1 })
     fireEvent.pointerMove(window, { movementX: 2, shiftKey: true })
+    await new Promise((r) => requestAnimationFrame(() => r(null)))
     expect(onChange).toHaveBeenCalledWith("65deg")
   })
 
@@ -377,6 +406,27 @@ describe("UnitInput pointer-lock scrub", () => {
     fireEvent.pointerDown(suffix, { pointerId: 1 })
     fireEvent.pointerUp(window)
     expect(document.exitPointerLock).toHaveBeenCalled()
+  })
+
+  it("applies alt ÷10 multiplier during scrub", async () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45.0deg"
+        unit="deg"
+        precision={1}
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const suffix = container.querySelector(
+      '[data-slot="unit-input-suffix"]',
+    ) as HTMLElement
+    fireEvent.pointerDown(suffix, { pointerId: 1 })
+    fireEvent.pointerMove(window, { movementX: 5, altKey: true })
+    // 45.0 + (5 * 1 * 1 * 0.1) = 45.5
+    await new Promise((r) => requestAnimationFrame(() => r(null)))
+    expect(onChange).toHaveBeenCalledWith("45.5deg")
   })
 
   it("does not scrub when disabled", () => {
