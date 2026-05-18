@@ -1,7 +1,13 @@
 "use client"
 
 import { parseColor } from "@/components/ui/color-picker/color-picker"
-import type { ColorString, GradientStop } from "./gradient-editor.types"
+import type {
+  ColorString,
+  GradientStop,
+  InterpolationHueMethod,
+  InterpolationSpace,
+  PolarSpace,
+} from "./gradient-editor.types"
 
 // ---------------------------------------------------------------------------
 // Component (top of file)
@@ -88,6 +94,49 @@ export function parseStop(
 
 export function formatStop(stop: GradientStop): string {
   return `${stop.color} ${Math.round(stop.position)}%`
+}
+
+const INTERPOLATION_SPACES = ["srgb", "oklch", "oklab", "hsl", "hwb"] as const
+const POLAR_SPACES: readonly PolarSpace[] = ["oklch", "hsl", "hwb"]
+
+interface Interpolation {
+  space: InterpolationSpace
+  hueMethod?: InterpolationHueMethod
+}
+
+/**
+ * Parse a CSS interpolation clause like `in oklch longer hue`.
+ * Returns null if the prefix is missing or the space is unrecognized.
+ */
+export function parseInterpolation(input: string): Interpolation | null {
+  const trimmed = input.trim()
+  if (!trimmed.startsWith("in ")) return null
+  const body = trimmed.slice(3).trim()
+  // Possible forms: "<space>", "<space> longer hue", "<space> shorter hue"
+  const huePartMatch = body.match(/^(\S+)\s+(longer|shorter)\s+hue$/)
+  if (huePartMatch) {
+    const space = huePartMatch[1] as InterpolationSpace
+    if (!INTERPOLATION_SPACES.includes(space)) return null
+    return { space, hueMethod: huePartMatch[2] as InterpolationHueMethod }
+  }
+  const space = body as InterpolationSpace
+  if (!INTERPOLATION_SPACES.includes(space)) return null
+  return { space, hueMethod: undefined }
+}
+
+/**
+ * Format an interpolation as a clause for inclusion in a gradient string,
+ * including the trailing comma. Returns empty string when the space is `srgb`
+ * with no hue method (CSS default — keep output clean).
+ */
+export function formatInterpolation(interp: Interpolation): string {
+  // srgb is CSS default — omit unless hue method is set (which is N/A for cartesian).
+  if (interp.space === "srgb") return ""
+  const isPolar = POLAR_SPACES.includes(interp.space as PolarSpace)
+  if (isPolar && interp.hueMethod) {
+    return `in ${interp.space} ${interp.hueMethod} hue, `
+  }
+  return `in ${interp.space}, `
 }
 
 // ---------------------------------------------------------------------------

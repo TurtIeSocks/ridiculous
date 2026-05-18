@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  parseInterpolation,
   parseStop,
   splitTopLevelCommas,
 } from "@/components/ui/gradient-editor/gradient-editor"
@@ -55,5 +56,32 @@ describe("parseStop", () => {
   })
   it("returns null for invalid stop", () => {
     expect(parseStop("not-a-color 50%")).toBeNull()
+  })
+})
+
+describe("parseInterpolation", () => {
+  it("parses `in oklch`", () => {
+    expect(parseInterpolation("in oklch")).toEqual({
+      space: "oklch",
+      hueMethod: undefined,
+    })
+  })
+  it("parses `in oklch longer hue`", () => {
+    expect(parseInterpolation("in oklch longer hue")).toEqual({
+      space: "oklch",
+      hueMethod: "longer",
+    })
+  })
+  it("parses `in srgb` (cartesian, no hue method)", () => {
+    expect(parseInterpolation("in srgb")).toEqual({
+      space: "srgb",
+      hueMethod: undefined,
+    })
+  })
+  it("returns null when prefix is missing", () => {
+    expect(parseInterpolation("oklch")).toBeNull()
+  })
+  it("returns null for unknown space", () => {
+    expect(parseInterpolation("in mystery")).toBeNull()
   })
 })
