@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  formatColor,
   formatHex,
   formatHsl,
   formatHwb,
@@ -71,5 +72,21 @@ describe("formatHwb", () => {
     expect(formatHwb({ l: 0.5, c: 0.18, h: 240, a: 0.5 })).toMatch(
       / \/ \d+%\)$/,
     )
+  })
+})
+
+describe("formatColor dispatcher", () => {
+  const sample = { l: 0.628, c: 0.258, h: 29.234, a: 1 }
+  it("dispatches each mode", () => {
+    expect(formatColor(sample, "hex")).toMatch(/^#/)
+    expect(formatColor(sample, "rgb")).toMatch(/^rgb\(/)
+    expect(formatColor(sample, "hsl")).toMatch(/^hsl\(/)
+    expect(formatColor(sample, "oklch")).toMatch(/^oklch\(/)
+    expect(formatColor(sample, "oklab")).toMatch(/^oklab\(/)
+    expect(formatColor(sample, "hwb")).toMatch(/^hwb\(/)
+  })
+  it("includes alpha branch for hex when a < 1", () => {
+    const withAlpha = { ...sample, a: 0.5 }
+    expect(formatColor(withAlpha, "hex")).toMatch(/^#[0-9a-f]{8}$/)
   })
 })

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  parseColor,
   parseHex,
   parseHsl,
   parseHwb,
@@ -170,5 +171,32 @@ describe("parseHwb", () => {
   })
   it("returns null for invalid", () => {
     expect(parseHwb("hwb(garbage)")).toBeNull()
+  })
+})
+
+describe("parseColor", () => {
+  it("detects oklch", () => {
+    expect(parseColor("oklch(0.5 0.1 240)")?.mode).toBe("oklch")
+  })
+  it("detects oklab", () => {
+    expect(parseColor("oklab(0.5 0.1 -0.05)")?.mode).toBe("oklab")
+  })
+  it("detects hex", () => {
+    expect(parseColor("#ff0000")?.mode).toBe("hex")
+  })
+  it("detects rgb", () => {
+    expect(parseColor("rgb(255 0 0)")?.mode).toBe("rgb")
+  })
+  it("detects hsl", () => {
+    expect(parseColor("hsl(0 100% 50%)")?.mode).toBe("hsl")
+  })
+  it("detects hwb", () => {
+    expect(parseColor("hwb(0 0% 0%)")?.mode).toBe("hwb")
+  })
+  it("trims whitespace", () => {
+    expect(parseColor("  #ff0000  ")?.mode).toBe("hex")
+  })
+  it("returns null for unrecognized", () => {
+    expect(parseColor("not a color")).toBeNull()
   })
 })

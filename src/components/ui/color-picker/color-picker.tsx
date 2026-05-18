@@ -1,5 +1,8 @@
 "use client"
 
+// TEMPORARY — replaced by import from ./color-picker.types in Task 23.
+type ColorMode = "oklch" | "oklab" | "hex" | "rgb" | "hsl" | "hwb"
+
 // ---------------------------------------------------------------------------
 // Component (top of file — filled in Phase 5)
 // ---------------------------------------------------------------------------
@@ -414,4 +417,79 @@ export function srgbToHwb(
   const w = Math.min(r, g, b)
   const bk = 1 - Math.max(r, g, b)
   return { h: hsl.h, w, b: bk }
+}
+
+// ---------------------------------------------------------------------------
+// Mode dispatchers
+// ---------------------------------------------------------------------------
+
+export interface ParseResult {
+  oklch: { l: number; c: number; h: number; a: number }
+  mode: ColorMode
+}
+
+export function parseColor(value: string): ParseResult | null {
+  const trimmed = value.trim()
+
+  const oklch = parseOklch(trimmed)
+  if (oklch) return { oklch, mode: "oklch" }
+
+  const oklab = parseOklab(trimmed)
+  if (oklab) {
+    const polar = oklabToOklch(oklab.l, oklab.a, oklab.b)
+    return {
+      oklch: { l: polar.l, c: polar.c, h: polar.h, a: oklab.alpha },
+      mode: "oklab",
+    }
+  }
+
+  const hex = parseHex(trimmed)
+  if (hex) {
+    return { oklch: srgbToOklch(hex.r, hex.g, hex.b, hex.a), mode: "hex" }
+  }
+
+  const rgb = parseRgb(trimmed)
+  if (rgb) {
+    return { oklch: srgbToOklch(rgb.r, rgb.g, rgb.b, rgb.a), mode: "rgb" }
+  }
+
+  const hsl = parseHsl(trimmed)
+  if (hsl) {
+    const srgb = hslToSrgb(hsl.h, hsl.s, hsl.l)
+    return {
+      oklch: srgbToOklch(srgb.r, srgb.g, srgb.b, hsl.a),
+      mode: "hsl",
+    }
+  }
+
+  const hwb = parseHwb(trimmed)
+  if (hwb) {
+    const srgb = hwbToSrgb(hwb.h, hwb.w, hwb.b)
+    return {
+      oklch: srgbToOklch(srgb.r, srgb.g, srgb.b, hwb.a),
+      mode: "hwb",
+    }
+  }
+
+  return null
+}
+
+export function formatColor(
+  oklch: { l: number; c: number; h: number; a: number },
+  mode: ColorMode,
+): string {
+  switch (mode) {
+    case "oklch":
+      return formatOklch(oklch)
+    case "oklab":
+      return formatOklab(oklch)
+    case "hex":
+      return formatHex(oklch, oklch.a < 1)
+    case "rgb":
+      return formatRgb(oklch)
+    case "hsl":
+      return formatHsl(oklch)
+    case "hwb":
+      return formatHwb(oklch)
+  }
 }
