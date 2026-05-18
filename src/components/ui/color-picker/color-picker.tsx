@@ -151,6 +151,19 @@ export function formatHex(
   return `${base}${channel(oklch.a)}`
 }
 
+export function formatRgb(oklch: {
+  l: number
+  c: number
+  h: number
+  a: number
+}): string {
+  const [r, g, b] = oklchToSrgb(oklch.l, oklch.c, oklch.h)
+  const channel = (n: number) => Math.round(clamp01(n) * 255)
+  const base = `rgb(${channel(r)} ${channel(g)} ${channel(b)}`
+  if (oklch.a >= 1) return `${base})`
+  return `${base} / ${Math.round(oklch.a * 100)}%)`
+}
+
 // ---------------------------------------------------------------------------
 // Color space conversions
 // ---------------------------------------------------------------------------
