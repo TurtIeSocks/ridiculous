@@ -14,6 +14,7 @@ import type {
   StepsString,
 } from "@/components/ui/easing-picker/easing-picker.types"
 import { easing } from "@/components/ui/easing-picker/easing-picker.types"
+import { EasingPicker } from "@/components/ui/easing-picker"
 
 test("EasingKeyword enumerates the 7 CSS keywords", () => {
   expectTypeOf<EasingKeyword>().toEqualTypeOf<
@@ -151,4 +152,24 @@ test("EasingState discriminates by basis", () => {
   // Verify the variables are valid EasingState members
   expectTypeOf(bezier).toMatchTypeOf<EasingState>()
   expectTypeOf(spring).toMatchTypeOf<EasingState>()
+})
+
+test("EasingPicker basis='bezier' narrows onChange to CubicBezierString", () => {
+  type Props = Parameters<typeof EasingPicker<"bezier">>[0]
+  expectTypeOf<Props["onChange"]>().parameter(0).toEqualTypeOf<CubicBezierString>()
+})
+
+test("EasingPicker basis='spring' narrows onChange to LinearString", () => {
+  type Props = Parameters<typeof EasingPicker<"spring">>[0]
+  expectTypeOf<Props["onChange"]>().parameter(0).toEqualTypeOf<LinearString>()
+})
+
+test("EasingPicker basis='steps' narrows onChange to StepsString", () => {
+  type Props = Parameters<typeof EasingPicker<"steps">>[0]
+  expectTypeOf<Props["onChange"]>().parameter(0).toEqualTypeOf<StepsString>()
+})
+
+test("EasingPicker without basis keeps full EasingString union", () => {
+  type Props = Parameters<typeof EasingPicker>[0]
+  expectTypeOf<Props["onChange"]>().parameter(0).toEqualTypeOf<EasingString>()
 })
