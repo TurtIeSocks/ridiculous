@@ -683,7 +683,7 @@ function AngleDial({
       aria-valuemax={360}
       aria-valuenow={Math.round(angle)}
       tabIndex={0}
-      className="h-10 w-10 shrink-0 touch-none cursor-grab rounded-full border bg-muted/40"
+      className="size-10 shrink-0 touch-none cursor-grab rounded-full border bg-muted/40"
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId)
         handlePointer(event)
@@ -765,7 +765,7 @@ function PositionPicker({
   return (
     <div className="flex items-center gap-3">
       <div
-        className="relative h-16 w-16 shrink-0 touch-none cursor-crosshair rounded border bg-muted/40"
+        className="relative size-16 shrink-0 touch-none cursor-crosshair rounded border bg-muted/40"
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId)
           handlePointer(event)
@@ -777,7 +777,7 @@ function PositionPicker({
       >
         <div
           aria-hidden="true"
-          className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow ring-1 ring-black/40"
+          className="absolute size-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow ring-1 ring-black/40"
           style={{ left: `${x}%`, top: `${y}%` }}
         />
       </div>
@@ -990,7 +990,7 @@ function StopDetailRow({
         onClick={onDelete}
         disabled={!canDelete}
         aria-label="Delete stop"
-        className="ml-auto flex h-7 w-7 items-center justify-center rounded-md border text-muted-foreground transition hover:border-white/25 hover:text-foreground disabled:opacity-30 disabled:hover:border-current disabled:hover:text-current"
+        className="ml-auto flex size-7 items-center justify-center rounded-md border text-muted-foreground transition hover:border-white/25 hover:text-foreground disabled:opacity-30 disabled:hover:border-current disabled:hover:text-current"
         data-slot="gradient-editor-delete-stop"
       >
         ×
