@@ -645,3 +645,49 @@ export function LcPad({
     </div>
   )
 }
+
+const HUE_GRADIENT = `linear-gradient(to right, oklch(0.7 0.18 0), oklch(0.7 0.18 60), oklch(0.7 0.18 120), oklch(0.7 0.18 180), oklch(0.7 0.18 240), oklch(0.7 0.18 300), oklch(0.7 0.18 360))`
+
+export function HueStrip({
+  h,
+  onChange,
+}: {
+  h: number
+  onChange: (h: number) => void
+}) {
+  const handlePointer = (event: React.PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    onChange(clamp01((event.clientX - rect.left) / rect.width) * 360)
+  }
+
+  return (
+    <div
+      data-slot="color-picker-hue"
+      role="slider"
+      aria-label="Hue"
+      aria-valuemin={0}
+      aria-valuemax={360}
+      aria-valuenow={Math.round(h)}
+      tabIndex={0}
+      className="relative h-4 w-full touch-none cursor-pointer rounded-full"
+      style={{ background: HUE_GRADIENT }}
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId)
+        handlePointer(event)
+      }}
+      onPointerMove={(event) => {
+        if (event.buttons) handlePointer(event)
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowLeft") onChange(Math.max(0, h - 1))
+        if (event.key === "ArrowRight") onChange(Math.min(360, h + 1))
+      }}
+    >
+      <div
+        aria-hidden="true"
+        className="absolute top-1/2 h-5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white border border-black/40 shadow pointer-events-none"
+        style={{ left: `${(h / 360) * 100}%` }}
+      />
+    </div>
+  )
+}
