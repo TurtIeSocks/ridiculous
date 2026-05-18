@@ -24,16 +24,6 @@ type NonEmptyAllChars<S extends string, Allowed extends string> = S extends ""
   ? false
   : AllChars<S, Allowed>
 
-type Enumerate<
-  N extends number,
-  A extends number[] = [],
-> = A["length"] extends N ? A[number] : Enumerate<N, [...A, A["length"]]>
-
-type IntRange<From extends number, To extends number> = Exclude<
-  Enumerate<To>,
-  Enumerate<From>
->
-
 type StripLeadingZeros<S extends string> = S extends `0${infer R}`
   ? R extends ""
     ? "0"
@@ -51,12 +41,6 @@ type And<A extends boolean, B extends boolean> = A extends true
     ? true
     : false
   : false
-
-type Or<A extends boolean, B extends boolean> = A extends true
-  ? true
-  : B extends true
-    ? true
-    : false
 
 type KeepIf<B extends boolean, S extends string> = B extends true ? S : never
 
@@ -89,12 +73,121 @@ type IsPositiveInt<S extends string> = S extends "0"
     : NonEmptyAllChars<S, Digit>
 
 // =====================================================================
-// 2. STRICT VALIDATORS — exported, generic (Phase 2)
+// 2. STRICT VALIDATORS — exported, generic. Used by easing() helper.
 // =====================================================================
 
+/** Named CSS Easing L1 keyword. */
+export type EasingKeywordLiteral<S extends string> = S extends EasingKeyword
+  ? S
+  : never
+
+/** `cubic-bezier(x1, y1, x2, y2)` — x ∈ [0,1], y signed (overshoot OK). */
+export type CubicBezierLiteral<S extends string> =
+  S extends `cubic-bezier(${infer X1}, ${infer Y1}, ${infer X2}, ${infer Y2})`
+    ? KeepIf<
+        And<
+          IsNumber0To1<Trim<X1>>,
+          And<
+            IsSignedDecimal<Trim<Y1>>,
+            And<IsNumber0To1<Trim<X2>>, IsSignedDecimal<Trim<Y2>>>
+          >
+        >,
+        S
+      >
+    : S extends `cubic-bezier(${infer X1} ${infer Y1} ${infer X2} ${infer Y2})`
+      ? KeepIf<
+          And<
+            IsNumber0To1<Trim<X1>>,
+            And<
+              IsSignedDecimal<Trim<Y1>>,
+              And<IsNumber0To1<Trim<X2>>, IsSignedDecimal<Trim<Y2>>>
+            >
+          >,
+          S
+        >
+      : never
+
+/** `steps(n)` or `steps(n, position)` — n positive integer. */
+export type StepsLiteral<S extends string> =
+  S extends `steps(${infer N}, ${infer P})`
+    ? P extends StepPosition
+      ? KeepIf<IsPositiveInt<Trim<N>>, S>
+      : never
+    : S extends `steps(${infer N})`
+      ? KeepIf<IsPositiveInt<Trim<N>>, S>
+      : never
+
+/**
+ * `linear()` — weak validation. Variadic stop range-checking at the type
+ * level would blow up compile time. Runtime parser does real validation.
+ */
+export type LinearLiteral<S extends string> = S extends `linear(${infer Body})`
+  ? Trim<Body> extends ""
+    ? never
+    : S
+  : never
+
+/** Union — accepts any valid CSS easing function or keyword. */
+export type EasingLiteral<S extends string> =
+  | EasingKeywordLiteral<S>
+  | CubicBezierLiteral<S>
+  | StepsLiteral<S>
+  | LinearLiteral<S>
+
+/** Call-site validator helper. Mirrors `color()` from color-picker. */
+export const easing = <S extends string>(value: S & EasingLiteral<S>): S => value
+
 // =====================================================================
-// 3. SUGGESTION STRINGS — non-generic, for IntelliSense + onChange (Phase 2)
+// 3. SUGGESTION STRINGS — non-generic, for IntelliSense + onChange returns
 // =====================================================================
+
+/** CSS Easing L1 named keywords. */
+export type EasingKeyword =
+  | "linear"
+  | "ease"
+  | "ease-in"
+  | "ease-out"
+  | "ease-in-out"
+  | "step-start"
+  | "step-end"
+
+/** `cubic-bezier(x1, y1, x2, y2)` — both comma and space forms. */
+export type CubicBezierString =
+  | `cubic-bezier(${number}, ${number}, ${number}, ${number})`
+  | `cubic-bezier(${number} ${number} ${number} ${number})`
+
+export type StepPosition =
+  | "start"
+  | "end"
+  | "jump-start"
+  | "jump-end"
+  | "jump-both"
+  | "jump-none"
+
+export type StepsString =
+  | `steps(${number})`
+  | `steps(${number}, ${StepPosition})`
+
+/** `linear()` multi-stop — variadic, weakly suggested. */
+export type LinearString = `linear(${string})`
+
+/** Union of every valid easing output. */
+export type EasingString =
+  | EasingKeyword
+  | CubicBezierString
+  | StepsString
+  | LinearString
+
+/** Basis → output-string type map. Used by `basis?` prop to narrow onChange. */
+export interface EasingStringMap {
+  bezier: CubicBezierString
+  spring: LinearString
+  bounce: LinearString
+  wiggle: LinearString
+  steps: StepsString
+}
+
+export type EasingBasis = keyof EasingStringMap
 
 // =====================================================================
 // 4. UTILITY TYPES (Phase 2)
