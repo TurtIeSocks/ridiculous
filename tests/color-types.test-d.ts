@@ -2,6 +2,7 @@ import { expectTypeOf, test } from "vitest"
 import type {
   HexLiteral,
   HSLLiteral,
+  OklabLiteral,
   OKLCHLiteral,
   RGBALiteral,
   RGBLiteral,
@@ -86,4 +87,20 @@ test("OKLCHLiteral accepts valid forms", () => {
 
 test("OKLCHLiteral rejects bad L", () => {
   expectTypeOf<OKLCHLiteral<"oklch(2 0.1 240)">>().toBeNever()
+})
+
+test("OklabLiteral accepts valid forms", () => {
+  expectTypeOf<OklabLiteral<"oklab(0.5 0.1 -0.05)">>().toEqualTypeOf<
+    "oklab(0.5 0.1 -0.05)"
+  >()
+  expectTypeOf<OklabLiteral<"oklab(50% 0.1 -0.05)">>().toEqualTypeOf<
+    "oklab(50% 0.1 -0.05)"
+  >()
+  expectTypeOf<OklabLiteral<"oklab(0.5 0.1 -0.05 / 0.5)">>().toEqualTypeOf<
+    "oklab(0.5 0.1 -0.05 / 0.5)"
+  >()
+})
+
+test("OklabLiteral rejects bad L", () => {
+  expectTypeOf<OklabLiteral<"oklab(2 0.1 0.1)">>().toBeNever()
 })

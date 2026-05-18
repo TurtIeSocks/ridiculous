@@ -293,3 +293,37 @@ export type OKLCHLiteral<S extends string> =
           S
         >
       : never
+
+type IsSignedDecimal<S extends string> = S extends `-${infer R}`
+  ? IsNonNegativeNumber<R>
+  : IsNonNegativeNumber<S>
+
+/**
+ * oklab(0.5 0.1 -0.05)
+ * oklab(50% 0.1 -0.05 / 0.5)
+ *
+ * Note: a/b axes are signed (typically -0.4..0.4 in sRGB gamut). This validator
+ * accepts any signed decimal; it does NOT range-check a/b to keep complexity
+ * tractable. CSS Color 4 allows broader ranges anyway.
+ */
+export type OklabLiteral<S extends string> =
+  S extends `oklab(${infer L} ${infer A} ${infer B} / ${infer Alpha})`
+    ? KeepIf<
+        And<
+          Or<IsNumber0To1<Trim<L>>, IsPercent0To100<Trim<L>>>,
+          And<
+            IsSignedDecimal<Trim<A>>,
+            And<IsSignedDecimal<Trim<B>>, IsAlpha<Trim<Alpha>>>
+          >
+        >,
+        S
+      >
+    : S extends `oklab(${infer L} ${infer A} ${infer B})`
+      ? KeepIf<
+          And<
+            Or<IsNumber0To1<Trim<L>>, IsPercent0To100<Trim<L>>>,
+            And<IsSignedDecimal<Trim<A>>, IsSignedDecimal<Trim<B>>>
+          >,
+          S
+        >
+      : never
