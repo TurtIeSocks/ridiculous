@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import type { ColorString } from "@/components/ui/color-picker"
+import { ColorPicker } from "@/components/ui/color-picker"
 import { parseColor } from "@/components/ui/color-picker/color-picker"
 import { cn } from "@/lib/utils"
 import type {
@@ -739,6 +740,58 @@ export function TypeSwitcher({
           {t}
         </Button>
       ))}
+    </div>
+  )
+}
+
+export function StopDetailRow({
+  stop,
+  canDelete,
+  onChange,
+  onDelete,
+}: {
+  stop: GradientStop
+  canDelete: boolean
+  onChange: (next: GradientStop) => void
+  onDelete: () => void
+}) {
+  return (
+    <div
+      className="flex items-center gap-2"
+      data-slot="gradient-editor-detail-row"
+    >
+      <ColorPicker
+        value={stop.color}
+        onChange={(next) => onChange({ ...stop, color: next })}
+      />
+      <input
+        type="number"
+        min={0}
+        max={100}
+        value={Math.round(stop.position)}
+        onChange={(e) =>
+          onChange({
+            ...stop,
+            position: Math.max(
+              0,
+              Math.min(100, Number.parseInt(e.target.value, 10) || 0),
+            ),
+          })
+        }
+        className="h-7 w-16 rounded border bg-background px-2 font-mono text-xs"
+        aria-label="Stop position"
+      />
+      <span className="font-mono text-xs text-muted-foreground">%</span>
+      <button
+        type="button"
+        onClick={onDelete}
+        disabled={!canDelete}
+        aria-label="Delete stop"
+        className="ml-auto flex h-7 w-7 items-center justify-center rounded-md border text-muted-foreground transition hover:border-white/25 hover:text-foreground disabled:opacity-30 disabled:hover:border-current disabled:hover:text-current"
+        data-slot="gradient-editor-delete-stop"
+      >
+        ×
+      </button>
     </div>
   )
 }
