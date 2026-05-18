@@ -795,3 +795,85 @@ export function StopDetailRow({
     </div>
   )
 }
+
+export function GradientPreview({
+  state,
+  selectedIndex,
+  onSelectStop,
+  onMoveStop,
+  onAddStop,
+  maxStops,
+}: {
+  state: InternalState
+  selectedIndex: number
+  onSelectStop: (i: number) => void
+  onMoveStop: (i: number, position: number) => void
+  onAddStop: (position: number) => void
+  maxStops: number
+}) {
+  // Always render as horizontal linear during editing so the 1D stop track makes sense.
+  const previewBg = formatGradient({
+    ...state,
+    type: "linear",
+    angle: 90,
+  })
+  const handleTrackPointer = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.target !== event.currentTarget) return
+    if (state.stops.length >= maxStops) return
+    const rect = event.currentTarget.getBoundingClientRect()
+    const pct = Math.max(
+      0,
+      Math.min(100, ((event.clientX - rect.left) / rect.width) * 100),
+    )
+    onAddStop(Math.round(pct))
+  }
+  return (
+    <div className="flex flex-col gap-1" data-slot="gradient-editor-preview">
+      <div
+        className="relative h-20 w-full rounded border"
+        style={{ background: previewBg }}
+        data-slot="gradient-editor-track"
+        onPointerDown={handleTrackPointer}
+      >
+        {state.stops.map((stop, i) => (
+          <button
+            // biome-ignore lint/suspicious/noArrayIndexKey: stops have no stable id; index is the canonical identity here
+            key={`${i}-${stop.position}`}
+            type="button"
+            aria-label={`Stop ${i + 1} at ${Math.round(stop.position)}%`}
+            onClick={() => onSelectStop(i)}
+            onPointerDown={(event) => {
+              event.stopPropagation()
+              event.currentTarget.setPointerCapture(event.pointerId)
+              onSelectStop(i)
+            }}
+            onPointerMove={(event) => {
+              if (event.buttons) {
+                const trackRect =
+                  event.currentTarget.parentElement!.getBoundingClientRect()
+                const pct = Math.max(
+                  0,
+                  Math.min(
+                    100,
+                    ((event.clientX - trackRect.left) / trackRect.width) * 100,
+                  ),
+                )
+                onMoveStop(i, Math.round(pct))
+              }
+            }}
+            className={cn(
+              "absolute bottom-1 h-4 w-4 -translate-x-1/2 cursor-grab rounded-sm border-2 border-white shadow ring-1 ring-black/40 transition",
+              i === selectedIndex && "ring-2 ring-primary scale-110",
+            )}
+            style={{
+              left: `${stop.position}%`,
+              backgroundColor: stop.color,
+            }}
+            data-slot="gradient-editor-handle"
+            data-selected={i === selectedIndex || undefined}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
