@@ -1,13 +1,85 @@
 "use client"
 
-import type { ColorMode } from "./color-picker.types"
+import { cn } from "@/lib/utils"
+import type {
+  ColorMode,
+  ColorString,
+  ColorStringMap,
+} from "./color-picker.types"
 
 // ---------------------------------------------------------------------------
 // Component (top of file — filled in Phase 5)
 // ---------------------------------------------------------------------------
 
-export function ColorPicker() {
-  return null
+export interface ColorPickerProps<
+  TMode extends ColorMode | undefined = undefined,
+> {
+  value: ColorString | (string & {})
+  onChange: (
+    value: TMode extends ColorMode ? ColorStringMap[TMode] : ColorString,
+  ) => void
+  mode?: TMode
+  native?: boolean
+  className?: string
+  "aria-label"?: string
+}
+
+export function ColorPicker<TMode extends ColorMode | undefined>({
+  value,
+  onChange,
+  mode: modeProp,
+  native = false,
+  className,
+  "aria-label": ariaLabel = "Pick a color",
+}: ColorPickerProps<TMode>) {
+  if (native) {
+    const parsed = parseColor(value)
+    const hex = parsed ? formatHex(parsed.oklch, false) : "#000000"
+    return (
+      <input
+        type="color"
+        value={hex}
+        onChange={(event) => {
+          const next = parseHex(event.target.value)
+          if (!next) return
+          const oklch = srgbToOklch(next.r, next.g, next.b, next.a)
+          onChange(
+            formatColor(oklch, modeProp ?? "hex") as Parameters<
+              typeof onChange
+            >[0],
+          )
+        }}
+        className={cn(
+          "h-6 w-6 cursor-pointer rounded border bg-transparent",
+          className,
+        )}
+        aria-label={ariaLabel}
+        data-slot="color-picker-native"
+      />
+    )
+  }
+
+  const parsed = parseColor(value)
+  if (!parsed) {
+    return (
+      <span
+        aria-hidden="true"
+        className={cn("inline-block h-5 w-5 rounded border", className)}
+        style={{ backgroundColor: value }}
+        data-slot="color-picker-fallback"
+      />
+    )
+  }
+
+  // Popover wiring lands in Task 37.
+  return (
+    <span
+      aria-hidden="true"
+      className={cn("inline-block h-5 w-5 rounded border", className)}
+      style={{ backgroundColor: value }}
+      data-slot="color-picker-trigger-placeholder"
+    />
+  )
 }
 
 // ---------------------------------------------------------------------------
