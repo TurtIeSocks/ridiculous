@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Popover,
@@ -48,9 +48,35 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
   className,
   "aria-label": ariaLabel = "Pick a color",
 }: ColorPickerProps<TMode>) {
-  if (native) {
+  const parsedFromValue = parseColor(value)
+
+  // Internal canonical oklch is the source of truth for the L×C pad / sliders.
+  // We do NOT derive marker position from each re-parse of `value`, because
+  // round-tripping through sRGB-bound modes (hex/rgb/hsl/hwb) gamut-clamps the
+  // oklch — the marker would refuse to follow the cursor into out-of-sRGB area.
+  // Instead: track internal oklch + the user's mode selection, and only resync
+  // from `value` when it changes from outside (not from our own emit).
+  const [internal, setInternal] = useState(
+    () => parsedFromValue?.oklch ?? { l: 0, c: 0, h: 0, a: 1 },
+  )
+  const [internalMode, setInternalMode] = useState<ColorMode>(
+    () => modeProp ?? parsedFromValue?.mode ?? "oklch",
+  )
+  const lastEmittedRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (value === lastEmittedRef.current) return
     const parsed = parseColor(value)
-    const hex = parsed ? formatHex(parsed.oklch, false) : "#000000"
+    if (parsed) {
+      setInternal(parsed.oklch)
+      if (modeProp == null) setInternalMode(parsed.mode)
+    }
+  }, [value, modeProp])
+
+  if (native) {
+    const hex = parsedFromValue
+      ? formatHex(parsedFromValue.oklch, false)
+      : "#000000"
     return (
       <input
         type="color"
@@ -59,11 +85,9 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
           const next = parseHex(event.target.value)
           if (!next) return
           const oklch = srgbToOklch(next.r, next.g, next.b, next.a)
-          onChange(
-            formatColor(oklch, modeProp ?? "hex") as Parameters<
-              typeof onChange
-            >[0],
-          )
+          const formatted = formatColor(oklch, modeProp ?? "hex")
+          lastEmittedRef.current = formatted
+          onChange(formatted as Parameters<typeof onChange>[0])
         }}
         className={cn(
           "h-6 w-6 cursor-pointer rounded border bg-transparent",
@@ -75,8 +99,7 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
     )
   }
 
-  const parsed = parseColor(value)
-  if (!parsed) {
+  if (!parsedFromValue) {
     return (
       <span
         aria-hidden="true"
@@ -87,14 +110,18 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
     )
   }
 
-  const activeMode: ColorMode = modeProp ?? parsed.mode
+  const activeMode: ColorMode = modeProp ?? internalMode
   const showModeGroup = modeProp == null
 
   const emit = (
     next: { l: number; c: number; h: number; a: number },
     mode: ColorMode = activeMode,
   ) => {
-    onChange(formatColor(next, mode) as Parameters<typeof onChange>[0])
+    setInternal(next)
+    if (modeProp == null && mode !== internalMode) setInternalMode(mode)
+    const formatted = formatColor(next, mode)
+    lastEmittedRef.current = formatted
+    onChange(formatted as Parameters<typeof onChange>[0])
   }
 
   return (
@@ -125,25 +152,22 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
           {showModeGroup && (
             <ModeButtonGroup
               mode={activeMode}
-              onChange={(next) => emit(parsed.oklch, next)}
+              onChange={(next) => emit(internal, next)}
             />
           )}
           <LcPad
-            l={parsed.oklch.l}
-            c={parsed.oklch.c}
-            h={parsed.oklch.h}
-            onChange={(l, c) => emit({ ...parsed.oklch, l, c })}
+            l={internal.l}
+            c={internal.c}
+            h={internal.h}
+            onChange={(l, c) => emit({ ...internal, l, c })}
           />
-          <HueStrip
-            h={parsed.oklch.h}
-            onChange={(h) => emit({ ...parsed.oklch, h })}
-          />
+          <HueStrip h={internal.h} onChange={(h) => emit({ ...internal, h })} />
           <AlphaStrip
-            a={parsed.oklch.a}
-            l={parsed.oklch.l}
-            c={parsed.oklch.c}
-            h={parsed.oklch.h}
-            onChange={(a) => emit({ ...parsed.oklch, a })}
+            a={internal.a}
+            l={internal.l}
+            c={internal.c}
+            h={internal.h}
+            onChange={(a) => emit({ ...internal, a })}
           />
         </div>
       </PopoverContent>
@@ -263,6 +287,11 @@ export function parseOklch(value: string): {
   if ([l, c, h].some((n) => Number.isNaN(n))) return null
   return { l, c, h, a }
 }
+
+// Alpha formatting: oklch and oklab preserve fractional precision via
+// trimNumber (perceptual spaces are precision-sensitive); rgb/hsl/hwb round
+// to integer percent (byte-quantized inputs make fractional alpha meaningless).
+// Hex encodes alpha as a byte-aligned digit pair.
 
 export function formatOklch({
   l,

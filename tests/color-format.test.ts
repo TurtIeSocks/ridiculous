@@ -58,7 +58,14 @@ describe("formatOklab", () => {
     expect(formatOklab({ l: 0.5, c: 0.18, h: 240, a: 1 })).toMatch(/-/)
   })
   it("emits alpha < 1", () => {
-    expect(formatOklab({ l: 0.5, c: 0.1, h: 0, a: 0.5 })).toMatch(/ \/ \d+%\)$/)
+    expect(formatOklab({ l: 0.5, c: 0.1, h: 0, a: 0.5 })).toMatch(
+      / \/ \d+(?:\.\d+)?%\)$/,
+    )
+  })
+  it("emits fractional alpha for non-integer percent (precision preserved)", () => {
+    expect(formatOklab({ l: 0.5, c: 0.1, h: 0, a: 0.5025 })).toMatch(
+      /50\.25%\)$/,
+    )
   })
 })
 
@@ -72,6 +79,9 @@ describe("formatHwb", () => {
     expect(formatHwb({ l: 0.5, c: 0.18, h: 240, a: 0.5 })).toMatch(
       / \/ \d+%\)$/,
     )
+  })
+  it("rounds fractional alpha to integer percent (byte-quantized space)", () => {
+    expect(formatHwb({ l: 0.5, c: 0.18, h: 240, a: 0.5025 })).toMatch(/50%\)$/)
   })
 })
 
