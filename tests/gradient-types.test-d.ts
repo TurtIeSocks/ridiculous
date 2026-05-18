@@ -21,3 +21,23 @@ test("GradientString unions the three flavors", () => {
     LinearGradientString | RadialGradientString | ConicGradientString
   >().toEqualTypeOf<GradientString>()
 })
+
+import type {
+  InterpolationHueMethod,
+  InterpolationSpace,
+  PolarSpace,
+} from "@/components/ui/gradient-editor/gradient-editor.types"
+
+test("InterpolationSpace lists the 5 supported spaces", () => {
+  expectTypeOf<InterpolationSpace>().toEqualTypeOf<
+    "srgb" | "oklch" | "oklab" | "hsl" | "hwb"
+  >()
+})
+
+test("InterpolationHueMethod is shorter | longer", () => {
+  expectTypeOf<InterpolationHueMethod>().toEqualTypeOf<"shorter" | "longer">()
+})
+
+test("PolarSpace is the polar subset of InterpolationSpace", () => {
+  expectTypeOf<PolarSpace>().toEqualTypeOf<"oklch" | "hsl" | "hwb">()
+})

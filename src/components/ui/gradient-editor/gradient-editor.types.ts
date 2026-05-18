@@ -31,6 +31,12 @@ export type GradientType = keyof GradientStringMap
 // 2. INTERPOLATION
 // =====================================================================
 
+export type InterpolationSpace = "srgb" | "oklch" | "oklab" | "hsl" | "hwb"
+export type InterpolationHueMethod = "shorter" | "longer"
+
+/** Polar spaces support hue interpolation method. Cartesian (srgb, oklab) don't. */
+export type PolarSpace = Extract<InterpolationSpace, "oklch" | "hsl" | "hwb">
+
 // =====================================================================
 // 3. UTILITY TYPES
 // =====================================================================
