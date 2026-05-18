@@ -144,7 +144,7 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-auto p-3"
+        className="w-72 p-3"
         align="start"
         data-slot="color-picker"
       >
@@ -718,8 +718,8 @@ function LcPad({
   return (
     <div
       data-slot="color-picker-pad"
-      className="relative touch-none cursor-crosshair rounded border overflow-hidden"
-      style={{ width: PAD_WIDTH, height: PAD_HEIGHT }}
+      className="relative w-full touch-none cursor-crosshair rounded border overflow-hidden"
+      style={{ height: PAD_HEIGHT }}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId)
         handlePointer(event)
@@ -766,7 +766,7 @@ function HueStrip({
       aria-valuemax={360}
       aria-valuenow={Math.round(h)}
       tabIndex={0}
-      className="relative h-4 w-full touch-none cursor-pointer rounded-full"
+      className="relative h-4 w-full touch-none cursor-pointer rounded-[3px]"
       style={{ background: HUE_GRADIENT }}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId)
@@ -821,7 +821,7 @@ function AlphaStrip({
       aria-valuemax={100}
       aria-valuenow={Math.round(a * 100)}
       tabIndex={0}
-      className="relative h-4 w-full touch-none cursor-pointer rounded-full"
+      className="relative h-4 w-full touch-none cursor-pointer rounded-[3px]"
       style={{ background }}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId)
