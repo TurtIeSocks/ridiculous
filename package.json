@@ -1,0 +1,45 @@
+{
+  "name": "ridiculous",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "pnpm registry:build && tsc -b && vite build",
+    "preview": "vite preview",
+    "registry:build": "shadcn build",
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "ci:check": "biome ci ."
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "react": "^19",
+    "react-dom": "^19",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.15",
+    "@tailwindcss/vite": "^4.3.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^25.8.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "@vitest/coverage-v8": "^4.1.6",
+    "jsdom": "^29.1.1",
+    "shadcn": "^4.7.0",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vite": "^5",
+    "vitest": "^4.1.6"
+  }
+}
