@@ -24,6 +24,48 @@ export function clamp01(n: number): number {
   return n < 0 ? 0 : n > 1 ? 1 : n
 }
 
+export function parseHex(
+  value: string,
+): { r: number; g: number; b: number; a: number } | null {
+  const match = value.match(/^#([0-9a-f]{3,8})$/i)
+  if (!match) return null
+  const body = match[1]
+  const read = (hex: string) => parseInt(hex, 16) / 255
+  if (body.length === 3) {
+    return {
+      r: read(body[0].repeat(2)),
+      g: read(body[1].repeat(2)),
+      b: read(body[2].repeat(2)),
+      a: 1,
+    }
+  }
+  if (body.length === 4) {
+    return {
+      r: read(body[0].repeat(2)),
+      g: read(body[1].repeat(2)),
+      b: read(body[2].repeat(2)),
+      a: read(body[3].repeat(2)),
+    }
+  }
+  if (body.length === 6) {
+    return {
+      r: read(body.slice(0, 2)),
+      g: read(body.slice(2, 4)),
+      b: read(body.slice(4, 6)),
+      a: 1,
+    }
+  }
+  if (body.length === 8) {
+    return {
+      r: read(body.slice(0, 2)),
+      g: read(body.slice(2, 4)),
+      b: read(body.slice(4, 6)),
+      a: read(body.slice(6, 8)),
+    }
+  }
+  return null
+}
+
 // ---------------------------------------------------------------------------
 // Color space conversions
 // ---------------------------------------------------------------------------
