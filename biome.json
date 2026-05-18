@@ -14,7 +14,8 @@
       "!**/public/r",
       "!**/.github",
       "!**/docs",
-      "!**/pnpm-lock.yaml"
+      "!**/pnpm-lock.yaml",
+      "!**/*.css"
     ]
   },
   "formatter": {
