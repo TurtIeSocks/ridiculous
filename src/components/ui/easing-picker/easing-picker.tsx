@@ -246,11 +246,17 @@ export function formatEasing(state: EasingState): EasingString {
       const { n, position } = state
       return position === "end" ? `steps(${n})` : `steps(${n}, ${position})`
     }
-    case "spring":
-    case "bounce":
+    case "spring": {
+      const { stiffness, damping, mass } = state
+      return bakeLinear(sampleSpring(stiffness, damping, mass, 60)) as EasingString
+    }
+    case "bounce": {
+      const { bounces, stiffness } = state
+      return bakeLinear(sampleBounce(bounces, stiffness)) as EasingString
+    }
     case "wiggle": {
-      // Filled in Phase 5 (Task 13/14/15)
-      return "linear(0, 1)" as const
+      const { wiggles, damping } = state
+      return bakeLinear(sampleWiggle(wiggles, damping)) as EasingString
     }
   }
 }
@@ -347,6 +353,66 @@ export function bakeLinear(samples: Sample[]): string {
     return `${fmtNum(s.y)} ${fmtNum(s.t * 100)}%`
   })
   return `linear(${parts.join(", ")})`
+}
+
+export function sampleBounce(bounces: number, stiffness: number): Sample[] {
+  // Parabolic-bounce model. Restitution decreases per bounce; each bounce
+  // is half a parabola (descending → contact → ascending).
+  const restitution = 0.4 + 0.5 * stiffness // 0.4..0.9
+  const out: Sample[] = []
+
+  // Compute durations such that total = 1
+  const segDurations: number[] = []
+  let energy = 1
+  for (let i = 0; i <= bounces; i++) {
+    segDurations.push(Math.sqrt(energy))
+    energy *= restitution
+  }
+  const totalDur = segDurations.reduce((a, b) => a + b, 0)
+  for (let i = 0; i < segDurations.length; i++) segDurations[i] /= totalDur
+
+  let t = 0
+  // Initial drop: descend from y=0 (start) to y=1 (ground)
+  const samplesPerSeg = 12
+  for (let i = 0; i < samplesPerSeg; i++) {
+    const localT = i / samplesPerSeg
+    out.push({ y: localT * localT, t: t + localT * segDurations[0] })
+  }
+  t += segDurations[0]
+  out.push({ y: 1, t })
+
+  // Bounces: rise to peak, fall back to ground
+  let energyTracker = restitution
+  for (let b = 0; b < bounces; b++) {
+    const segDur = segDurations[b + 1]
+    for (let i = 1; i <= samplesPerSeg; i++) {
+      const localT = i / samplesPerSeg
+      // y = 1 - peak*(1 - (2*localT - 1)^2) — inverted parabola from 1 to 1-peak to 1
+      const u = 2 * localT - 1
+      const y = 1 - (1 - energyTracker) * (1 - u * u)
+      out.push({ y, t: t + localT * segDur })
+    }
+    t += segDur
+    energyTracker *= restitution
+  }
+  // Ensure exactly ends at y=1, t=1
+  out.push({ y: 1, t: 1 })
+  return out
+}
+
+export function sampleWiggle(wiggles: number, damping: number): Sample[] {
+  // Decaying cosine wave around y=1. After settling, y=1.
+  const samples = 80
+  const out: Sample[] = []
+  for (let i = 0; i < samples; i++) {
+    const t = i / (samples - 1)
+    const decay = Math.exp(-damping * t)
+    const y = 1 - decay * Math.cos(wiggles * 2 * Math.PI * t)
+    out.push({ y, t })
+  }
+  // Force endpoint
+  out[out.length - 1] = { y: 1, t: 1 }
+  return out
 }
 
 // ---------------------------------------------------------------------------
