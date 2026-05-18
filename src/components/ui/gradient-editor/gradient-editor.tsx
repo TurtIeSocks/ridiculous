@@ -1,9 +1,15 @@
 "use client"
 
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import type { ColorString } from "@/components/ui/color-picker"
 import { ColorPicker } from "@/components/ui/color-picker"
 import { parseColor } from "@/components/ui/color-picker/color-picker"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import type {
   ConicGradientString,
@@ -58,13 +64,41 @@ export interface GradientEditorProps<
 
 export function GradientEditor<TType extends GradientType | undefined>({
   value,
-  onChange: _onChange, // not yet wired
-  type: _typeProp, // not yet wired
-  maxStops: _maxStops = 8, // not yet wired
+  onChange,
+  type: typeProp,
+  maxStops = 8,
   className,
-  "aria-label": _ariaLabel = "Edit gradient",
+  "aria-label": ariaLabel = "Edit gradient",
 }: GradientEditorProps<TType>) {
   const parsedFromValue = parseGradient(value)
+
+  // Internal state mirrors color-picker's hybrid pattern. We do NOT derive
+  // marker/handle positions from each re-parse of `value`, because round-tripping
+  // through CSS gradient strings rounds sub-percent positions/angles to integers.
+  const [internal, setInternal] = useState<InternalState>(
+    () =>
+      parsedFromValue ?? {
+        type: "linear",
+        stops: [
+          { color: "#000000", position: 0 },
+          { color: "#ffffff", position: 100 },
+        ],
+        angle: 90,
+        shape: "ellipse",
+        size: "farthest-corner",
+        position: { x: 50, y: 50 },
+        fromAngle: 0,
+        interpolation: { space: "oklch" },
+      },
+  )
+  const [selectedStopIndex, setSelectedStopIndex] = useState(0)
+  const lastEmittedRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (value === lastEmittedRef.current) return
+    const parsed = parseGradient(value)
+    if (parsed) setInternal(parsed)
+  }, [value])
 
   if (!parsedFromValue) {
     return (
@@ -80,17 +114,128 @@ export function GradientEditor<TType extends GradientType | undefined>({
     )
   }
 
+  const activeType: GradientType = typeProp ?? internal.type
+  const showTypeSwitcher = typeProp == null
+
+  const emit = (next: InternalState) => {
+    setInternal(next)
+    const formatted = formatGradient(next)
+    lastEmittedRef.current = formatted
+    onChange(formatted as Parameters<typeof onChange>[0])
+  }
+
   return (
-    <button
-      type="button"
-      aria-label={_ariaLabel}
-      className={cn(
-        "h-5 w-12 shrink-0 cursor-pointer rounded border outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
-        className,
-      )}
-      style={{ background: value }}
-      data-slot="gradient-editor-trigger"
-    />
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={ariaLabel}
+          className={cn(
+            "h-5 w-12 shrink-0 cursor-pointer rounded border outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
+            className,
+          )}
+          style={{ background: value }}
+          data-slot="gradient-editor-trigger"
+        />
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-fit min-w-[320px] p-3"
+        align="start"
+        data-slot="gradient-editor"
+      >
+        <div className="flex flex-col gap-3">
+          {showTypeSwitcher && (
+            <TypeSwitcher
+              type={activeType}
+              onChange={(next) => emit({ ...internal, type: next })}
+            />
+          )}
+          <GradientPreview
+            state={{ ...internal, type: activeType }}
+            selectedIndex={selectedStopIndex}
+            onSelectStop={setSelectedStopIndex}
+            onMoveStop={(i, position) => {
+              const stops = internal.stops.map((s, idx) =>
+                idx === i ? { ...s, position } : s,
+              )
+              emit({ ...internal, stops })
+            }}
+            onAddStop={(position) => {
+              if (internal.stops.length >= maxStops) return
+              // Pick interpolated color from neighbors; fallback to last stop's color.
+              const newColor =
+                internal.stops[internal.stops.length - 1]?.color ?? "#000000"
+              const stops = [
+                ...internal.stops,
+                { color: newColor, position },
+              ].sort((a, b) => a.position - b.position)
+              setSelectedStopIndex(
+                stops.findIndex((s) => s.position === position),
+              )
+              emit({ ...internal, stops })
+            }}
+            maxStops={maxStops}
+          />
+          <StopDetailRow
+            stop={internal.stops[selectedStopIndex] ?? internal.stops[0]}
+            canDelete={internal.stops.length > 2}
+            onChange={(next) => {
+              const stops = internal.stops.map((s, idx) =>
+                idx === selectedStopIndex ? next : s,
+              )
+              emit({ ...internal, stops })
+            }}
+            onDelete={() => {
+              if (internal.stops.length <= 2) return
+              const stops = internal.stops.filter(
+                (_, idx) => idx !== selectedStopIndex,
+              )
+              setSelectedStopIndex(Math.max(0, selectedStopIndex - 1))
+              emit({ ...internal, stops })
+            }}
+          />
+          {activeType === "linear" && (
+            <LinearControls
+              angle={internal.angle}
+              onChange={(angle) => emit({ ...internal, angle })}
+            />
+          )}
+          {activeType === "radial" && (
+            <RadialControls
+              state={{
+                shape: internal.shape,
+                size: internal.size,
+                position: internal.position,
+              }}
+              onChange={(partial) => emit({ ...internal, ...partial })}
+            />
+          )}
+          {activeType === "conic" && (
+            <ConicControls
+              fromAngle={internal.fromAngle}
+              position={internal.position}
+              onChange={(partial) => emit({ ...internal, ...partial })}
+            />
+          )}
+          <InterpolationPicker
+            space={internal.interpolation.space}
+            hueMethod={internal.interpolation.hueMethod}
+            onSpaceChange={(space) =>
+              emit({
+                ...internal,
+                interpolation: { ...internal.interpolation, space },
+              })
+            }
+            onHueMethodChange={(hueMethod) =>
+              emit({
+                ...internal,
+                interpolation: { ...internal.interpolation, hueMethod },
+              })
+            }
+          />
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -403,7 +548,7 @@ export function formatGradient(state: InternalState): string {
 // Sub-components (filled in Phase 4)
 // ---------------------------------------------------------------------------
 
-export function InterpolationPicker({
+function InterpolationPicker({
   space,
   hueMethod,
   onSpaceChange,
@@ -449,7 +594,7 @@ export function InterpolationPicker({
   )
 }
 
-export function AngleDial({
+function AngleDial({
   angle,
   onChange,
 }: {
@@ -511,7 +656,7 @@ export function AngleDial({
   )
 }
 
-export function LinearControls({
+function LinearControls({
   angle,
   onChange,
 }: {
@@ -538,7 +683,7 @@ export function LinearControls({
   )
 }
 
-export function PositionPicker({
+function PositionPicker({
   x,
   y,
   onChange,
@@ -612,7 +757,7 @@ export function PositionPicker({
   )
 }
 
-export function RadialControls({
+function RadialControls({
   state,
   onChange,
 }: {
@@ -665,7 +810,7 @@ export function RadialControls({
   )
 }
 
-export function ConicControls({
+function ConicControls({
   fromAngle,
   position,
   onChange,
@@ -712,7 +857,7 @@ export function ConicControls({
   )
 }
 
-export function TypeSwitcher({
+function TypeSwitcher({
   type,
   onChange,
 }: {
@@ -744,7 +889,7 @@ export function TypeSwitcher({
   )
 }
 
-export function StopDetailRow({
+function StopDetailRow({
   stop,
   canDelete,
   onChange,
@@ -796,7 +941,7 @@ export function StopDetailRow({
   )
 }
 
-export function GradientPreview({
+function GradientPreview({
   state,
   selectedIndex,
   onSelectStop,
