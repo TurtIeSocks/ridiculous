@@ -1,5 +1,9 @@
 import { expectTypeOf, test } from "vitest"
-import type { HexLiteral } from "@/components/ui/color-picker/color-picker.types"
+import type {
+  HexLiteral,
+  RGBALiteral,
+  RGBLiteral,
+} from "@/components/ui/color-picker/color-picker.types"
 
 // Type-only smoke test: ensure the file imports cleanly.
 test("color-picker.types module imports", () => {
@@ -18,4 +22,33 @@ test("HexLiteral rejects invalid hex", () => {
   expectTypeOf<HexLiteral<"#ff">>().toBeNever() // wrong length
   expectTypeOf<HexLiteral<"#fffff">>().toBeNever() // wrong length
   expectTypeOf<HexLiteral<"ff0000">>().toBeNever() // missing #
+})
+
+test("RGBLiteral accepts valid forms", () => {
+  expectTypeOf<RGBLiteral<"rgb(255, 0, 0)">>().toEqualTypeOf<"rgb(255, 0, 0)">()
+  expectTypeOf<RGBLiteral<"rgb(255 0 0)">>().toEqualTypeOf<"rgb(255 0 0)">()
+  expectTypeOf<RGBLiteral<"rgb(100%, 0%, 0%)">>().toEqualTypeOf<
+    "rgb(100%, 0%, 0%)"
+  >()
+})
+
+test("RGBLiteral rejects out-of-range bytes", () => {
+  expectTypeOf<RGBLiteral<"rgb(256, 0, 0)">>().toBeNever()
+  expectTypeOf<RGBLiteral<"rgb(255 0 999)">>().toBeNever()
+})
+
+test("RGBALiteral accepts alpha forms", () => {
+  expectTypeOf<RGBALiteral<"rgba(255, 0, 0, 0.5)">>().toEqualTypeOf<
+    "rgba(255, 0, 0, 0.5)"
+  >()
+  expectTypeOf<RGBALiteral<"rgba(255 0 0 / 0.5)">>().toEqualTypeOf<
+    "rgba(255 0 0 / 0.5)"
+  >()
+  expectTypeOf<RGBALiteral<"rgb(255 0 0 / 0.5)">>().toEqualTypeOf<
+    "rgb(255 0 0 / 0.5)"
+  >()
+})
+
+test("RGBALiteral rejects bad alpha", () => {
+  expectTypeOf<RGBALiteral<"rgba(255, 0, 0, 2)">>().toBeNever()
 })

@@ -174,15 +174,69 @@ export type HexLiteral<S extends string> = S extends `#${infer Body}`
     : never
   : never
 
+/** rgb(255, 0, 0) | rgb(100%, 0%, 0%) | rgb(255 0 0) */
+export type RGBLiteral<S extends string> =
+  S extends `rgb(${infer R},${infer G},${infer B})`
+    ? KeepIf<
+        And<
+          IsRgbChannel<Trim<R>>,
+          And<IsRgbChannel<Trim<G>>, IsRgbChannel<Trim<B>>>
+        >,
+        S
+      >
+    : S extends `rgb(${infer R} ${infer G} ${infer B})`
+      ? KeepIf<
+          And<
+            IsRgbChannel<Trim<R>>,
+            And<IsRgbChannel<Trim<G>>, IsRgbChannel<Trim<B>>>
+          >,
+          S
+        >
+      : never
+
+/**
+ * rgba(255, 0, 0, 0.5) | rgba(255, 0, 0, 50%)
+ * rgba(255 0 0 / 0.5) | rgb(255 0 0 / 0.5)
+ */
+export type RGBALiteral<S extends string> =
+  S extends `rgba(${infer R},${infer G},${infer B},${infer A})`
+    ? KeepIf<
+        And<
+          IsRgbChannel<Trim<R>>,
+          And<
+            IsRgbChannel<Trim<G>>,
+            And<IsRgbChannel<Trim<B>>, IsAlpha<Trim<A>>>
+          >
+        >,
+        S
+      >
+    : S extends `rgba(${infer R} ${infer G} ${infer B} / ${infer A})`
+      ? KeepIf<
+          And<
+            IsRgbChannel<Trim<R>>,
+            And<
+              IsRgbChannel<Trim<G>>,
+              And<IsRgbChannel<Trim<B>>, IsAlpha<Trim<A>>>
+            >
+          >,
+          S
+        >
+      : S extends `rgb(${infer R} ${infer G} ${infer B} / ${infer A})`
+        ? KeepIf<
+            And<
+              IsRgbChannel<Trim<R>>,
+              And<
+                IsRgbChannel<Trim<G>>,
+                And<IsRgbChannel<Trim<B>>, IsAlpha<Trim<A>>>
+              >
+            >,
+            S
+          >
+        : never
+
 // Compile-time anchor for primitives not yet consumed by an exported
 // validator. tsc's `noUnusedLocals` flags top-level type aliases (TS6196),
 // so each unconsumed primitive is referenced here. Entries are removed as
 // subsequent tasks introduce validators that consume them. Erased at
 // compile time; intentionally exported so the anchor itself isn't flagged.
-export type __PrimitivesAnchor__ = [
-  Trim<"">,
-  IsAlpha<"">,
-  IsRgbChannel<"">,
-  IsHue<"">,
-  IsNonNegativeNumber<"">,
-]
+export type __PrimitivesAnchor__ = [IsHue<"">, IsNonNegativeNumber<"">]
