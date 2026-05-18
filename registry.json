@@ -92,6 +92,31 @@
           "target": "components/ui/gradient-editor/gradient-editor.types.ts"
         }
       ]
+    },
+    {
+      "name": "easing-picker",
+      "type": "registry:ui",
+      "title": "Easing Picker",
+      "description": "Ridiculously typed CSS easing function picker — bezier canvas, spring/bounce/wiggle physics baked to linear(), polynomial preset gallery, 6-property animation preview, 3-format output (CSS/Tailwind v3/v4).",
+      "registryDependencies": ["button", "popover"],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/easing-picker/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/index.ts"
+        },
+        {
+          "path": "src/components/ui/easing-picker/easing-picker.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/easing-picker.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/easing-picker.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/easing-picker.types.ts"
+        }
+      ]
     }
   ]
 }
