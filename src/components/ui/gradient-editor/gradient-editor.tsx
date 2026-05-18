@@ -912,21 +912,17 @@ function ConicControls({
           angle={fromAngle}
           onChange={(next) => onChange({ fromAngle: next, position })}
         />
-        <input
-          type="number"
+        <UnitInput
+          unit="deg"
+          value={toDeg(fromAngle)}
+          onChange={(v) =>
+            onChange({ fromAngle: fromUnitString(v), position })
+          }
           min={0}
           max={360}
-          value={Math.round(fromAngle)}
-          onChange={(e) =>
-            onChange({
-              fromAngle: Number.parseInt(e.target.value, 10) || 0,
-              position,
-            })
-          }
-          className="h-7 w-16 rounded border bg-background px-2 font-mono text-xs"
           aria-label="Conic from-angle in degrees"
+          className="h-7 w-16"
         />
-        <span className="font-mono text-xs text-muted-foreground">deg</span>
       </div>
       <PositionPicker
         x={position.x}
