@@ -1,5 +1,6 @@
 import { BasicUsage } from "./examples/color-picker/basic-usage"
 import { ModeLocked } from "./examples/color-picker/mode-locked"
+import { Native } from "./examples/color-picker/native"
 
 export function App() {
   return (
@@ -25,6 +26,7 @@ export function App() {
           <h2 className="text-2xl font-semibold mb-6">Color Picker</h2>
           <BasicUsage />
           <ModeLocked />
+          <Native />
         </section>
       </main>
       <footer className="border-t mt-24">
