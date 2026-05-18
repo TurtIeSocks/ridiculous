@@ -2,6 +2,7 @@ import { BasicUsage } from "./examples/color-picker/basic-usage"
 import { ModeLocked } from "./examples/color-picker/mode-locked"
 import { Native } from "./examples/color-picker/native"
 import { TierCasual } from "./examples/color-picker/tier-casual"
+import { TierIntellisense } from "./examples/color-picker/tier-intellisense"
 
 export function App() {
   return (
@@ -29,6 +30,7 @@ export function App() {
           <ModeLocked />
           <Native />
           <TierCasual />
+          <TierIntellisense />
         </section>
       </main>
       <footer className="border-t mt-24">
