@@ -195,6 +195,9 @@ export function EasingPanel<
     ? ([basisProp] as const)
     : ALL_BASES
 
+  const [previewProperty, setPreviewProperty] =
+    useState<PreviewProperty>("moveX")
+
   const currentName =
     internal.basis === "bezier"
       ? matchPreset(internal.x1, internal.y1, internal.x2, internal.y2)
@@ -271,7 +274,30 @@ export function EasingPanel<
           onChange={(v) => setAndEmit(() => ({ basis: "steps", ...v }))}
         />
       )}
-      <EasingPreview easing={formatEasing(internal)} />
+      <div className="flex items-center gap-2 text-xs">
+        <label htmlFor="preview-property" className="text-muted-foreground">
+          Preview:
+        </label>
+        <select
+          id="preview-property"
+          value={previewProperty}
+          onChange={(e) =>
+            setPreviewProperty(e.target.value as PreviewProperty)
+          }
+          className="px-2 py-1 bg-muted rounded text-foreground"
+        >
+          <option value="moveX">Move X</option>
+          <option value="moveY">Move Y</option>
+          <option value="scale">Scale</option>
+          <option value="rotate">Rotate</option>
+          <option value="opacity">Opacity</option>
+          <option value="width">Width</option>
+        </select>
+      </div>
+      <EasingPreview
+        easing={formatEasing(internal)}
+        property={previewProperty}
+      />
       <OutputPanel
         easing={formatEasing(internal)}
         format={outputFormat}
@@ -373,7 +399,7 @@ function formatSnippet(
       return `class="ease-[${encoded}]"`
     }
     case "tailwind-v4":
-      return `@theme {\n  --${varName}: ${easing};\n}\n/* usage: class="${varName.replace(/^ease-/, "ease-")}" */`
+      return `@theme {\n  --${varName}: ${easing};\n}\n/* usage: class="${varName}" */`
   }
 }
 
@@ -423,7 +449,7 @@ function BasisTabs({ value, onChange, available = ALL_BASES }: BasisTabsProps) {
 
 export interface PresetGalleryProps {
   value?: PresetName
-  onChange: (preset: PresetName, bezier: string) => void
+  onChange: (preset: PresetName, bezier: CubicBezierString) => void
   className?: string
 }
 
@@ -488,7 +514,7 @@ function PresetRow({
   label: string
   presets: readonly PresetEntry[]
   value?: PresetName
-  onChange: (preset: PresetName, bezier: string) => void
+  onChange: (preset: PresetName, bezier: CubicBezierString) => void
 }) {
   return (
     <div>
@@ -516,7 +542,7 @@ function PresetGrid({
 }: {
   presets: readonly PresetEntry[]
   value?: PresetName
-  onChange: (preset: PresetName, bezier: string) => void
+  onChange: (preset: PresetName, bezier: CubicBezierString) => void
 }) {
   return (
     <div className="grid grid-cols-4 gap-1">
@@ -1021,6 +1047,7 @@ export function WiggleControls({
 // ---------------------------------------------------------------------------
 
 import type {
+  CubicBezierString,
   Direction,
   EasingBasis,
   EasingState,
@@ -1546,11 +1573,11 @@ export const PRESETS: readonly PresetEntry[] = [
   { name: "smoothStep", bezier: [0.45, 0, 0.55, 1] },
 ] as const
 
-export function bezierFromPreset(name: PresetName): string {
+export function bezierFromPreset(name: PresetName): CubicBezierString {
   const preset = PRESETS.find((p) => p.name === name)
   if (!preset) throw new Error(`Unknown preset: ${name}`)
   const [x1, y1, x2, y2] = preset.bezier
-  return `cubic-bezier(${fmtNum(x1)}, ${fmtNum(y1)}, ${fmtNum(x2)}, ${fmtNum(y2)})`
+  return `cubic-bezier(${fmtNum(x1)}, ${fmtNum(y1)}, ${fmtNum(x2)}, ${fmtNum(y2)})` as CubicBezierString
 }
 
 const PRESET_MATCH_TOLERANCE = 0.005
@@ -1588,7 +1615,7 @@ export type PreviewProperty =
   | "width"
 
 export interface EasingPreviewProps {
-  easing: string
+  easing: EasingString | (string & {})
   property?: PreviewProperty
   duration?: number
   loop?: boolean
@@ -1620,6 +1647,7 @@ export function EasingPreview({
   className,
 }: EasingPreviewProps) {
   const [animKey, setAnimKey] = useState(0)
+  const [playing, setPlaying] = useState(true)
   const animName = `easing-preview-${property}`
 
   return (
@@ -1642,6 +1670,7 @@ export function EasingPreview({
           className="absolute top-6 left-4 size-8 rounded bg-muted-foreground/35"
           style={{
             animation: `${animName} ${duration}ms ${loop ? "infinite" : "1"} linear`,
+            animationPlayState: playing ? "running" : "paused",
           }}
         />
       )}
@@ -1652,9 +1681,19 @@ export function EasingPreview({
         className="absolute top-6 left-4 size-8 rounded bg-primary"
         style={{
           animation: `${animName} ${duration}ms ${loop ? "infinite" : "1"} ${easing}`,
+          animationPlayState: playing ? "running" : "paused",
         }}
       />
       <div className="absolute bottom-2 right-2 flex gap-1">
+        {loop && (
+          <button
+            type="button"
+            onClick={() => setPlaying((p) => !p)}
+            className="px-2 py-1 text-xs bg-background border rounded"
+          >
+            {playing ? "Pause" : "Play"}
+          </button>
+        )}
         <button
           type="button"
           onClick={() => setAnimKey((k) => k + 1)}

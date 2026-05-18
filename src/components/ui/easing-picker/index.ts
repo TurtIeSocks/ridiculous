@@ -6,6 +6,7 @@ export type {
   EasingPreviewProps,
   PresetGalleryProps,
   PreviewProperty,
+  Sample,
   SpringControlsProps,
   StepsControlsProps,
   WiggleControlsProps,

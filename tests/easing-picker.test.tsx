@@ -223,3 +223,63 @@ describe("EasingPicker popover", () => {
     expect(els.length).toBeGreaterThan(0)
   })
 })
+
+describe("OutputPanel via EasingPanel", () => {
+  test("CSS format shows the raw easing string", () => {
+    render(
+      <EasingPanel
+        value="cubic-bezier(0.42, 0, 0.58, 1)"
+        onChange={() => {}}
+        output="css"
+      />,
+    )
+    // The OutputPanel <pre> shows the snippet
+    expect(
+      screen.getByText("cubic-bezier(0.42, 0, 0.58, 1)"),
+    ).toBeInTheDocument()
+  })
+
+  test("Tailwind v3 format wraps with class= and replaces spaces with _", () => {
+    render(
+      <EasingPanel
+        value="cubic-bezier(0.42, 0, 0.58, 1)"
+        onChange={() => {}}
+        output="tailwind-v3"
+      />,
+    )
+    expect(
+      screen.getByText('class="ease-[cubic-bezier(0.42,_0,_0.58,_1)]"'),
+    ).toBeInTheDocument()
+  })
+
+  test("copy button writes the snippet to clipboard", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    })
+    render(
+      <EasingPanel
+        value="cubic-bezier(0.42, 0, 0.58, 1)"
+        onChange={() => {}}
+        output="css"
+      />,
+    )
+    fireEvent.click(screen.getByRole("button", { name: /copy/i }))
+    expect(writeText).toHaveBeenCalledWith("cubic-bezier(0.42, 0, 0.58, 1)")
+  })
+
+  test("clicking a format-toggle button updates the snippet", async () => {
+    render(
+      <EasingPanel
+        value="cubic-bezier(0.42, 0, 0.58, 1)"
+        onChange={() => {}}
+        output="css"
+      />,
+    )
+    fireEvent.click(screen.getByRole("button", { name: "tailwind-v3" }))
+    expect(
+      screen.getByText('class="ease-[cubic-bezier(0.42,_0,_0.58,_1)]"'),
+    ).toBeInTheDocument()
+  })
+})
