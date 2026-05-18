@@ -307,6 +307,22 @@ function parsePercent(input: string | undefined): number | null {
   return Number.isNaN(n) ? null : n
 }
 
+/**
+ * Serialize internal state to a CSS gradient string.
+ */
+export function formatGradient(state: InternalState): string {
+  const interp = formatInterpolation(state.interpolation)
+  const stops = state.stops.map(formatStop).join(", ")
+  switch (state.type) {
+    case "linear":
+      return `linear-gradient(${interp}${state.angle}deg, ${stops})`
+    case "radial":
+      return `radial-gradient(${interp}${state.shape} ${state.size} at ${Math.round(state.position.x)}% ${Math.round(state.position.y)}%, ${stops})`
+    case "conic":
+      return `conic-gradient(${interp}from ${state.fromAngle}deg at ${Math.round(state.position.x)}% ${Math.round(state.position.y)}%, ${stops})`
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Sub-components (filled in Phase 4)
 // ---------------------------------------------------------------------------
