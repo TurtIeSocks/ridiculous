@@ -2,10 +2,12 @@
 
 import type { ColorString } from "@/components/ui/color-picker"
 import { parseColor } from "@/components/ui/color-picker/color-picker"
+import { cn } from "@/lib/utils"
 import type {
   ConicGradientString,
   GradientStop,
   GradientString,
+  GradientStringMap,
   GradientType,
   InterpolationHueMethod,
   InterpolationSpace,
@@ -37,8 +39,57 @@ export interface InternalState {
 // Component (top of file)
 // ---------------------------------------------------------------------------
 
-export function GradientEditor() {
-  return null
+export interface GradientEditorProps<
+  TType extends GradientType | undefined = undefined,
+> {
+  value: GradientString | (string & {})
+  onChange: (
+    value: TType extends GradientType
+      ? GradientStringMap[TType]
+      : GradientString,
+  ) => void
+  type?: TType
+  maxStops?: number
+  className?: string
+  "aria-label"?: string
+}
+
+export function GradientEditor<TType extends GradientType | undefined>({
+  value,
+  onChange: _onChange, // not yet wired
+  type: _typeProp, // not yet wired
+  maxStops: _maxStops = 8, // not yet wired
+  className,
+  "aria-label": _ariaLabel = "Edit gradient",
+}: GradientEditorProps<TType>) {
+  const parsedFromValue = parseGradient(value)
+
+  if (!parsedFromValue) {
+    return (
+      <span
+        aria-hidden="true"
+        className={cn(
+          "inline-block h-5 w-12 rounded border bg-muted",
+          className,
+        )}
+        style={{ backgroundColor: value }}
+        data-slot="gradient-editor-fallback"
+      />
+    )
+  }
+
+  return (
+    <button
+      type="button"
+      aria-label={_ariaLabel}
+      className={cn(
+        "h-5 w-12 shrink-0 cursor-pointer rounded border outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
+        className,
+      )}
+      style={{ background: value }}
+      data-slot="gradient-editor-trigger"
+    />
+  )
 }
 
 // ---------------------------------------------------------------------------
