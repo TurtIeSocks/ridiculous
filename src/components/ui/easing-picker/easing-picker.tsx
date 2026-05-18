@@ -16,7 +16,7 @@ export function EasingPicker() {
 // Sub-components (filled in Phases 3-7)
 // ---------------------------------------------------------------------------
 
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 
 export interface PresetGalleryProps {
@@ -850,4 +850,85 @@ export function matchPreset(
     }
   }
   return null
+}
+
+// ---------------------------------------------------------------------------
+// EasingPreview
+// ---------------------------------------------------------------------------
+
+export type PreviewProperty =
+  | "moveX"
+  | "moveY"
+  | "scale"
+  | "rotate"
+  | "opacity"
+  | "width"
+
+export interface EasingPreviewProps {
+  easing: string
+  property?: PreviewProperty
+  duration?: number
+  loop?: boolean
+  showLinearComparison?: boolean
+  className?: string
+}
+
+const PROP_KEYFRAMES: Record<PreviewProperty, { from: string; to: string }> = {
+  moveX: { from: "transform: translateX(0)", to: "transform: translateX(200px)" },
+  moveY: { from: "transform: translateY(0)", to: "transform: translateY(100px)" },
+  scale: { from: "transform: scale(0.5)", to: "transform: scale(1.5)" },
+  rotate: { from: "transform: rotate(0)", to: "transform: rotate(360deg)" },
+  opacity: { from: "opacity: 0", to: "opacity: 1" },
+  width: { from: "width: 50px", to: "width: 200px" },
+}
+
+export function EasingPreview({
+  easing,
+  property = "moveX",
+  duration = 800,
+  loop = false,
+  showLinearComparison = false,
+  className,
+}: EasingPreviewProps) {
+  const [animKey, setAnimKey] = useState(0)
+  const animName = `easing-preview-${property}`
+
+  return (
+    <div className={cn("relative w-full h-[120px] bg-muted/30 rounded overflow-hidden", className)}>
+      <style>
+        {`@keyframes ${animName} {
+          from { ${PROP_KEYFRAMES[property].from}; }
+          to { ${PROP_KEYFRAMES[property].to}; }
+        }`}
+      </style>
+      {showLinearComparison && (
+        <div
+          key={`ghost-${animKey}`}
+          data-preview-ghost
+          className="absolute top-6 left-4 size-8 rounded bg-muted-foreground/35"
+          style={{
+            animation: `${animName} ${duration}ms ${loop ? "infinite" : "1"} linear`,
+          }}
+        />
+      )}
+      <div
+        key={`target-${animKey}`}
+        data-preview-target
+        data-animation-key={animKey}
+        className="absolute top-6 left-4 size-8 rounded bg-primary"
+        style={{
+          animation: `${animName} ${duration}ms ${loop ? "infinite" : "1"} ${easing}`,
+        }}
+      />
+      <div className="absolute bottom-2 right-2 flex gap-1">
+        <button
+          type="button"
+          onClick={() => setAnimKey((k) => k + 1)}
+          className="px-2 py-1 text-xs bg-background border rounded"
+        >
+          Replay
+        </button>
+      </div>
+    </div>
+  )
 }

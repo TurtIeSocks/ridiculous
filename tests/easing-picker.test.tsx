@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from "vitest"
 import {
   BezierCanvas,
   BounceControls,
+  EasingPreview,
   PresetGallery,
   SpringControls,
   StepsControls,
@@ -101,5 +102,32 @@ describe("PresetGallery", () => {
     render(<PresetGallery onChange={onChange} />)
     screen.getByTitle("ease").click()
     expect(onChange).toHaveBeenCalledWith("ease", "cubic-bezier(0.25, 0.1, 0.25, 1)")
+  })
+})
+
+describe("EasingPreview", () => {
+  test("renders an animated element with the easing applied", () => {
+    const { container } = render(
+      <EasingPreview easing="cubic-bezier(0.42, 0, 0.58, 1)" />,
+    )
+    const target = container.querySelector("[data-preview-target]") as HTMLElement
+    expect(target).not.toBeNull()
+    expect(target.style.animation).toContain("cubic-bezier(0.42, 0, 0.58, 1)")
+  })
+
+  test("renders linear comparison ghost when enabled", () => {
+    const { container } = render(
+      <EasingPreview easing="ease" showLinearComparison />,
+    )
+    expect(container.querySelector("[data-preview-ghost]")).not.toBeNull()
+  })
+
+  test("Replay button increments the animation key", () => {
+    const { container } = render(<EasingPreview easing="ease" />)
+    const target = container.querySelector("[data-preview-target]") as HTMLElement
+    const initialKey = target.dataset.animationKey
+    fireEvent.click(screen.getByRole("button", { name: /replay/i }))
+    const newKey = container.querySelector("[data-preview-target]")?.getAttribute("data-animation-key")
+    expect(newKey).not.toBe(initialKey)
   })
 })
