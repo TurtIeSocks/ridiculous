@@ -949,7 +949,7 @@ function ModeButtonGroup({
     <div
       role="tablist"
       aria-label="Color format"
-      className="flex gap-1"
+      className="flex gap-1 w-full justify-evenly items-center"
       data-slot="color-picker-modes"
     >
       {COLOR_MODES.map((m) => (
@@ -996,7 +996,7 @@ function PresetPalette({
   return (
     <div
       data-slot="color-picker-presets"
-      className="flex flex-1 items-center gap-1.5"
+      className="flex flex-1 items-center w-full justify-evenly gap-1.5"
     >
       {PRESETS.map((p) => (
         <button
