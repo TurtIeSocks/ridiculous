@@ -163,18 +163,26 @@ type IsNonNegativeNumber<S extends string> = S extends `${infer I}.${infer F}`
 
 type KeepIf<B extends boolean, S extends string> = B extends true ? S : never
 
+// =====================================================================
+// 2. STRICT VALIDATORS — exported, generic. Used by color() helper.
+// =====================================================================
+
+/** #RGB, #RGBA, #RRGGBB, #RRGGBBAA */
+export type HexLiteral<S extends string> = S extends `#${infer Body}`
+  ? Length<Body> extends 3 | 4 | 6 | 8
+    ? KeepIf<AllChars<Body, HexDigit>, S>
+    : never
+  : never
+
 // Compile-time anchor for primitives not yet consumed by an exported
 // validator. tsc's `noUnusedLocals` flags top-level type aliases (TS6196),
 // so each unconsumed primitive is referenced here. Entries are removed as
 // subsequent tasks introduce validators that consume them. Erased at
 // compile time; intentionally exported so the anchor itself isn't flagged.
 export type __PrimitivesAnchor__ = [
-  HexDigit,
   Trim<"">,
-  Length<"">,
   IsAlpha<"">,
   IsRgbChannel<"">,
   IsHue<"">,
   IsNonNegativeNumber<"">,
-  KeepIf<true, "">,
 ]
