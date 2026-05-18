@@ -27,15 +27,17 @@ function ModeCard<M extends ColorMode>({ mode }: { mode: M }) {
     initial[mode] as ColorStringMap[M],
   )
   return (
-    <div className="rounded-lg border p-4">
-      <h4 className="font-mono text-sm mb-3">{mode}</h4>
-      <div className="flex items-center gap-3">
+    <div className="glass-card rounded-xl p-4">
+      <div className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">
+        <span className="text-gradient">→</span> {mode}
+      </div>
+      <div className="mt-3 flex items-center gap-3">
         <ColorPicker<M>
           value={color}
           mode={mode}
           onChange={(next) => setColor(next as ColorStringMap[M])}
         />
-        <code className="text-xs font-mono bg-muted px-2 py-1 rounded truncate">
+        <code className="text-xs font-mono bg-black/40 border border-white/10 px-2.5 py-1 rounded-md truncate min-w-0 flex-1">
           {color}
         </code>
       </div>
@@ -45,17 +47,21 @@ function ModeCard<M extends ColorMode>({ mode }: { mode: M }) {
 
 export function ModeLocked() {
   return (
-    <div className="rounded-lg border p-6">
-      <h3 className="font-semibold mb-4">Mode-Locked</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="glass-card rounded-2xl p-6 md:p-8">
+      <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">
+        <span className="text-gradient">/</span> mode-locked
+      </div>
+      <h3 className="text-xl font-semibold tracking-tight">Mode-Locked</h3>
+      <p className="mt-2 text-sm text-muted-foreground max-w-prose">
+        Setting <code className="text-foreground">mode</code> hides the switcher
+        and locks <code className="text-foreground">onChange</code> to that
+        format.
+      </p>
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {MODES.map((m) => (
           <ModeCard key={m} mode={m} />
         ))}
       </div>
-      <p className="mt-4 text-sm text-muted-foreground">
-        Setting <code>mode</code> hides the switcher and locks onChange to that
-        format.
-      </p>
     </div>
   )
 }

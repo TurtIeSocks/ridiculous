@@ -7,61 +7,140 @@ import { TierStrict } from "./examples/color-picker/tier-strict"
 
 export function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b">
-        <div className="container mx-auto px-6 py-12">
-          <h1 className="text-5xl font-bold tracking-tight">ridiculous</h1>
-          <p className="mt-3 text-lg text-muted-foreground">
-            ridiculously typed shadcn components
+    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+      <div
+        aria-hidden="true"
+        className="bg-mesh pointer-events-none fixed inset-0 -z-10"
+      />
+      <div
+        aria-hidden="true"
+        className="bg-grid pointer-events-none fixed inset-0 -z-10"
+      />
+
+      <header className="relative">
+        <div className="container mx-auto max-w-6xl px-6 pt-24 pb-16">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-mono text-muted-foreground backdrop-blur-sm">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-violet-glow shadow-[0_0_8px_var(--color-violet-glow)]" />
+            v0 · color-picker
+          </div>
+          <h1 className="mt-6 text-6xl md:text-7xl font-extrabold tracking-tight leading-[0.95]">
+            <span className="text-gradient">ridiculous</span>
+          </h1>
+          <p className="mt-4 max-w-xl text-lg text-muted-foreground">
+            Ridiculously typed shadcn components. Template-literal validators,
+            tiered ergonomics, zero-runtime guarantees.
           </p>
-          <p className="mt-2">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <a
               href="https://github.com/TurtIeSocks/ridiculous"
-              className="underline"
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-medium text-foreground transition hover:border-white/25 hover:bg-white/10"
             >
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="h-4 w-4"
+                aria-hidden="true"
+              >
+                <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.57.11.78-.25.78-.55 0-.27-.01-1.17-.02-2.12-3.2.7-3.87-1.36-3.87-1.36-.53-1.34-1.29-1.7-1.29-1.7-1.05-.71.08-.7.08-.7 1.16.08 1.78 1.2 1.78 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.27.73-1.56-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.28 1.18-3.08-.12-.29-.51-1.46.11-3.05 0 0 .97-.31 3.18 1.18a11 11 0 0 1 5.8 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.24 2.76.12 3.05.74.8 1.18 1.82 1.18 3.08 0 4.42-2.7 5.39-5.27 5.68.41.36.78 1.06.78 2.14 0 1.55-.01 2.8-.01 3.18 0 .3.21.67.79.55C20.21 21.38 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z" />
+              </svg>
               github.com/TurtIeSocks/ridiculous
             </a>
-          </p>
+            <a
+              href="#install"
+              className="inline-flex items-center gap-2 rounded-full bg-gradient-to-br from-violet-glow to-pink-glow px-4 py-2 text-sm font-semibold text-background shadow-[0_4px_24px_oklch(0.5_0.2_300_/_0.35)] transition hover:brightness-110"
+            >
+              Install
+            </a>
+          </div>
+        </div>
+        <div className="container mx-auto max-w-6xl px-6">
+          <div className="h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
         </div>
       </header>
-      <main className="container mx-auto px-6 py-12 space-y-16">
-        <section>
-          <h2 className="text-2xl font-semibold mb-6">Color Picker</h2>
-          <BasicUsage />
-          <ModeLocked />
-          <Native />
-          <TierCasual />
-          <TierIntellisense />
-          <TierStrict />
-        </section>
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Install</h2>
-          <div className="rounded-lg border p-6 space-y-4">
-            <p className="text-sm">
-              Drop the component into any shadcn-configured project:
-            </p>
-            <pre className="text-sm font-mono bg-muted p-3 rounded overflow-x-auto">
-              npx shadcn add
-              https://turtiesocks.github.io/ridiculous/r/color-picker.json
-            </pre>
-            <p className="text-xs text-muted-foreground">
-              <code>button</code> and <code>popover</code> dependencies resolve
-              against the shadcn-ui registry automatically.
-            </p>
+
+      <main className="relative">
+        <div className="container mx-auto max-w-6xl px-6 py-20">
+          <SectionHeader
+            eyebrow="component"
+            title="Color Picker"
+            description="Oklch L×C pad, hue + alpha strips, 6-mode round-trip (oklch, oklab, hex, rgb, hsl, hwb). Three usage tiers from casual to strict."
+          />
+          <div className="mt-12 space-y-10">
+            <BasicUsage />
+            <ModeLocked />
+            <Native />
           </div>
-        </section>
+
+          <SectionHeader
+            className="mt-32"
+            eyebrow="types"
+            title="Three usage tiers"
+            description="Pick the level of compile-time validation you want. From useState-and-go to literal-validated."
+          />
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            <TierCasual />
+            <TierIntellisense />
+            <TierStrict />
+          </div>
+
+          <SectionHeader
+            className="mt-32"
+            eyebrow="install"
+            title="Drop it in"
+            description="One command. Resolves button + popover against the shadcn-ui registry automatically."
+            id="install"
+          />
+          <div className="mt-8">
+            <div className="glass-card rounded-2xl p-6 md:p-8">
+              <pre className="text-sm md:text-base font-mono overflow-x-auto">
+                <span className="text-muted-foreground select-none">$ </span>
+                <span className="text-foreground">npx shadcn add </span>
+                <span className="text-gradient">
+                  https://turtiesocks.github.io/ridiculous/r/color-picker.json
+                </span>
+              </pre>
+            </div>
+          </div>
+        </div>
       </main>
-      <footer className="border-t mt-24">
-        <div className="container mx-auto px-6 py-6 text-sm text-muted-foreground">
-          MIT License ·{" "}
+
+      <footer className="relative border-t border-white/10 mt-20">
+        <div className="container mx-auto max-w-6xl px-6 py-8 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+          <span>MIT License · 2026</span>
           <a
             href="https://github.com/TurtIeSocks/ridiculous"
-            className="underline"
+            className="underline-offset-4 hover:text-foreground hover:underline"
           >
-            Source
+            github.com/TurtIeSocks/ridiculous
           </a>
         </div>
       </footer>
+    </div>
+  )
+}
+
+function SectionHeader({
+  eyebrow,
+  title,
+  description,
+  className,
+  id,
+}: {
+  eyebrow: string
+  title: string
+  description: string
+  className?: string
+  id?: string
+}) {
+  return (
+    <div className={className} id={id}>
+      <div className="text-xs font-mono uppercase tracking-[0.18em] text-muted-foreground">
+        <span className="text-gradient">/</span> {eyebrow}
+      </div>
+      <h2 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight">
+        {title}
+      </h2>
+      <p className="mt-3 max-w-2xl text-muted-foreground">{description}</p>
     </div>
   )
 }
