@@ -27,6 +27,31 @@
           "target": "components/ui/color-picker/color-picker.types.ts"
         }
       ]
+    },
+    {
+      "name": "gradient-editor",
+      "type": "registry:ui",
+      "title": "Gradient Editor",
+      "description": "Linear / radial / conic gradient editor with draggable stops, position picker, oklch-default interpolation, and reusable color-picker stops.",
+      "registryDependencies": ["button", "popover", "color-picker"],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/gradient-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/gradient-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/gradient-editor/gradient-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/gradient-editor/gradient-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/gradient-editor/gradient-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/gradient-editor/gradient-editor.types.ts"
+        }
+      ]
     }
   ]
 }
