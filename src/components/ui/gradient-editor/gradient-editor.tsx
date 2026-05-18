@@ -534,3 +534,177 @@ export function LinearControls({
     </div>
   )
 }
+
+export function PositionPicker({
+  x,
+  y,
+  onChange,
+}: {
+  x: number
+  y: number
+  onChange: (next: { x: number; y: number }) => void
+}) {
+  const handlePointer = (event: React.PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const nx = Math.max(
+      0,
+      Math.min(100, ((event.clientX - rect.left) / rect.width) * 100),
+    )
+    const ny = Math.max(
+      0,
+      Math.min(100, ((event.clientY - rect.top) / rect.height) * 100),
+    )
+    onChange({ x: Math.round(nx), y: Math.round(ny) })
+  }
+  return (
+    <div className="flex items-center gap-3">
+      <div
+        className="relative h-16 w-16 shrink-0 touch-none cursor-crosshair rounded border bg-muted/40"
+        onPointerDown={(event) => {
+          event.currentTarget.setPointerCapture(event.pointerId)
+          handlePointer(event)
+        }}
+        onPointerMove={(event) => {
+          if (event.buttons) handlePointer(event)
+        }}
+        data-slot="gradient-editor-position-pad"
+      >
+        <div
+          aria-hidden="true"
+          className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow ring-1 ring-black/40"
+          style={{ left: `${x}%`, top: `${y}%` }}
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+          x:
+          <input
+            type="number"
+            min={0}
+            max={100}
+            value={Math.round(x)}
+            onChange={(e) =>
+              onChange({ x: Number.parseInt(e.target.value, 10) || 0, y })
+            }
+            className="h-6 w-12 rounded border bg-background px-1 font-mono text-xs"
+          />
+          %
+        </label>
+        <label className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+          y:
+          <input
+            type="number"
+            min={0}
+            max={100}
+            value={Math.round(y)}
+            onChange={(e) =>
+              onChange({ x, y: Number.parseInt(e.target.value, 10) || 0 })
+            }
+            className="h-6 w-12 rounded border bg-background px-1 font-mono text-xs"
+          />
+          %
+        </label>
+      </div>
+    </div>
+  )
+}
+
+export function RadialControls({
+  state,
+  onChange,
+}: {
+  state: Pick<InternalState, "shape" | "size" | "position">
+  onChange: (next: Pick<InternalState, "shape" | "size" | "position">) => void
+}) {
+  return (
+    <div
+      className="flex flex-col gap-3"
+      data-slot="gradient-editor-radial-controls"
+    >
+      <div className="flex items-center gap-2">
+        <select
+          value={state.shape}
+          onChange={(e) =>
+            onChange({
+              ...state,
+              shape: e.target.value as "circle" | "ellipse",
+            })
+          }
+          className="h-7 rounded border bg-background px-2 font-mono text-xs"
+          aria-label="Radial shape"
+        >
+          <option value="ellipse">ellipse</option>
+          <option value="circle">circle</option>
+        </select>
+        <select
+          value={state.size}
+          onChange={(e) =>
+            onChange({
+              ...state,
+              size: e.target.value as InternalState["size"],
+            })
+          }
+          className="h-7 rounded border bg-background px-2 font-mono text-xs"
+          aria-label="Radial size"
+        >
+          <option value="farthest-corner">farthest-corner</option>
+          <option value="closest-corner">closest-corner</option>
+          <option value="farthest-side">farthest-side</option>
+          <option value="closest-side">closest-side</option>
+        </select>
+      </div>
+      <PositionPicker
+        x={state.position.x}
+        y={state.position.y}
+        onChange={(pos) => onChange({ ...state, position: pos })}
+      />
+    </div>
+  )
+}
+
+export function ConicControls({
+  fromAngle,
+  position,
+  onChange,
+}: {
+  fromAngle: number
+  position: { x: number; y: number }
+  onChange: (next: {
+    fromAngle: number
+    position: { x: number; y: number }
+  }) => void
+}) {
+  return (
+    <div
+      className="flex flex-col gap-3"
+      data-slot="gradient-editor-conic-controls"
+    >
+      <div className="flex items-center gap-3">
+        <AngleDial
+          angle={fromAngle}
+          onChange={(next) => onChange({ fromAngle: next, position })}
+        />
+        <input
+          type="number"
+          min={0}
+          max={360}
+          value={Math.round(fromAngle)}
+          onChange={(e) =>
+            onChange({
+              fromAngle: Number.parseInt(e.target.value, 10) || 0,
+              position,
+            })
+          }
+          className="h-7 w-16 rounded border bg-background px-2 font-mono text-xs"
+          aria-label="Conic from-angle in degrees"
+        />
+        <span className="font-mono text-xs text-muted-foreground">deg</span>
+      </div>
+      <PositionPicker
+        x={position.x}
+        y={position.y}
+        onChange={(pos) => onChange({ fromAngle, position: pos })}
+      />
+    </div>
+  )
+}
