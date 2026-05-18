@@ -70,37 +70,8 @@ export function GradientEditor<TType extends GradientType | undefined>({
   className,
   "aria-label": ariaLabel = "Edit gradient",
 }: GradientEditorProps<TType>) {
-  const parsedFromValue = parseGradient(value)
-
-  // Internal state mirrors color-picker's hybrid pattern. We do NOT derive
-  // marker/handle positions from each re-parse of `value`, because round-tripping
-  // through CSS gradient strings rounds sub-percent positions/angles to integers.
-  const [internal, setInternal] = useState<InternalState>(
-    () =>
-      parsedFromValue ?? {
-        type: "linear",
-        stops: [
-          { color: "#000000", position: 0 },
-          { color: "#ffffff", position: 100 },
-        ],
-        angle: 90,
-        shape: "ellipse",
-        size: "farthest-corner",
-        position: { x: 50, y: 50 },
-        fromAngle: 0,
-        interpolation: { space: "oklch" },
-      },
-  )
-  const [selectedStopIndex, setSelectedStopIndex] = useState(0)
-  const lastEmittedRef = useRef<string | null>(null)
-
-  useEffect(() => {
-    if (value === lastEmittedRef.current) return
-    const parsed = parseGradient(value)
-    if (parsed) setInternal(parsed)
-  }, [value])
-
-  if (!parsedFromValue) {
+  const parsed = parseGradient(value)
+  if (!parsed) {
     return (
       <span
         aria-hidden="true"
@@ -113,6 +84,51 @@ export function GradientEditor<TType extends GradientType | undefined>({
       />
     )
   }
+  return (
+    <GradientEditorBody
+      value={value}
+      initial={parsed}
+      onChange={onChange as (next: string) => void}
+      typeProp={typeProp}
+      maxStops={maxStops}
+      className={className}
+      ariaLabel={ariaLabel}
+    />
+  )
+}
+
+interface GradientEditorBodyProps {
+  value: string
+  initial: InternalState
+  onChange: (next: string) => void
+  typeProp: GradientType | undefined
+  maxStops: number
+  className: string | undefined
+  ariaLabel: string
+}
+
+function GradientEditorBody({
+  value,
+  initial,
+  onChange,
+  typeProp,
+  maxStops,
+  className,
+  ariaLabel,
+}: GradientEditorBodyProps) {
+  // Internal state owns marker/handle positions. We do NOT derive them from
+  // each re-parse of `value`, because round-tripping through CSS gradient
+  // strings rounds sub-percent positions/angles to integers. Resync only when
+  // `value` changes from outside (not from our own emit, guarded by ref).
+  const [internal, setInternal] = useState<InternalState>(initial)
+  const [selectedStopIndex, setSelectedStopIndex] = useState(0)
+  const lastEmittedRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (value === lastEmittedRef.current) return
+    const next = parseGradient(value)
+    if (next) setInternal(next)
+  }, [value])
 
   const activeType: GradientType = typeProp ?? internal.type
   const showTypeSwitcher = typeProp == null
@@ -121,7 +137,7 @@ export function GradientEditor<TType extends GradientType | undefined>({
     setInternal(next)
     const formatted = formatGradient(next)
     lastEmittedRef.current = formatted
-    onChange(formatted as Parameters<typeof onChange>[0])
+    onChange(formatted)
   }
 
   return (
