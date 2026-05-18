@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
   parseHex,
   parseHsl,
+  parseHwb,
   parseOklab,
   parseOklch,
   parseRgb,
@@ -147,5 +148,27 @@ describe("parseOklab", () => {
       b: -0.05,
       alpha: 0.5,
     })
+  })
+})
+
+describe("parseHwb", () => {
+  it("parses hwb(H W% B%)", () => {
+    expect(parseHwb("hwb(0 0% 0%)")).toEqual({
+      h: 0,
+      w: 0,
+      b: 0,
+      a: 1,
+    })
+  })
+  it("parses alpha", () => {
+    expect(parseHwb("hwb(240 20% 30% / 0.5)")).toEqual({
+      h: 240,
+      w: 0.2,
+      b: 0.3,
+      a: 0.5,
+    })
+  })
+  it("returns null for invalid", () => {
+    expect(parseHwb("hwb(garbage)")).toBeNull()
   })
 })

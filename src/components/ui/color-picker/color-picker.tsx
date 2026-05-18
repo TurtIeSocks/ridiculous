@@ -218,6 +218,41 @@ export function formatOklab(oklch: {
   return `${base} / ${trimNumber(oklch.a * 100)}%)`
 }
 
+const HWB_RE =
+  /^hwb\(\s*([\d.]+)(?:deg)?[\s,]+([\d.]+)%[\s,]+([\d.]+)%\s*(?:\/\s*([\d.]+%?)\s*)?\)$/i
+
+export function parseHwb(value: string): {
+  h: number
+  w: number
+  b: number
+  a: number
+} | null {
+  const match = value.match(HWB_RE)
+  if (!match) return null
+  const h = parseFloat(match[1])
+  const w = parseFloat(match[2]) / 100
+  const b = parseFloat(match[3]) / 100
+  const a = match[4] != null ? parseAlphaToken(match[4]) : 1
+  if ([h, w, b].some((n) => Number.isNaN(n))) return null
+  return { h, w, b, a }
+}
+
+export function formatHwb(oklch: {
+  l: number
+  c: number
+  h: number
+  a: number
+}): string {
+  const [r, g, b] = oklchToSrgb(oklch.l, oklch.c, oklch.h)
+  const hwb = srgbToHwb(clamp01(r), clamp01(g), clamp01(b))
+  const h = Math.round(hwb.h)
+  const w = Math.round(hwb.w * 100)
+  const bk = Math.round(hwb.b * 100)
+  const base = `hwb(${h} ${w}% ${bk}%`
+  if (oklch.a >= 1) return `${base})`
+  return `${base} / ${Math.round(oklch.a * 100)}%)`
+}
+
 // ---------------------------------------------------------------------------
 // Color space conversions
 // ---------------------------------------------------------------------------
@@ -349,4 +384,34 @@ export function oklabToOklch(
   let H = (Math.atan2(b, a) * 180) / Math.PI
   if (H < 0) H += 360
   return { l: L, c: C, h: H }
+}
+
+// Per CSS Color 4 spec, https://www.w3.org/TR/css-color-4/#hwb-to-rgb
+export function hwbToSrgb(
+  h: number,
+  w: number,
+  b: number,
+): { r: number; g: number; b: number } {
+  if (w + b >= 1) {
+    const gray = w / (w + b)
+    return { r: gray, g: gray, b: gray }
+  }
+  const rgb = hslToSrgb(h, 1, 0.5)
+  const scale = 1 - w - b
+  return {
+    r: rgb.r * scale + w,
+    g: rgb.g * scale + w,
+    b: rgb.b * scale + w,
+  }
+}
+
+export function srgbToHwb(
+  r: number,
+  g: number,
+  b: number,
+): { h: number; w: number; b: number } {
+  const hsl = srgbToHsl(r, g, b)
+  const w = Math.min(r, g, b)
+  const bk = 1 - Math.max(r, g, b)
+  return { h: hsl.h, w, b: bk }
 }

@@ -143,3 +143,30 @@ describe("oklch ↔ oklab", () => {
     expect(oklab.b).toBeCloseTo(0, 6)
   })
 })
+
+import { hwbToSrgb, srgbToHwb } from "@/components/ui/color-picker/color-picker"
+
+describe("hwbToSrgb / srgbToHwb", () => {
+  it("round-trips pure red", () => {
+    const srgb = hwbToSrgb(0, 0, 0)
+    expect(srgb.r).toBeCloseTo(1, 6)
+    expect(srgb.g).toBeCloseTo(0, 6)
+    expect(srgb.b).toBeCloseTo(0, 6)
+    const hwb = srgbToHwb(srgb.r, srgb.g, srgb.b)
+    expect(hwb.h).toBeCloseTo(0, 4)
+    expect(hwb.w).toBeCloseTo(0, 4)
+    expect(hwb.b).toBeCloseTo(0, 4)
+  })
+  it("W=1 yields white regardless of hue", () => {
+    const srgb = hwbToSrgb(240, 1, 0)
+    expect(srgb.r).toBeCloseTo(1, 4)
+    expect(srgb.g).toBeCloseTo(1, 4)
+    expect(srgb.b).toBeCloseTo(1, 4)
+  })
+  it("B=1 yields black regardless of hue", () => {
+    const srgb = hwbToSrgb(240, 0, 1)
+    expect(srgb.r).toBeCloseTo(0, 4)
+    expect(srgb.g).toBeCloseTo(0, 4)
+    expect(srgb.b).toBeCloseTo(0, 4)
+  })
+})
