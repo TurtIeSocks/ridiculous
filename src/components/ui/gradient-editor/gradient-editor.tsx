@@ -165,13 +165,12 @@ export function GradientEditor<TType extends GradientType | undefined>({
               // Pick interpolated color from neighbors; fallback to last stop's color.
               const newColor =
                 internal.stops[internal.stops.length - 1]?.color ?? "#000000"
-              const stops = [
-                ...internal.stops,
-                { color: newColor, position },
-              ].sort((a, b) => a.position - b.position)
-              setSelectedStopIndex(
-                stops.findIndex((s) => s.position === position),
+              const newStop = { color: newColor, position }
+              const stops = [...internal.stops, newStop].sort(
+                (a, b) => a.position - b.position,
               )
+              // Find by reference (handles duplicate positions correctly).
+              setSelectedStopIndex(stops.indexOf(newStop))
               emit({ ...internal, stops })
             }}
             maxStops={maxStops}
@@ -413,7 +412,7 @@ export function parseGradient(value: string): InternalState | null {
   let preludeIndex = 0
   const first = preludeAndStops[0] ?? ""
   const looksLikePrelude =
-    /^(\d+(\.\d+)?deg|to )/.test(first) || // linear angle
+    /^(-?\d+(\.\d+)?deg|to )/.test(first) || // linear angle (signed)
     /^(circle|ellipse|closest|farthest)/.test(first) || // radial shape/size
     first.startsWith("at ") || // radial position alone
     first.startsWith("from ") // conic
@@ -430,7 +429,7 @@ export function parseGradient(value: string): InternalState | null {
     if (SIDE_TO_ANGLE[prelude] != null) {
       angle = SIDE_TO_ANGLE[prelude]
     } else {
-      const m = prelude.match(/^(\d+(?:\.\d+)?)deg$/)
+      const m = prelude.match(/^(-?\d+(?:\.\d+)?)deg$/)
       if (m) angle = parseFloat(m[1])
       else return null
     }
@@ -983,7 +982,7 @@ function GradientPreview({
         {state.stops.map((stop, i) => (
           <button
             // biome-ignore lint/suspicious/noArrayIndexKey: stops have no stable id; index is the canonical identity here
-            key={`${i}-${stop.position}`}
+            key={i}
             type="button"
             aria-label={`Stop ${i + 1} at ${Math.round(stop.position)}%`}
             onClick={() => onSelectStop(i)}
