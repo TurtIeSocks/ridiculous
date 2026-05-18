@@ -174,7 +174,7 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
         </button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-80 p-3"
+        className="w-77 p-3"
         align="start"
         data-slot="color-picker"
       >
