@@ -234,9 +234,40 @@ export type RGBALiteral<S extends string> =
           >
         : never
 
+/** hsl(210, 100%, 50%) | hsl(210 100% 50%) | hsl(210 100% 50% / 0.5) */
+export type HSLLiteral<S extends string> =
+  S extends `hsl(${infer H} ${infer Sat} ${infer Light} / ${infer A})`
+    ? KeepIf<
+        And<
+          IsHue<Trim<H>>,
+          And<
+            IsPercent0To100<Trim<Sat>>,
+            And<IsPercent0To100<Trim<Light>>, IsAlpha<Trim<A>>>
+          >
+        >,
+        S
+      >
+    : S extends `hsl(${infer H},${infer Sat},${infer Light})`
+      ? KeepIf<
+          And<
+            IsHue<Trim<H>>,
+            And<IsPercent0To100<Trim<Sat>>, IsPercent0To100<Trim<Light>>>
+          >,
+          S
+        >
+      : S extends `hsl(${infer H} ${infer Sat} ${infer Light})`
+        ? KeepIf<
+            And<
+              IsHue<Trim<H>>,
+              And<IsPercent0To100<Trim<Sat>>, IsPercent0To100<Trim<Light>>>
+            >,
+            S
+          >
+        : never
+
 // Compile-time anchor for primitives not yet consumed by an exported
 // validator. tsc's `noUnusedLocals` flags top-level type aliases (TS6196),
 // so each unconsumed primitive is referenced here. Entries are removed as
 // subsequent tasks introduce validators that consume them. Erased at
 // compile time; intentionally exported so the anchor itself isn't flagged.
-export type __PrimitivesAnchor__ = [IsHue<"">, IsNonNegativeNumber<"">]
+export type __PrimitivesAnchor__ = [IsNonNegativeNumber<"">]

@@ -1,6 +1,7 @@
 import { expectTypeOf, test } from "vitest"
 import type {
   HexLiteral,
+  HSLLiteral,
   RGBALiteral,
   RGBLiteral,
 } from "@/components/ui/color-picker/color-picker.types"
@@ -51,4 +52,21 @@ test("RGBALiteral accepts alpha forms", () => {
 
 test("RGBALiteral rejects bad alpha", () => {
   expectTypeOf<RGBALiteral<"rgba(255, 0, 0, 2)">>().toBeNever()
+})
+
+test("HSLLiteral accepts valid forms", () => {
+  expectTypeOf<HSLLiteral<"hsl(210 100% 50%)">>().toEqualTypeOf<
+    "hsl(210 100% 50%)"
+  >()
+  expectTypeOf<HSLLiteral<"hsl(210, 100%, 50%)">>().toEqualTypeOf<
+    "hsl(210, 100%, 50%)"
+  >()
+  expectTypeOf<HSLLiteral<"hsl(210 100% 50% / 0.5)">>().toEqualTypeOf<
+    "hsl(210 100% 50% / 0.5)"
+  >()
+})
+
+test("HSLLiteral rejects out-of-range", () => {
+  expectTypeOf<HSLLiteral<"hsl(400 100% 50%)">>().toBeNever()
+  expectTypeOf<HSLLiteral<"hsl(210 200% 50%)">>().toBeNever()
 })
