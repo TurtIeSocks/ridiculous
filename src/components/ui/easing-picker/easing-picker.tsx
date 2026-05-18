@@ -1,11 +1,92 @@
 "use client"
 
+import React, { useEffect, useRef, useState } from "react"
+import { cn } from "@/lib/utils"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Button } from "@/components/ui/button"
+
 // ---------------------------------------------------------------------------
-// Component (top of file — filled in Phase 9)
+// Component
 // ---------------------------------------------------------------------------
 
-export function EasingPicker() {
-  return null
+export interface EasingPickerProps<
+  TBasis extends EasingBasis | undefined = undefined,
+> extends EasingPanelProps<TBasis> {}
+
+export function EasingPicker<
+  TBasis extends EasingBasis | undefined = undefined,
+>({
+  value,
+  onChange,
+  basis,
+  output,
+  className,
+  "aria-label": ariaLabel = "Pick an easing",
+}: EasingPickerProps<TBasis>) {
+  const parsed = parseEasing(value)
+  const label = computeTriggerLabel(parsed)
+  const thumb = computeTriggerThumb(parsed)
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button
+          variant="outline"
+          className={cn("h-9 gap-2 px-3", className)}
+          aria-label={ariaLabel}
+        >
+          <div className="size-5 text-foreground/70">{thumb}</div>
+          <span className="text-xs font-mono">{label}</span>
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto p-0" align="start">
+        <EasingPanel
+          value={value}
+          onChange={onChange}
+          basis={basis}
+          output={output}
+        />
+      </PopoverContent>
+    </Popover>
+  )
+}
+
+function computeTriggerLabel(state: EasingState | null): string {
+  if (!state) return "(invalid)"
+  switch (state.basis) {
+    case "bezier": {
+      const name = matchPreset(state.x1, state.y1, state.x2, state.y2)
+      return name ?? "cubic-bezier"
+    }
+    case "spring":
+      return "spring"
+    case "bounce":
+      return "bounce"
+    case "wiggle":
+      return "wiggle"
+    case "steps":
+      return `steps(${state.n})`
+  }
+}
+
+function computeTriggerThumb(state: EasingState | null): React.ReactNode {
+  if (!state || state.basis !== "bezier") {
+    return (
+      <svg viewBox="0 0 48 32">
+        <line x1="0" y1="16" x2="48" y2="16" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    )
+  }
+  const path = `M 0 32 C ${state.x1 * 48} ${(1 - state.y1) * 32}, ${state.x2 * 48} ${(1 - state.y2) * 32}, 48 0`
+  return (
+    <svg viewBox="0 0 48 32">
+      <path d={path} fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -306,9 +387,6 @@ function BasisTabs({ value, onChange, available = ALL_BASES }: BasisTabsProps) {
 // ---------------------------------------------------------------------------
 // Sub-components (filled in Phases 3-7)
 // ---------------------------------------------------------------------------
-
-import { useEffect, useRef, useState } from "react"
-import { cn } from "@/lib/utils"
 
 export interface PresetGalleryProps {
   value?: PresetName

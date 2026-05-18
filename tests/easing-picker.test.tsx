@@ -4,6 +4,7 @@ import {
   BezierCanvas,
   BounceControls,
   EasingPanel,
+  EasingPicker,
   EasingPreview,
   PresetGallery,
   SpringControls,
@@ -164,5 +165,24 @@ describe("EasingPanel integration", () => {
       />,
     )
     expect(screen.queryByText(/spring/i)).not.toBeInTheDocument()
+  })
+})
+
+describe("EasingPicker popover", () => {
+  test("trigger button renders curve thumbnail + name label", () => {
+    render(
+      <EasingPicker value="cubic-bezier(0.42, 0, 0.58, 1)" onChange={() => {}} />,
+    )
+    expect(screen.getByRole("button")).toBeInTheDocument()
+    // Matches "ease-in-out" preset, so trigger should show that label
+    expect(screen.getByRole("button").textContent).toContain("ease-in-out")
+  })
+
+  test("opening popover renders EasingPanel", async () => {
+    render(<EasingPicker value="ease" onChange={() => {}} />)
+    fireEvent.click(screen.getByRole("button"))
+    // PopoverContent renders BasisTabs — findAllByText handles multiple matches
+    const els = await screen.findAllByText(/bezier/i)
+    expect(els.length).toBeGreaterThan(0)
   })
 })
