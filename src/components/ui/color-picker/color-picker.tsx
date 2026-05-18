@@ -2,6 +2,11 @@
 
 import { useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import type {
   ColorMode,
@@ -82,14 +87,67 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
     )
   }
 
-  // Popover wiring lands in Task 37.
+  const activeMode: ColorMode = modeProp ?? parsed.mode
+  const showModeGroup = modeProp == null
+
+  const emit = (
+    next: { l: number; c: number; h: number; a: number },
+    mode: ColorMode = activeMode,
+  ) => {
+    onChange(formatColor(next, mode) as Parameters<typeof onChange>[0])
+  }
+
   return (
-    <span
-      aria-hidden="true"
-      className={cn("inline-block h-5 w-5 rounded border", className)}
-      style={{ backgroundColor: value }}
-      data-slot="color-picker-trigger-placeholder"
-    />
+    <Popover>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          aria-label={ariaLabel}
+          className={cn(
+            "shrink-0 cursor-pointer rounded outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
+            className,
+          )}
+          data-slot="color-picker-trigger"
+        >
+          <span
+            aria-hidden="true"
+            className="block h-5 w-5 rounded border"
+            style={{ backgroundColor: value }}
+          />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent
+        className="w-auto p-3"
+        align="start"
+        data-slot="color-picker"
+      >
+        <div className="flex flex-col gap-3">
+          {showModeGroup && (
+            <ModeButtonGroup
+              mode={activeMode}
+              onChange={(next) => emit(parsed.oklch, next)}
+            />
+          )}
+          <LcPad
+            l={parsed.oklch.l}
+            c={parsed.oklch.c}
+            h={parsed.oklch.h}
+            onChange={(l, c) => emit({ ...parsed.oklch, l, c })}
+          />
+          <HueStrip
+            h={parsed.oklch.h}
+            onChange={(h) => emit({ ...parsed.oklch, h })}
+          />
+          <AlphaStrip
+            a={parsed.oklch.a}
+            l={parsed.oklch.l}
+            c={parsed.oklch.c}
+            h={parsed.oklch.h}
+            onChange={(a) => emit({ ...parsed.oklch, a })}
+          />
+        </div>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -584,7 +642,7 @@ const PAD_WIDTH = 240
 const PAD_HEIGHT = 160
 const CHROMA_MAX = 0.4
 
-export function LcPad({
+function LcPad({
   l,
   c,
   h,
@@ -658,7 +716,7 @@ export function LcPad({
 
 const HUE_GRADIENT = `linear-gradient(to right, oklch(0.7 0.18 0), oklch(0.7 0.18 60), oklch(0.7 0.18 120), oklch(0.7 0.18 180), oklch(0.7 0.18 240), oklch(0.7 0.18 300), oklch(0.7 0.18 360))`
 
-export function HueStrip({
+function HueStrip({
   h,
   onChange,
 }: {
@@ -704,7 +762,7 @@ export function HueStrip({
 
 const CHECKER_BG = `conic-gradient(#bbb 25%, #fff 0 50%, #bbb 0 75%, #fff 0) 0 0 / 10px 10px`
 
-export function AlphaStrip({
+function AlphaStrip({
   a,
   l,
   c,
@@ -757,7 +815,7 @@ export function AlphaStrip({
   )
 }
 
-export function ModeButtonGroup({
+function ModeButtonGroup({
   mode,
   onChange,
 }: {
