@@ -265,9 +265,31 @@ export type HSLLiteral<S extends string> =
           >
         : never
 
-// Compile-time anchor for primitives not yet consumed by an exported
-// validator. tsc's `noUnusedLocals` flags top-level type aliases (TS6196),
-// so each unconsumed primitive is referenced here. Entries are removed as
-// subsequent tasks introduce validators that consume them. Erased at
-// compile time; intentionally exported so the anchor itself isn't flagged.
-export type __PrimitivesAnchor__ = [IsNonNegativeNumber<"">]
+/**
+ * oklch(62% 0.18 240)
+ * oklch(0.62 0.18 240deg / 0.8)
+ */
+export type OKLCHLiteral<S extends string> =
+  S extends `oklch(${infer L} ${infer C} ${infer H} / ${infer A})`
+    ? KeepIf<
+        And<
+          Or<IsNumber0To1<Trim<L>>, IsPercent0To100<Trim<L>>>,
+          And<
+            Or<IsNonNegativeNumber<Trim<C>>, IsPercent0To100<Trim<C>>>,
+            And<IsHue<Trim<H>>, IsAlpha<Trim<A>>>
+          >
+        >,
+        S
+      >
+    : S extends `oklch(${infer L} ${infer C} ${infer H})`
+      ? KeepIf<
+          And<
+            Or<IsNumber0To1<Trim<L>>, IsPercent0To100<Trim<L>>>,
+            And<
+              Or<IsNonNegativeNumber<Trim<C>>, IsPercent0To100<Trim<C>>>,
+              IsHue<Trim<H>>
+            >
+          >,
+          S
+        >
+      : never
