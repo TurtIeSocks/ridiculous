@@ -691,3 +691,58 @@ export function HueStrip({
     </div>
   )
 }
+
+const CHECKER_BG = `conic-gradient(#bbb 25%, #fff 0 50%, #bbb 0 75%, #fff 0) 0 0 / 10px 10px`
+
+export function AlphaStrip({
+  a,
+  l,
+  c,
+  h,
+  onChange,
+}: {
+  a: number
+  l: number
+  c: number
+  h: number
+  onChange: (next: number) => void
+}) {
+  const handlePointer = (event: React.PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    onChange(clamp01((event.clientX - rect.left) / rect.width))
+  }
+
+  const color = `oklch(${l} ${c} ${h})`
+  const background = `linear-gradient(to right, transparent, ${color}), ${CHECKER_BG}`
+
+  return (
+    <div
+      data-slot="color-picker-alpha"
+      role="slider"
+      aria-label="Alpha"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(a * 100)}
+      tabIndex={0}
+      className="relative h-4 w-full touch-none cursor-pointer rounded-full"
+      style={{ background }}
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId)
+        handlePointer(event)
+      }}
+      onPointerMove={(event) => {
+        if (event.buttons) handlePointer(event)
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowLeft") onChange(clamp01(a - 0.01))
+        if (event.key === "ArrowRight") onChange(clamp01(a + 0.01))
+      }}
+    >
+      <div
+        aria-hidden="true"
+        className="absolute top-1/2 h-5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white border border-black/40 shadow pointer-events-none"
+        style={{ left: `${a * 100}%` }}
+      />
+    </div>
+  )
+}
