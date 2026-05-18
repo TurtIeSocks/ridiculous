@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import type {
   ColorMode,
@@ -563,4 +564,84 @@ export function formatColor(
     case "hwb":
       return formatHwb(oklch)
   }
+}
+
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
+
+const PAD_WIDTH = 240
+const PAD_HEIGHT = 160
+const CHROMA_MAX = 0.4
+
+export function LcPad({
+  l,
+  c,
+  h,
+  onChange,
+}: {
+  l: number
+  c: number
+  h: number
+  onChange: (l: number, c: number) => void
+}) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
+    const image = ctx.createImageData(PAD_WIDTH, PAD_HEIGHT)
+    for (let y = 0; y < PAD_HEIGHT; y++) {
+      const lAtRow = 1 - y / (PAD_HEIGHT - 1)
+      for (let x = 0; x < PAD_WIDTH; x++) {
+        const cAtCol = (x / (PAD_WIDTH - 1)) * CHROMA_MAX
+        const [r, g, b] = oklchToSrgb(lAtRow, cAtCol, h)
+        const i = (y * PAD_WIDTH + x) * 4
+        image.data[i] = r * 255
+        image.data[i + 1] = g * 255
+        image.data[i + 2] = b * 255
+        image.data[i + 3] = 255
+      }
+    }
+    ctx.putImageData(image, 0, 0)
+  }, [h])
+
+  const handlePointer = (event: React.PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const nx = clamp01((event.clientX - rect.left) / rect.width)
+    const ny = clamp01((event.clientY - rect.top) / rect.height)
+    onChange(1 - ny, nx * CHROMA_MAX)
+  }
+
+  const markerX = (c / CHROMA_MAX) * 100
+  const markerY = (1 - l) * 100
+
+  return (
+    <div
+      data-slot="color-picker-pad"
+      className="relative touch-none cursor-crosshair rounded border overflow-hidden"
+      style={{ width: PAD_WIDTH, height: PAD_HEIGHT }}
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId)
+        handlePointer(event)
+      }}
+      onPointerMove={(event) => {
+        if (event.buttons) handlePointer(event)
+      }}
+    >
+      <canvas
+        ref={canvasRef}
+        width={PAD_WIDTH}
+        height={PAD_HEIGHT}
+        className="block h-full w-full"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow ring-1 ring-black/40 pointer-events-none"
+        style={{ left: `${markerX}%`, top: `${markerY}%` }}
+      />
+    </div>
+  )
 }
