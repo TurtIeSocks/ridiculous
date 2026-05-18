@@ -1,2 +1,10 @@
-// Barrel re-exports. Populated as types and component land.
-export {}
+export type {
+  DegLiteral,
+  EmLiteral,
+  PercentLiteral,
+  PxLiteral,
+  RemLiteral,
+  UnitLiteral,
+  VhLiteral,
+  VwLiteral,
+} from "./unit-input.types"
