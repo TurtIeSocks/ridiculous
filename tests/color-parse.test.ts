@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest"
-import { parseHex } from "@/components/ui/color-picker/color-picker"
+import {
+  parseHex,
+  parseRgb,
+} from "@/components/ui/color-picker/color-picker"
 
 describe("parseHex", () => {
   it("parses 6-digit hex", () => {
@@ -32,5 +35,37 @@ describe("parseHex", () => {
     expect(parseHex("ff0000")).toBeNull()
     expect(parseHex("#ff")).toBeNull()
     expect(parseHex("")).toBeNull()
+  })
+})
+
+describe("parseRgb", () => {
+  it("parses comma-separated rgb()", () => {
+    expect(parseRgb("rgb(255, 0, 0)")).toEqual({ r: 1, g: 0, b: 0, a: 1 })
+  })
+  it("parses space-separated rgb()", () => {
+    expect(parseRgb("rgb(255 0 0)")).toEqual({ r: 1, g: 0, b: 0, a: 1 })
+  })
+  it("parses percentage channels", () => {
+    expect(parseRgb("rgb(100% 0% 0%)")).toEqual({ r: 1, g: 0, b: 0, a: 1 })
+  })
+  it("parses rgba with alpha slash", () => {
+    expect(parseRgb("rgba(255 0 0 / 0.5)")).toEqual({
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 0.5,
+    })
+  })
+  it("parses rgba with comma alpha", () => {
+    expect(parseRgb("rgba(255, 0, 0, 0.5)")).toEqual({
+      r: 1,
+      g: 0,
+      b: 0,
+      a: 0.5,
+    })
+  })
+  it("returns null for invalid", () => {
+    expect(parseRgb("rgb()")).toBeNull()
+    expect(parseRgb("not-rgb")).toBeNull()
   })
 })

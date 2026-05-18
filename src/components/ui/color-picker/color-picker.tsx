@@ -66,6 +66,23 @@ export function parseHex(
   return null
 }
 
+export function parseRgb(
+  value: string,
+): { r: number; g: number; b: number; a: number } | null {
+  const match = value.match(
+    /^rgba?\(\s*([\d.]+%?)[\s,]+([\d.]+%?)[\s,]+([\d.]+%?)\s*(?:[,/]\s*([\d.]+%?))?\s*\)$/i,
+  )
+  if (!match) return null
+  const channel = (raw: string) =>
+    raw.endsWith("%") ? parseFloat(raw) / 100 : parseFloat(raw) / 255
+  const r = channel(match[1])
+  const g = channel(match[2])
+  const b = channel(match[3])
+  const a = match[4] != null ? parseAlphaToken(match[4]) : 1
+  if ([r, g, b].some((n) => Number.isNaN(n))) return null
+  return { r, g, b, a }
+}
+
 // ---------------------------------------------------------------------------
 // Color space conversions
 // ---------------------------------------------------------------------------
