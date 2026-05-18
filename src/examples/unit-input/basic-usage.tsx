@@ -24,6 +24,7 @@ export function BasicUsage() {
             min={0}
             max={360}
             aria-label="Angle"
+            className="w-24"
           />
         </div>
         <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
@@ -35,6 +36,7 @@ export function BasicUsage() {
             min={0}
             max={100}
             aria-label="Opacity"
+            className="w-20"
           />
         </div>
         <code className="text-sm font-mono bg-black/40 border border-white/10 px-3 py-1.5 rounded-lg">

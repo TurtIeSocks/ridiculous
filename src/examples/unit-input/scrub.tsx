@@ -24,6 +24,7 @@ export function Scrub() {
           step={1}
           dragSensitivity={1}
           aria-label="Size"
+          className="w-20"
         />
         <div
           aria-hidden="true"

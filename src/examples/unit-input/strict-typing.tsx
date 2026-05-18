@@ -26,6 +26,7 @@ export function StrictTyping() {
           min={0}
           max={360}
           aria-label="Angle"
+          className="w-24"
         />
         <code className="text-sm font-mono bg-black/40 border border-white/10 px-3 py-1.5 rounded-lg">
           {angle}
