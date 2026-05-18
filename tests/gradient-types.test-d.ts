@@ -41,3 +41,31 @@ test("InterpolationHueMethod is shorter | longer", () => {
 test("PolarSpace is the polar subset of InterpolationSpace", () => {
   expectTypeOf<PolarSpace>().toEqualTypeOf<"oklch" | "hsl" | "hwb">()
 })
+
+import type {
+  GradientTypeOf,
+  InterpolationOf,
+} from "@/components/ui/gradient-editor/gradient-editor.types"
+
+test("GradientTypeOf extracts the type from a literal", () => {
+  expectTypeOf<GradientTypeOf<"linear-gradient(red, blue)">>().toEqualTypeOf<
+    "linear"
+  >()
+  expectTypeOf<GradientTypeOf<"radial-gradient(red, blue)">>().toEqualTypeOf<
+    "radial"
+  >()
+  expectTypeOf<GradientTypeOf<"conic-gradient(red, blue)">>().toEqualTypeOf<
+    "conic"
+  >()
+  expectTypeOf<GradientTypeOf<"not a gradient">>().toBeNever()
+})
+
+test("InterpolationOf extracts the interpolation space", () => {
+  expectTypeOf<InterpolationOf<"linear-gradient(in oklch, red, blue)">>()
+    .toEqualTypeOf<"oklch">()
+  expectTypeOf<InterpolationOf<"linear-gradient(in oklch longer hue, red, blue)">>()
+    .toEqualTypeOf<"oklch">()
+  expectTypeOf<InterpolationOf<"linear-gradient(in oklch shorter hue, red, blue)">>()
+    .toEqualTypeOf<"oklch">()
+  expectTypeOf<InterpolationOf<"linear-gradient(red, blue)">>().toBeNever()
+})

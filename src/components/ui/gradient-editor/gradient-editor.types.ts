@@ -38,8 +38,33 @@ export type InterpolationHueMethod = "shorter" | "longer"
 export type PolarSpace = Extract<InterpolationSpace, "oklch" | "hsl" | "hwb">
 
 // =====================================================================
-// 3. UTILITY TYPES
+// 3. UTILITY TYPES — extract structural info at the type level.
 // =====================================================================
+
+/**
+ * Extract gradient type from a literal.
+ * @example
+ * type T = GradientTypeOf<"linear-gradient(red, blue)">  // "linear"
+ */
+export type GradientTypeOf<S extends string> = S extends `linear-gradient(${string}`
+  ? "linear"
+  : S extends `radial-gradient(${string}`
+    ? "radial"
+    : S extends `conic-gradient(${string}`
+      ? "conic"
+      : never
+
+/**
+ * Extract interpolation space from a literal, if declared.
+ * @example
+ * type T = InterpolationOf<"linear-gradient(in oklch, red, blue)">  // "oklch"
+ */
+export type InterpolationOf<S extends string> =
+  S extends `${string}-gradient(in ${infer Space}, ${string}`
+    ? Space extends `${infer Pure} longer hue` | `${infer Pure} shorter hue`
+      ? Pure
+      : Space
+    : never
 
 // =====================================================================
 // 4. INTERNAL STOP REPRESENTATION
