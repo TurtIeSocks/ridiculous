@@ -189,6 +189,24 @@ export interface EasingStringMap {
 
 export type EasingBasis = keyof EasingStringMap
 
+export type PolynomialFamily =
+  | "Sine"
+  | "Quad"
+  | "Cubic"
+  | "Quart"
+  | "Quint"
+  | "Expo"
+  | "Circ"
+  | "Back"
+
+export type Direction = "In" | "Out" | "InOut" | "OutIn"
+
+export type PresetName =
+  | EasingKeyword
+  | `ease${Direction}${PolynomialFamily}`
+  | "anticipate"
+  | "smoothStep"
+
 // =====================================================================
 // 4. UTILITY TYPES — operate on easing literals at the type level.
 // =====================================================================
