@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest"
+import { describe, expect, it } from "vitest"
 import {
   clamp01,
-  trimNumber,
   parseAlphaToken,
+  trimNumber,
 } from "@/components/ui/color-picker/color-picker"
 
 describe("clamp01", () => {
@@ -39,5 +39,29 @@ describe("parseAlphaToken", () => {
     expect(parseAlphaToken("50%")).toBe(0.5)
     expect(parseAlphaToken("100%")).toBe(1)
     expect(parseAlphaToken("0%")).toBe(0)
+  })
+})
+
+import {
+  linearToSrgb,
+  srgbToLinear,
+} from "@/components/ui/color-picker/color-picker"
+
+describe("linearToSrgb / srgbToLinear", () => {
+  it("clamps below 0 and above 1", () => {
+    expect(linearToSrgb(-0.5)).toBe(0)
+    expect(linearToSrgb(1.5)).toBe(1)
+    expect(srgbToLinear(-0.5)).toBe(0)
+    expect(srgbToLinear(1.5)).toBe(1)
+  })
+  it("round-trips arbitrary values", () => {
+    for (const v of [0.05, 0.1, 0.25, 0.5, 0.75, 0.9]) {
+      expect(linearToSrgb(srgbToLinear(v))).toBeCloseTo(v, 6)
+      expect(srgbToLinear(linearToSrgb(v))).toBeCloseTo(v, 6)
+    }
+  })
+  it("matches IEC 61966-2-1 anchors", () => {
+    expect(linearToSrgb(0.0031308)).toBeCloseTo(0.04045, 4)
+    expect(srgbToLinear(0.04045)).toBeCloseTo(0.0031308, 6)
   })
 })

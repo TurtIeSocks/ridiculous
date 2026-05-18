@@ -27,3 +27,15 @@ export function clamp01(n: number): number {
 // ---------------------------------------------------------------------------
 // Color space conversions
 // ---------------------------------------------------------------------------
+
+export function linearToSrgb(x: number): number {
+  if (x <= 0) return 0
+  if (x >= 1) return 1
+  return x <= 0.0031308 ? 12.92 * x : 1.055 * x ** (1 / 2.4) - 0.055
+}
+
+export function srgbToLinear(x: number): number {
+  if (x <= 0) return 0
+  if (x >= 1) return 1
+  return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4
+}
