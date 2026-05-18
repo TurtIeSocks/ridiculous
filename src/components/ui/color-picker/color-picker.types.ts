@@ -327,3 +327,29 @@ export type OklabLiteral<S extends string> =
           S
         >
       : never
+
+/**
+ * hwb(240 20% 30%)
+ * hwb(240 20% 30% / 0.5)
+ */
+export type HWBLiteral<S extends string> =
+  S extends `hwb(${infer H} ${infer W} ${infer B} / ${infer A})`
+    ? KeepIf<
+        And<
+          IsHue<Trim<H>>,
+          And<
+            IsPercent0To100<Trim<W>>,
+            And<IsPercent0To100<Trim<B>>, IsAlpha<Trim<A>>>
+          >
+        >,
+        S
+      >
+    : S extends `hwb(${infer H} ${infer W} ${infer B})`
+      ? KeepIf<
+          And<
+            IsHue<Trim<H>>,
+            And<IsPercent0To100<Trim<W>>, IsPercent0To100<Trim<B>>>
+          >,
+          S
+        >
+      : never
