@@ -16,6 +16,112 @@ export function EasingPicker() {
 // Sub-components (filled in Phases 3-7)
 // ---------------------------------------------------------------------------
 
+import { cn } from "@/lib/utils"
+
+export interface PresetGalleryProps {
+  value?: PresetName
+  onChange: (preset: PresetName, bezier: string) => void
+  className?: string
+}
+
+function PresetThumb({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
+  const path = `M 0 32 C ${x1 * 48} ${(1 - y1) * 32}, ${x2 * 48} ${(1 - y2) * 32}, 48 0`
+  return (
+    <svg viewBox="0 0 48 32" className="size-full">
+      <path d={path} fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  )
+}
+
+export function PresetGallery({
+  value,
+  onChange,
+  className,
+}: PresetGalleryProps) {
+  const keywords = PRESETS.filter((p) => !p.family && p.name !== "anticipate" && p.name !== "smoothStep")
+  const polynomials = PRESETS.filter((p) => p.family)
+  const specials = PRESETS.filter((p) => p.name === "anticipate" || p.name === "smoothStep")
+
+  return (
+    <div className={cn("space-y-3", className)}>
+      <PresetRow label="Keywords" presets={keywords} value={value} onChange={onChange} />
+      <PresetGrid presets={polynomials} value={value} onChange={onChange} />
+      <PresetRow label="Special" presets={specials} value={value} onChange={onChange} />
+    </div>
+  )
+}
+
+function PresetRow({
+  label,
+  presets,
+  value,
+  onChange,
+}: {
+  label: string
+  presets: readonly PresetEntry[]
+  value?: PresetName
+  onChange: (preset: PresetName, bezier: string) => void
+}) {
+  return (
+    <div>
+      <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">{label}</div>
+      <div className="flex flex-wrap gap-1">
+        {presets.map((p) => (
+          <PresetCard key={p.name} preset={p} active={value === p.name} onClick={() => onChange(p.name, bezierFromPreset(p.name))} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function PresetGrid({
+  presets,
+  value,
+  onChange,
+}: {
+  presets: readonly PresetEntry[]
+  value?: PresetName
+  onChange: (preset: PresetName, bezier: string) => void
+}) {
+  return (
+    <div className="grid grid-cols-4 gap-1">
+      {presets.map((p) => (
+        <PresetCard key={p.name} preset={p} active={value === p.name} onClick={() => onChange(p.name, bezierFromPreset(p.name))} />
+      ))}
+    </div>
+  )
+}
+
+function PresetCard({
+  preset,
+  active,
+  onClick,
+}: {
+  preset: PresetEntry
+  active: boolean
+  onClick: () => void
+}) {
+  const [x1, y1, x2, y2] = preset.bezier
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "flex flex-col items-center gap-0.5 p-1.5 rounded text-xs border transition-colors",
+        active
+          ? "bg-accent border-accent-foreground/20"
+          : "bg-transparent border-transparent hover:bg-accent/50",
+      )}
+      title={preset.name}
+    >
+      <div className="size-10 text-muted-foreground">
+        <PresetThumb x1={x1} y1={y1} x2={x2} y2={y2} />
+      </div>
+      <span className="text-[10px] truncate w-full text-center">{preset.name}</span>
+    </button>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Parsing / formatting (Phase 2)
 // ---------------------------------------------------------------------------
