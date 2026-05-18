@@ -79,3 +79,42 @@ export type UnitLiteral<S extends string> =
   | EmLiteral<S>
   | VwLiteral<S>
   | VhLiteral<S>
+
+// =====================================================================
+// 3. SUGGESTION STRINGS — non-generic, for IntelliSense + onChange returns.
+// =====================================================================
+
+export type DegString = `${number}deg`
+export type PercentString = `${number}%`
+export type PxString = `${number}px`
+export type RemString = `${number}rem`
+export type EmString = `${number}em`
+export type VwString = `${number}vw`
+export type VhString = `${number}vh`
+
+export interface UnitStringMap {
+  deg: DegString
+  "%": PercentString
+  px: PxString
+  rem: RemString
+  em: EmString
+  vw: VwString
+  vh: VhString
+}
+
+export type KnownUnit = keyof UnitStringMap
+export type UnitString = UnitStringMap[KnownUnit]
+
+// =====================================================================
+// 4. STRICT HELPERS — validate at the call site, return the literal back.
+// =====================================================================
+
+export const deg = <S extends string>(value: S & DegLiteral<S>): S => value
+export const percent = <S extends string>(
+  value: S & PercentLiteral<S>,
+): S => value
+export const px = <S extends string>(value: S & PxLiteral<S>): S => value
+export const rem = <S extends string>(value: S & RemLiteral<S>): S => value
+export const em = <S extends string>(value: S & EmLiteral<S>): S => value
+export const vw = <S extends string>(value: S & VwLiteral<S>): S => value
+export const vh = <S extends string>(value: S & VhLiteral<S>): S => value

@@ -40,3 +40,61 @@ test("UnitLiteral is the union across all 7 unit literal types", () => {
   expectTypeOf<UnitLiteral<"16px">>().toEqualTypeOf<"16px">()
   expectTypeOf<UnitLiteral<"45">>().toBeNever()
 })
+
+import {
+  deg,
+  em,
+  percent,
+  px,
+  rem,
+  vh,
+  vw,
+} from "@/components/ui/unit-input"
+import type {
+  DegString,
+  EmString,
+  KnownUnit,
+  PercentString,
+  PxString,
+  RemString,
+  UnitString,
+  UnitStringMap,
+  VhString,
+  VwString,
+} from "@/components/ui/unit-input"
+
+test("Suggestion strings extend their template shape", () => {
+  expectTypeOf<DegString>().toExtend<`${number}deg`>()
+  expectTypeOf<PercentString>().toExtend<`${number}%`>()
+  expectTypeOf<PxString>().toExtend<`${number}px`>()
+  expectTypeOf<RemString>().toExtend<`${number}rem`>()
+  expectTypeOf<EmString>().toExtend<`${number}em`>()
+  expectTypeOf<VwString>().toExtend<`${number}vw`>()
+  expectTypeOf<VhString>().toExtend<`${number}vh`>()
+})
+
+test("UnitStringMap keys are KnownUnit, values are correct strings", () => {
+  expectTypeOf<KnownUnit>().toEqualTypeOf<keyof UnitStringMap>()
+  expectTypeOf<UnitStringMap["deg"]>().toEqualTypeOf<DegString>()
+  expectTypeOf<UnitStringMap["%"]>().toEqualTypeOf<PercentString>()
+  expectTypeOf<UnitString>().toEqualTypeOf<UnitStringMap[KnownUnit]>()
+})
+
+test("Strict helpers return the literal back, error on shape mismatch", () => {
+  expectTypeOf(deg("45deg")).toEqualTypeOf<"45deg">()
+  expectTypeOf(percent("50%")).toEqualTypeOf<"50%">()
+  expectTypeOf(px("16px")).toEqualTypeOf<"16px">()
+  expectTypeOf(rem("1.5rem")).toEqualTypeOf<"1.5rem">()
+  expectTypeOf(em("2em")).toEqualTypeOf<"2em">()
+  expectTypeOf(vw("100vw")).toEqualTypeOf<"100vw">()
+  expectTypeOf(vh("50vh")).toEqualTypeOf<"50vh">()
+})
+
+test("Strict helpers reject wrong suffix or missing suffix", () => {
+  // @ts-expect-error — wrong suffix
+  deg("45px")
+  // @ts-expect-error — missing suffix
+  deg("45")
+  // @ts-expect-error — bare number
+  percent("50")
+})
