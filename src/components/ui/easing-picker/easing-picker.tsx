@@ -9,14 +9,298 @@ export function EasingPicker() {
 }
 
 // ---------------------------------------------------------------------------
-// Composed: EasingPanel (filled in Phase 8)
+// Composed: EasingPanel
 // ---------------------------------------------------------------------------
+
+export interface EasingPanelProps<
+  TBasis extends EasingBasis | undefined = undefined,
+> {
+  value: EasingString | (string & {})
+  onChange: (
+    value: TBasis extends EasingBasis
+      ? EasingStringMap[TBasis]
+      : EasingString,
+  ) => void
+  basis?: TBasis
+  output?: OutputFormat
+  className?: string
+  "aria-label"?: string
+}
+
+const DEFAULT_SPRING_STATE: Extract<EasingState, { basis: "spring" }> = {
+  basis: "spring",
+  stiffness: 100,
+  damping: 10,
+  mass: 1,
+}
+const DEFAULT_BOUNCE_STATE: Extract<EasingState, { basis: "bounce" }> = {
+  basis: "bounce",
+  bounces: 3,
+  stiffness: 0.5,
+}
+const DEFAULT_WIGGLE_STATE: Extract<EasingState, { basis: "wiggle" }> = {
+  basis: "wiggle",
+  wiggles: 4,
+  damping: 5,
+}
+const DEFAULT_BEZIER_STATE: Extract<EasingState, { basis: "bezier" }> = {
+  basis: "bezier",
+  x1: 0.42,
+  y1: 0,
+  x2: 0.58,
+  y2: 1,
+  extraTop: 0.25,
+  extraBottom: 0.25,
+}
+const DEFAULT_STEPS_STATE: Extract<EasingState, { basis: "steps" }> = {
+  basis: "steps",
+  n: 4,
+  position: "end",
+}
+
+const DEFAULT_BY_BASIS: Record<EasingBasis, EasingState> = {
+  bezier: DEFAULT_BEZIER_STATE,
+  spring: DEFAULT_SPRING_STATE,
+  bounce: DEFAULT_BOUNCE_STATE,
+  wiggle: DEFAULT_WIGGLE_STATE,
+  steps: DEFAULT_STEPS_STATE,
+}
+
+export function EasingPanel<
+  TBasis extends EasingBasis | undefined = undefined,
+>({
+  value,
+  onChange,
+  basis: basisProp,
+  output: outputProp = "css",
+  className,
+  "aria-label": ariaLabel = "Pick an easing",
+}: EasingPanelProps<TBasis>) {
+  const parsed = parseEasing(value) ?? DEFAULT_BEZIER_STATE
+  const [internal, setInternal] = useState<EasingState>(parsed)
+  const [outputFormat, setOutputFormat] = useState<OutputFormat>(outputProp)
+  const lastEmittedRef = useRef<string | null>(null)
+
+  // Resync from external value (skip our own emits)
+  useEffect(() => {
+    if (value === lastEmittedRef.current) return
+    const next = parseEasing(value)
+    if (next) setInternal(next)
+  }, [value])
+
+  const emit = (next: EasingState) => {
+    setInternal(next)
+    const s = formatEasing(next)
+    lastEmittedRef.current = s
+    onChange(s as never)
+  }
+
+  const switchBasis = (basis: EasingBasis) => {
+    emit(DEFAULT_BY_BASIS[basis])
+  }
+
+  const available: readonly EasingBasis[] = basisProp
+    ? ([basisProp] as const)
+    : ALL_BASES
+
+  const currentName =
+    internal.basis === "bezier"
+      ? matchPreset(internal.x1, internal.y1, internal.x2, internal.y2)
+      : null
+
+  return (
+    <div
+      className={cn("w-[480px] space-y-3 p-3 bg-background", className)}
+      aria-label={ariaLabel}
+    >
+      <BasisTabs
+        value={internal.basis}
+        onChange={switchBasis}
+        available={available}
+      />
+      {internal.basis === "bezier" && (
+        <>
+          <PresetGallery
+            value={currentName ?? undefined}
+            onChange={(_, bezier) => {
+              const next = parseEasing(bezier)
+              if (next) emit(next)
+            }}
+          />
+          <div className="grid grid-cols-[1fr_180px] gap-3">
+            <div className="size-60">
+              <BezierCanvas
+                value={{
+                  x1: internal.x1,
+                  y1: internal.y1,
+                  x2: internal.x2,
+                  y2: internal.y2,
+                }}
+                extraTop={internal.extraTop}
+                extraBottom={internal.extraBottom}
+                onChange={(v) => emit({ ...internal, ...v })}
+              />
+            </div>
+            <BezierInputs
+              value={internal}
+              onChange={(v) => emit({ basis: "bezier", ...v })}
+            />
+          </div>
+        </>
+      )}
+      {internal.basis === "spring" && (
+        <SpringControls
+          value={internal}
+          onChange={(v) => emit({ basis: "spring", ...v })}
+        />
+      )}
+      {internal.basis === "bounce" && (
+        <BounceControls
+          value={internal}
+          onChange={(v) => emit({ basis: "bounce", ...v })}
+        />
+      )}
+      {internal.basis === "wiggle" && (
+        <WiggleControls
+          value={internal}
+          onChange={(v) => emit({ basis: "wiggle", ...v })}
+        />
+      )}
+      {internal.basis === "steps" && (
+        <StepsControls
+          value={internal}
+          onChange={(v) => emit({ basis: "steps", ...v })}
+        />
+      )}
+      <EasingPreview easing={formatEasing(internal)} />
+      <OutputPanel
+        easing={formatEasing(internal)}
+        format={outputFormat}
+        onFormatChange={setOutputFormat}
+      />
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Internal: OutputPanel
+// ---------------------------------------------------------------------------
+
+type OutputFormat = "css" | "tailwind-v3" | "tailwind-v4"
+
+interface OutputPanelProps {
+  easing: string
+  format: OutputFormat
+  onFormatChange: (format: OutputFormat) => void
+}
+
+function OutputPanel({ easing, format, onFormatChange }: OutputPanelProps) {
+  const [varName, setVarName] = useState("ease-custom")
+  const [copied, setCopied] = useState(false)
+
+  const snippet = formatSnippet(easing, format, varName)
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(snippet)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1500)
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex gap-1 text-xs">
+        {(["css", "tailwind-v3", "tailwind-v4"] as const).map((f) => (
+          <button
+            key={f}
+            type="button"
+            onClick={() => onFormatChange(f)}
+            className={cn(
+              "px-2 py-1 rounded border",
+              format === f ? "bg-accent border-accent-foreground/20" : "border-transparent hover:bg-accent/50",
+            )}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+      {format === "tailwind-v4" && (
+        <label className="flex items-center gap-2 text-xs">
+          <span className="text-muted-foreground">--var name:</span>
+          <input
+            type="text"
+            value={varName}
+            onChange={(e) => setVarName(e.target.value.replace(/[^a-z0-9-]/g, ""))}
+            className="px-2 py-1 bg-muted rounded text-foreground flex-1"
+          />
+        </label>
+      )}
+      <pre className="text-xs bg-muted rounded p-2 overflow-auto whitespace-pre-wrap font-mono">
+        {snippet}
+      </pre>
+      <button
+        type="button"
+        onClick={copy}
+        className="w-full px-2 py-1 text-xs bg-primary text-primary-foreground rounded"
+      >
+        {copied ? "Copied" : "Copy"}
+      </button>
+    </div>
+  )
+}
+
+function formatSnippet(easing: string, format: OutputFormat, varName: string): string {
+  switch (format) {
+    case "css":
+      return easing
+    case "tailwind-v3": {
+      // Strip spaces inside cubic-bezier(...) for arbitrary-value class
+      const stripped = easing.replace(/cubic-bezier\(([^)]+)\)/, (_, body) =>
+        `cubic-bezier(${body.replace(/\s+/g, "")})`,
+      )
+      return `class="ease-[${stripped}]"`
+    }
+    case "tailwind-v4":
+      return `@theme {\n  --${varName}: ${easing};\n}\n/* usage: class="${varName.replace(/^ease-/, "ease-")}" */`
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Internal: BasisTabs
+// ---------------------------------------------------------------------------
+
+interface BasisTabsProps {
+  value: EasingBasis
+  onChange: (basis: EasingBasis) => void
+  available?: readonly EasingBasis[]
+}
+
+const ALL_BASES: readonly EasingBasis[] = ["bezier", "spring", "bounce", "wiggle", "steps"] as const
+
+function BasisTabs({ value, onChange, available = ALL_BASES }: BasisTabsProps) {
+  return (
+    <div className="flex gap-1 text-xs border-b">
+      {available.map((basis) => (
+        <button
+          key={basis}
+          type="button"
+          onClick={() => onChange(basis)}
+          className={cn(
+            "px-3 py-1.5 capitalize transition-colors",
+            value === basis ? "border-b-2 border-primary text-foreground" : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          {basis}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 // ---------------------------------------------------------------------------
 // Sub-components (filled in Phases 3-7)
 // ---------------------------------------------------------------------------
 
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 
 export interface PresetGalleryProps {
@@ -260,7 +544,7 @@ interface BezierInputsProps {
   onChange: (v: BezierInputsProps["value"]) => void
 }
 
-export function BezierInputs({ value, onChange }: BezierInputsProps) {
+function BezierInputs({ value, onChange }: BezierInputsProps) {
   const set = (k: keyof BezierInputsProps["value"]) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const n = Number(e.target.value)
     if (!Number.isFinite(n)) return
@@ -464,8 +748,10 @@ export function WiggleControls({ value, onChange, className }: WiggleControlsPro
 
 import type {
   Direction,
+  EasingBasis,
   EasingState,
   EasingString,
+  EasingStringMap,
   PolynomialFamily,
   PresetName,
   StepPosition,
