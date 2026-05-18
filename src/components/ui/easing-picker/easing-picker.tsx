@@ -88,15 +88,18 @@ export function EasingPanel<
     if (next) setInternal(next)
   }, [value])
 
-  const emit = (next: EasingState) => {
-    setInternal(next)
-    const s = formatEasing(next)
-    lastEmittedRef.current = s
-    onChange(s as never)
+  const setAndEmit = (updater: (prev: EasingState) => EasingState) => {
+    setInternal((prev) => {
+      const next = updater(prev)
+      const s = formatEasing(next)
+      lastEmittedRef.current = s
+      onChange(s as never)
+      return next
+    })
   }
 
   const switchBasis = (basis: EasingBasis) => {
-    emit(DEFAULT_BY_BASIS[basis])
+    setAndEmit(() => DEFAULT_BY_BASIS[basis])
   }
 
   const available: readonly EasingBasis[] = basisProp
@@ -124,7 +127,7 @@ export function EasingPanel<
             value={currentName ?? undefined}
             onChange={(_, bezier) => {
               const next = parseEasing(bezier)
-              if (next) emit(next)
+              if (next) setAndEmit(() => next)
             }}
           />
           <div className="grid grid-cols-[1fr_180px] gap-3">
@@ -138,12 +141,12 @@ export function EasingPanel<
                 }}
                 extraTop={internal.extraTop}
                 extraBottom={internal.extraBottom}
-                onChange={(v) => emit({ ...internal, ...v })}
+                onChange={(v) => setAndEmit((prev) => prev.basis === "bezier" ? { ...prev, ...v } : prev)}
               />
             </div>
             <BezierInputs
               value={internal}
-              onChange={(v) => emit({ basis: "bezier", ...v })}
+              onChange={(v) => setAndEmit(() => ({ basis: "bezier", ...v }))}
             />
           </div>
         </>
@@ -151,25 +154,25 @@ export function EasingPanel<
       {internal.basis === "spring" && (
         <SpringControls
           value={internal}
-          onChange={(v) => emit({ basis: "spring", ...v })}
+          onChange={(v) => setAndEmit(() => ({ basis: "spring", ...v }))}
         />
       )}
       {internal.basis === "bounce" && (
         <BounceControls
           value={internal}
-          onChange={(v) => emit({ basis: "bounce", ...v })}
+          onChange={(v) => setAndEmit(() => ({ basis: "bounce", ...v }))}
         />
       )}
       {internal.basis === "wiggle" && (
         <WiggleControls
           value={internal}
-          onChange={(v) => emit({ basis: "wiggle", ...v })}
+          onChange={(v) => setAndEmit(() => ({ basis: "wiggle", ...v }))}
         />
       )}
       {internal.basis === "steps" && (
         <StepsControls
           value={internal}
-          onChange={(v) => emit({ basis: "steps", ...v })}
+          onChange={(v) => setAndEmit(() => ({ basis: "steps", ...v }))}
         />
       )}
       <EasingPreview easing={formatEasing(internal)} />
@@ -197,13 +200,19 @@ interface OutputPanelProps {
 function OutputPanel({ easing, format, onFormatChange }: OutputPanelProps) {
   const [varName, setVarName] = useState("ease-custom")
   const [copied, setCopied] = useState(false)
+  const [copyError, setCopyError] = useState(false)
 
   const snippet = formatSnippet(easing, format, varName)
 
   const copy = async () => {
-    await navigator.clipboard.writeText(snippet)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
+    try {
+      await navigator.clipboard.writeText(snippet)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      setCopyError(true)
+      setTimeout(() => setCopyError(false), 1500)
+    }
   }
 
   return (
@@ -229,7 +238,7 @@ function OutputPanel({ easing, format, onFormatChange }: OutputPanelProps) {
           <input
             type="text"
             value={varName}
-            onChange={(e) => setVarName(e.target.value.replace(/[^a-z0-9-]/g, ""))}
+            onChange={(e) => setVarName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
             className="px-2 py-1 bg-muted rounded text-foreground flex-1"
           />
         </label>
@@ -242,7 +251,7 @@ function OutputPanel({ easing, format, onFormatChange }: OutputPanelProps) {
         onClick={copy}
         className="w-full px-2 py-1 text-xs bg-primary text-primary-foreground rounded"
       >
-        {copied ? "Copied" : "Copy"}
+        {copyError ? "Failed" : copied ? "Copied" : "Copy"}
       </button>
     </div>
   )
@@ -253,11 +262,9 @@ function formatSnippet(easing: string, format: OutputFormat, varName: string): s
     case "css":
       return easing
     case "tailwind-v3": {
-      // Strip spaces inside cubic-bezier(...) for arbitrary-value class
-      const stripped = easing.replace(/cubic-bezier\(([^)]+)\)/, (_, body) =>
-        `cubic-bezier(${body.replace(/\s+/g, "")})`,
-      )
-      return `class="ease-[${stripped}]"`
+      // Tailwind v3 arbitrary values: spaces become _ (Tailwind decodes back)
+      const encoded = easing.replace(/\s+/g, "_")
+      return `class="ease-[${encoded}]"`
     }
     case "tailwind-v4":
       return `@theme {\n  --${varName}: ${easing};\n}\n/* usage: class="${varName.replace(/^ease-/, "ease-")}" */`
