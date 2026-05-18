@@ -445,3 +445,92 @@ export function InterpolationPicker({
     </div>
   )
 }
+
+export function AngleDial({
+  angle,
+  onChange,
+}: {
+  angle: number
+  onChange: (next: number) => void
+}) {
+  const handlePointer = (event: React.PointerEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+    const dx = event.clientX - cx
+    const dy = event.clientY - cy
+    // 0deg = up; rotate by -90 to align CSS angle convention
+    let deg = (Math.atan2(dy, dx) * 180) / Math.PI + 90
+    if (deg < 0) deg += 360
+    if (event.shiftKey) deg = Math.round(deg / 15) * 15
+    onChange(Math.round(deg) % 360)
+  }
+  // Convert to radians for the indicator line; CSS 0deg = up means angle-90 in atan2 terms.
+  const rad = ((angle - 90) * Math.PI) / 180
+  const x = 20 + 16 * Math.cos(rad)
+  const y = 20 + 16 * Math.sin(rad)
+  return (
+    <div
+      role="slider"
+      aria-label="Angle"
+      aria-valuemin={0}
+      aria-valuemax={360}
+      aria-valuenow={Math.round(angle)}
+      tabIndex={0}
+      className="h-10 w-10 shrink-0 touch-none cursor-grab rounded-full border bg-muted/40"
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId)
+        handlePointer(event)
+      }}
+      onPointerMove={(event) => {
+        if (event.buttons) handlePointer(event)
+      }}
+      onKeyDown={(event) => {
+        const step = event.shiftKey ? 15 : 1
+        if (event.key === "ArrowLeft") onChange((angle - step + 360) % 360)
+        if (event.key === "ArrowRight") onChange((angle + step) % 360)
+      }}
+      data-slot="gradient-editor-angle-dial"
+    >
+      <svg viewBox="0 0 40 40" className="h-full w-full" aria-hidden="true">
+        <title>Angle dial</title>
+        <circle cx="20" cy="20" r="1.5" fill="currentColor" />
+        <line
+          x1="20"
+          y1="20"
+          x2={x}
+          y2={y}
+          stroke="currentColor"
+          strokeWidth="1.5"
+        />
+      </svg>
+    </div>
+  )
+}
+
+export function LinearControls({
+  angle,
+  onChange,
+}: {
+  angle: number
+  onChange: (next: number) => void
+}) {
+  return (
+    <div
+      className="flex items-center gap-3"
+      data-slot="gradient-editor-linear-controls"
+    >
+      <AngleDial angle={angle} onChange={onChange} />
+      <input
+        type="number"
+        min={0}
+        max={360}
+        value={Math.round(angle)}
+        onChange={(e) => onChange(Number.parseInt(e.target.value, 10) || 0)}
+        className="h-7 w-16 rounded border bg-background px-2 font-mono text-xs"
+        aria-label="Angle in degrees"
+      />
+      <span className="font-mono text-xs text-muted-foreground">deg</span>
+    </div>
+  )
+}
