@@ -399,3 +399,49 @@ export function formatGradient(state: InternalState): string {
 // ---------------------------------------------------------------------------
 // Sub-components (filled in Phase 4)
 // ---------------------------------------------------------------------------
+
+export function InterpolationPicker({
+  space,
+  hueMethod,
+  onSpaceChange,
+  onHueMethodChange,
+}: {
+  space: InterpolationSpace
+  hueMethod?: InterpolationHueMethod
+  onSpaceChange: (next: InterpolationSpace) => void
+  onHueMethodChange: (next: InterpolationHueMethod) => void
+}) {
+  const isPolar = POLAR_SPACES.includes(space as PolarSpace)
+  return (
+    <div
+      className="flex items-center gap-2"
+      data-slot="gradient-editor-interpolation"
+    >
+      <select
+        value={space}
+        onChange={(e) => onSpaceChange(e.target.value as InterpolationSpace)}
+        className="h-7 rounded border bg-background px-2 font-mono text-xs"
+        aria-label="Interpolation space"
+      >
+        {INTERPOLATION_SPACES.map((s) => (
+          <option key={s} value={s}>
+            in {s}
+          </option>
+        ))}
+      </select>
+      {isPolar && (
+        <select
+          value={hueMethod ?? "shorter"}
+          onChange={(e) =>
+            onHueMethodChange(e.target.value as InterpolationHueMethod)
+          }
+          className="h-7 rounded border bg-background px-2 font-mono text-xs"
+          aria-label="Hue method"
+        >
+          <option value="shorter">shorter hue</option>
+          <option value="longer">longer hue</option>
+        </select>
+      )}
+    </div>
+  )
+}
