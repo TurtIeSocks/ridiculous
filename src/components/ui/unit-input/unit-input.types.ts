@@ -23,13 +23,19 @@ type NonEmptyAllChars<S extends string, Allowed extends string> = S extends ""
   ? false
   : AllChars<S, Allowed>
 
+type And<A extends boolean, B extends boolean> = A extends true
+  ? B extends true
+    ? true
+    : false
+  : false
+
 type IsIntPart<S extends string> = S extends ""
   ? true
   : NonEmptyAllChars<S, Digit>
 
 type IsNonNegativeNumber<S extends string> = S extends `${infer I}.${infer F}`
-  ? IsIntPart<I> extends true
-    ? NonEmptyAllChars<F, Digit>
+  ? And<IsIntPart<I>, NonEmptyAllChars<F, Digit>> extends true
+    ? true
     : false
   : NonEmptyAllChars<S, Digit>
 
@@ -103,7 +109,14 @@ export interface UnitStringMap {
 }
 
 export type KnownUnit = keyof UnitStringMap
-export type UnitString = UnitStringMap[KnownUnit]
+export type UnitString =
+  | DegString
+  | PercentString
+  | PxString
+  | RemString
+  | EmString
+  | VwString
+  | VhString
 
 // =====================================================================
 // 4. STRICT HELPERS — validate at the call site, return the literal back.

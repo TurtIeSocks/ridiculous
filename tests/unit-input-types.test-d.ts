@@ -98,3 +98,26 @@ test("Strict helpers reject wrong suffix or missing suffix", () => {
   // @ts-expect-error — bare number
   percent("50")
 })
+
+test("Cross-suffix rejection for all strict helpers", () => {
+  // @ts-expect-error — wrong suffix
+  percent("50px")
+  // @ts-expect-error — wrong suffix
+  px("16em")
+  // @ts-expect-error — wrong suffix
+  rem("1.5em")
+  // @ts-expect-error — wrong suffix
+  em("2rem")
+  // @ts-expect-error — wrong suffix
+  vw("100vh")
+  // @ts-expect-error — wrong suffix
+  vh("50vw")
+})
+
+test("Suffix substring overlap (em/rem) does not cross-match", () => {
+  // RemLiteral matches `${N}rem`, not `${N}em` — so "1em" must fail
+  expectTypeOf<RemLiteral<"1em">>().toBeNever()
+  // EmLiteral matches `${N}em` — "1rem" would infer N="1r" which is not a
+  // valid signed decimal, so it falls through to never
+  expectTypeOf<EmLiteral<"1rem">>().toBeNever()
+})
