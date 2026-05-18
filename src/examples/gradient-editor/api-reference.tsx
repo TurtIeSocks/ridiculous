@@ -86,7 +86,7 @@ export function ApiReference() {
             },
             {
               name: "InterpolationOf<S>",
-              desc: 'Extract the interpolation space from a literal, if declared.',
+              desc: "Extract the interpolation space from a literal, if declared.",
             },
           ]}
         />

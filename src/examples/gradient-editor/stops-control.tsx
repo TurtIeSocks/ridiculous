@@ -16,8 +16,8 @@ export function StopsControl() {
       </div>
       <h3 className="text-xl font-semibold tracking-tight">Stops Control</h3>
       <p className="mt-2 text-sm text-muted-foreground max-w-prose">
-        The <code className="text-foreground">maxStops</code> prop caps how
-        many stops the editor will allow. Min 2 is always enforced.
+        The <code className="text-foreground">maxStops</code> prop caps how many
+        stops the editor will allow. Min 2 is always enforced.
       </p>
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="glass-card rounded-xl p-4">

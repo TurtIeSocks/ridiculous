@@ -1,8 +1,8 @@
 import { useState } from "react"
 import {
-  type GradientType,
   GradientEditor,
   type GradientStringMap,
+  type GradientType,
 } from "@/components/ui/gradient-editor"
 import { CopyButton } from "../color-picker/copy-button"
 
@@ -45,9 +45,9 @@ export function TypeLocked() {
       </div>
       <h3 className="text-xl font-semibold tracking-tight">Type-Locked</h3>
       <p className="mt-2 text-sm text-muted-foreground max-w-prose">
-        Setting <code className="text-foreground">type</code> hides the
-        switcher and locks <code className="text-foreground">onChange</code> to
-        that gradient flavor.
+        Setting <code className="text-foreground">type</code> hides the switcher
+        and locks <code className="text-foreground">onChange</code> to that
+        gradient flavor.
       </p>
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
         {TYPES.map((t) => (

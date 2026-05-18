@@ -5,6 +5,11 @@ import { Native } from "./examples/color-picker/native"
 import { TierCasual } from "./examples/color-picker/tier-casual"
 import { TierIntellisense } from "./examples/color-picker/tier-intellisense"
 import { TierStrict } from "./examples/color-picker/tier-strict"
+import { ApiReference as GradientApiReference } from "./examples/gradient-editor/api-reference"
+import { BasicUsage as GradientBasicUsage } from "./examples/gradient-editor/basic-usage"
+import { Interpolation as GradientInterpolation } from "./examples/gradient-editor/interpolation"
+import { StopsControl as GradientStopsControl } from "./examples/gradient-editor/stops-control"
+import { TypeLocked as GradientTypeLocked } from "./examples/gradient-editor/type-locked"
 
 export function App() {
   return (
@@ -74,6 +79,19 @@ export function App() {
 
           <SectionHeader
             className="mt-32"
+            eyebrow="component"
+            title="Gradient Editor"
+            description="Linear / radial / conic gradients with draggable stops, oklch-default interpolation, and color-picker stops via cross-registry composition."
+          />
+          <div className="mt-12 space-y-10">
+            <GradientBasicUsage />
+            <GradientTypeLocked />
+            <GradientStopsControl />
+            <GradientInterpolation />
+          </div>
+
+          <SectionHeader
+            className="mt-32"
             eyebrow="types"
             title="Three usage tiers"
             description="Pick the level of compile-time validation you want. From useState-and-go to literal-validated."
@@ -90,8 +108,19 @@ export function App() {
             title="API"
             description="Public surface — component props, runtime helpers, and the type exports. Strict validator internals are intentionally not expanded here; they read better in the source."
           />
-          <div className="mt-8">
-            <ApiReference />
+          <div className="mt-8 space-y-8">
+            <div>
+              <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground mb-3">
+                <span className="text-gradient">/</span> color-picker
+              </div>
+              <ApiReference />
+            </div>
+            <div>
+              <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground mb-3">
+                <span className="text-gradient">/</span> gradient-editor
+              </div>
+              <GradientApiReference />
+            </div>
           </div>
 
           <SectionHeader
@@ -101,13 +130,22 @@ export function App() {
             description="One command. Resolves button + popover against the shadcn-ui registry automatically."
             id="install"
           />
-          <div className="mt-8">
+          <div className="mt-8 space-y-3">
             <div className="glass-card rounded-2xl p-6 md:p-8">
               <pre className="text-sm md:text-base font-mono overflow-x-auto">
                 <span className="text-muted-foreground select-none">$ </span>
                 <span className="text-foreground">npx shadcn add </span>
                 <span className="text-gradient">
                   https://turtiesocks.github.io/ridiculous/r/color-picker.json
+                </span>
+              </pre>
+            </div>
+            <div className="glass-card rounded-2xl p-6 md:p-8">
+              <pre className="text-sm md:text-base font-mono overflow-x-auto">
+                <span className="text-muted-foreground select-none">$ </span>
+                <span className="text-foreground">npx shadcn add </span>
+                <span className="text-gradient">
+                  https://turtiesocks.github.io/ridiculous/r/gradient-editor.json
                 </span>
               </pre>
             </div>
