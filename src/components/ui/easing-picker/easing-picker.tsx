@@ -77,7 +77,8 @@ function computeTriggerLabel(state: EasingState | null): string {
 function computeTriggerThumb(state: EasingState | null): React.ReactNode {
   if (!state || state.basis !== "bezier") {
     return (
-      <svg viewBox="0 0 48 32">
+      <svg viewBox="0 0 48 32" aria-hidden="true">
+        <title>Easing curve preview</title>
         <line
           x1="0"
           y1="16"
@@ -91,7 +92,8 @@ function computeTriggerThumb(state: EasingState | null): React.ReactNode {
   }
   const path = `M 0 32 C ${state.x1 * 48} ${(1 - state.y1) * 32}, ${state.x2 * 48} ${(1 - state.y2) * 32}, 48 0`
   return (
-    <svg viewBox="0 0 48 32">
+    <svg viewBox="0 0 48 32" aria-hidden="true">
+      <title>Easing curve preview</title>
       <path d={path} fill="none" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   )
@@ -199,8 +201,11 @@ export function EasingPanel<
       : null
 
   return (
-    <div
-      className={cn("w-[480px] space-y-3 p-3 bg-background", className)}
+    <fieldset
+      className={cn(
+        "w-[480px] space-y-3 p-3 bg-background border-0 m-0",
+        className,
+      )}
       aria-label={ariaLabel}
     >
       <BasisTabs
@@ -272,7 +277,7 @@ export function EasingPanel<
         format={outputFormat}
         onFormatChange={setOutputFormat}
       />
-    </div>
+    </fieldset>
   )
 }
 
@@ -435,7 +440,8 @@ function PresetThumb({
 }) {
   const path = `M 0 32 C ${x1 * 48} ${(1 - y1) * 32}, ${x2 * 48} ${(1 - y2) * 32}, 48 0`
   return (
-    <svg viewBox="0 0 48 32" className="size-full">
+    <svg viewBox="0 0 48 32" className="size-full" aria-hidden="true">
+      <title>Preset curve thumbnail</title>
       <path d={path} fill="none" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   )
@@ -634,7 +640,10 @@ export function BezierCanvas({
       ref={svgRef}
       viewBox={`0 0 ${CANVAS_SIZE} ${CANVAS_SIZE}`}
       className={cn("size-full bg-muted/30 rounded", className)}
+      role="img"
+      aria-label="Cubic bezier curve editor — drag the two handles to shape the curve"
     >
+      <title>Cubic bezier curve editor</title>
       {showLinearReference && (
         <line
           x1={p0.sx}
