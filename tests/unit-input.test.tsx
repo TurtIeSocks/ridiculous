@@ -148,3 +148,99 @@ describe("UnitInput commit lifecycle", () => {
     expect(onChange).not.toHaveBeenCalled()
   })
 })
+
+describe("UnitInput keyboard", () => {
+  it("commits on Enter", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const input = container.querySelector("input") as HTMLInputElement
+    fireEvent.change(input, { target: { value: "60" } })
+    fireEvent.keyDown(input, { key: "Enter" })
+    expect(onChange).toHaveBeenCalledWith("60deg")
+  })
+
+  it("reverts the draft on Escape without committing", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const input = container.querySelector("input") as HTMLInputElement
+    fireEvent.change(input, { target: { value: "60" } })
+    fireEvent.keyDown(input, { key: "Escape" })
+    expect(onChange).not.toHaveBeenCalled()
+    expect(input.value).toBe("45")
+  })
+
+  it("steps +1 on ArrowUp", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const input = container.querySelector("input") as HTMLInputElement
+    fireEvent.keyDown(input, { key: "ArrowUp" })
+    expect(onChange).toHaveBeenCalledWith("46deg")
+  })
+
+  it("steps -1 on ArrowDown", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const input = container.querySelector("input") as HTMLInputElement
+    fireEvent.keyDown(input, { key: "ArrowDown" })
+    expect(onChange).toHaveBeenCalledWith("44deg")
+  })
+
+  it("Shift+ArrowUp multiplies step by 10", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const input = container.querySelector("input") as HTMLInputElement
+    fireEvent.keyDown(input, { key: "ArrowUp", shiftKey: true })
+    expect(onChange).toHaveBeenCalledWith("55deg")
+  })
+
+  it("Alt+ArrowUp with precision=1 emits 45.1", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45.0deg"
+        unit="deg"
+        precision={1}
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const input = container.querySelector("input") as HTMLInputElement
+    fireEvent.keyDown(input, { key: "ArrowUp", altKey: true })
+    expect(onChange).toHaveBeenCalledWith("45.1deg")
+  })
+})

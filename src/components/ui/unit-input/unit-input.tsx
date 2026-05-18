@@ -48,6 +48,7 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
   unit,
   min,
   max,
+  step: props_step = 1,
   precision = 0,
   prefix,
   suffix,
@@ -70,6 +71,37 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
     setRawDraft(null)
     if (formatted !== String(value)) {
       onChange(formatted as Parameters<typeof onChange>[0])
+    }
+  }
+
+  const stepValue = (
+    direction: 1 | -1,
+    modifier: { shift: boolean; alt: boolean },
+  ) => {
+    const stepProp = props_step
+    const multiplier = modifier.shift ? 10 : modifier.alt ? 0.1 : 1
+    const delta = stepProp * multiplier * direction
+    const base =
+      rawDraft !== null
+        ? Number.parseFloat(rawDraft) || parsedFromValue
+        : parsedFromValue
+    commit(String(base + delta))
+  }
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (disabled) return
+    if (e.key === "Enter") {
+      e.preventDefault()
+      commit(e.currentTarget.value)
+    } else if (e.key === "Escape") {
+      e.preventDefault()
+      setRawDraft(null)
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault()
+      stepValue(1, { shift: e.shiftKey, alt: e.altKey })
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault()
+      stepValue(-1, { shift: e.shiftKey, alt: e.altKey })
     }
   }
 
@@ -109,6 +141,7 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
         aria-label={ariaLabel}
         onChange={(e) => setRawDraft(e.target.value)}
         onBlur={(e) => commit(e.target.value)}
+        onKeyDown={onKeyDown}
         className="border-0 rounded-none bg-transparent px-2 font-mono text-xs h-full focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
       />
       <div className="w-px bg-input" aria-hidden="true" />
