@@ -11,6 +11,11 @@ ergonomic escape hatches when you just want JavaScript.
 
 - **Color Picker** — oklch L×C pad, hue/alpha strips, 6 modes (oklch, oklab,
   hex, rgb, hsl, hwb), tiered typing (casual / IntelliSense / strict).
+- **Gradient Editor** — linear / radial / conic editor with draggable stops,
+  position picker, oklch interpolation, reusable color-picker stops.
+- **Unit Input** — typed CSS-unit input (deg / % / px / rem / em / vw / vh)
+  with pointer-locked drag scrubbing, Shift / Alt step modifiers, and a
+  call-site validator helper per unit.
 
 ## Install
 

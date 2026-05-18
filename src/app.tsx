@@ -10,6 +10,10 @@ import { BasicUsage as GradientBasicUsage } from "./examples/gradient-editor/bas
 import { Interpolation as GradientInterpolation } from "./examples/gradient-editor/interpolation"
 import { StopsControl as GradientStopsControl } from "./examples/gradient-editor/stops-control"
 import { TypeLocked as GradientTypeLocked } from "./examples/gradient-editor/type-locked"
+import { ApiReference as UnitInputApiReference } from "./examples/unit-input/api-reference"
+import { BasicUsage as UnitInputBasicUsage } from "./examples/unit-input/basic-usage"
+import { Scrub as UnitInputScrub } from "./examples/unit-input/scrub"
+import { StrictTyping as UnitInputStrictTyping } from "./examples/unit-input/strict-typing"
 
 export function App() {
   return (
@@ -88,6 +92,19 @@ export function App() {
             <GradientTypeLocked />
             <GradientStopsControl />
             <GradientInterpolation />
+          </div>
+
+          <SectionHeader
+            className="mt-32"
+            eyebrow="component"
+            title="Unit Input"
+            description="CSS-unit input with built-in deg/%/px/rem/em/vw/vh validators, pointer-locked drag scrubbing, and tiered typing tiers from casual to strict."
+          />
+          <div className="mt-12 space-y-10">
+            <UnitInputBasicUsage />
+            <UnitInputScrub />
+            <UnitInputStrictTyping />
+            <UnitInputApiReference />
           </div>
 
           <SectionHeader

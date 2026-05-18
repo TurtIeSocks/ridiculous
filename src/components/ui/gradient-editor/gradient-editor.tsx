@@ -10,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { UnitInput } from "@/components/ui/unit-input"
 import { cn } from "@/lib/utils"
 import type {
   ConicGradientString,
@@ -356,6 +357,13 @@ export function formatStop(stop: GradientStop): string {
 const INTERPOLATION_SPACES = ["srgb", "oklch", "oklab", "hsl", "hwb"] as const
 const POLAR_SPACES: readonly PolarSpace[] = ["oklch", "hsl", "hwb"]
 const GRADIENT_TYPES: readonly GradientType[] = ["linear", "radial", "conic"]
+
+const toDeg = (n: number) => `${Math.round(n)}deg`
+const toPct = (n: number) => `${Math.round(n)}%`
+const fromUnitString = (s: string) => {
+  const n = Number.parseFloat(s)
+  return Number.isNaN(n) ? 0 : n
+}
 
 interface Interpolation {
   space: InterpolationSpace
@@ -743,16 +751,15 @@ function LinearControls({
       data-slot="gradient-editor-linear-controls"
     >
       <AngleDial angle={angle} onChange={onChange} />
-      <input
-        type="number"
+      <UnitInput
+        unit="deg"
+        value={toDeg(angle)}
+        onChange={(v) => onChange(fromUnitString(v))}
         min={0}
         max={360}
-        value={Math.round(angle)}
-        onChange={(e) => onChange(Number.parseInt(e.target.value, 10) || 0)}
-        className="h-7 w-16 rounded border bg-background px-2 font-mono text-xs"
         aria-label="Angle in degrees"
+        className="h-7 w-16"
       />
-      <span className="font-mono text-xs text-muted-foreground">deg</span>
     </div>
   )
 }
@@ -798,34 +805,30 @@ function PositionPicker({
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-          x:
-          <input
-            type="number"
+        <div className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+          <span aria-hidden="true">x:</span>
+          <UnitInput
+            unit="%"
+            value={toPct(x)}
+            onChange={(v) => onChange({ x: fromUnitString(v), y })}
             min={0}
             max={100}
-            value={Math.round(x)}
-            onChange={(e) =>
-              onChange({ x: Number.parseInt(e.target.value, 10) || 0, y })
-            }
-            className="h-6 w-12 rounded border bg-background px-1 font-mono text-xs"
+            aria-label="Position x"
+            className="h-6 w-12"
           />
-          %
-        </label>
-        <label className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-          y:
-          <input
-            type="number"
+        </div>
+        <div className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+          <span aria-hidden="true">y:</span>
+          <UnitInput
+            unit="%"
+            value={toPct(y)}
+            onChange={(v) => onChange({ x, y: fromUnitString(v) })}
             min={0}
             max={100}
-            value={Math.round(y)}
-            onChange={(e) =>
-              onChange({ x, y: Number.parseInt(e.target.value, 10) || 0 })
-            }
-            className="h-6 w-12 rounded border bg-background px-1 font-mono text-xs"
+            aria-label="Position y"
+            className="h-6 w-12"
           />
-          %
-        </label>
+        </div>
       </div>
     </div>
   )
@@ -906,21 +909,15 @@ function ConicControls({
           angle={fromAngle}
           onChange={(next) => onChange({ fromAngle: next, position })}
         />
-        <input
-          type="number"
+        <UnitInput
+          unit="deg"
+          value={toDeg(fromAngle)}
+          onChange={(v) => onChange({ fromAngle: fromUnitString(v), position })}
           min={0}
           max={360}
-          value={Math.round(fromAngle)}
-          onChange={(e) =>
-            onChange({
-              fromAngle: Number.parseInt(e.target.value, 10) || 0,
-              position,
-            })
-          }
-          className="h-7 w-16 rounded border bg-background px-2 font-mono text-xs"
           aria-label="Conic from-angle in degrees"
+          className="h-7 w-16"
         />
-        <span className="font-mono text-xs text-muted-foreground">deg</span>
       </div>
       <PositionPicker
         x={position.x}
@@ -983,24 +980,20 @@ function StopDetailRow({
         value={stop.color}
         onChange={(next) => onChange({ ...stop, color: next })}
       />
-      <input
-        type="number"
-        min={0}
-        max={100}
-        value={Math.round(stop.position)}
-        onChange={(e) =>
+      <UnitInput
+        unit="%"
+        value={toPct(stop.position)}
+        onChange={(v) =>
           onChange({
             ...stop,
-            position: Math.max(
-              0,
-              Math.min(100, Number.parseInt(e.target.value, 10) || 0),
-            ),
+            position: Math.max(0, Math.min(100, fromUnitString(v))),
           })
         }
-        className="h-7 w-16 rounded border bg-background px-2 font-mono text-xs"
+        min={0}
+        max={100}
         aria-label="Stop position"
+        className="h-7 w-16"
       />
-      <span className="font-mono text-xs text-muted-foreground">%</span>
       <button
         type="button"
         onClick={onDelete}

@@ -8,6 +8,7 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
+    clearMocks: true,
     typecheck: {
       enabled: true,
       tsconfig: "./tsconfig.app.json",
@@ -16,7 +17,10 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
-      include: ["src/components/ui/color-picker/**"],
+      include: [
+        "src/components/ui/color-picker/**",
+        "src/components/ui/unit-input/**",
+      ],
       thresholds: {
         statements: 90,
         branches: 85,
