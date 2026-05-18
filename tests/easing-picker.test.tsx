@@ -3,6 +3,7 @@ import { describe, expect, test, vi } from "vitest"
 import {
   BezierCanvas,
   BounceControls,
+  EasingPanel,
   EasingPreview,
   PresetGallery,
   SpringControls,
@@ -129,5 +130,39 @@ describe("EasingPreview", () => {
     fireEvent.click(screen.getByRole("button", { name: /replay/i }))
     const newKey = container.querySelector("[data-preview-target]")?.getAttribute("data-animation-key")
     expect(newKey).not.toBe(initialKey)
+  })
+})
+
+describe("EasingPanel integration", () => {
+  test("changing basis tab updates emitted output", async () => {
+    const onChange = vi.fn()
+    render(
+      <EasingPanel value="cubic-bezier(0.42, 0, 0.58, 1)" onChange={onChange} />,
+    )
+    // Click "spring" tab
+    fireEvent.click(screen.getByText(/spring/i))
+    // Spring controls render
+    expect(screen.getAllByRole("slider").length).toBeGreaterThan(0)
+    // onChange fires with linear() output
+    await new Promise((r) => setTimeout(r, 0))
+    expect(onChange).toHaveBeenCalledWith(expect.stringMatching(/^linear\(/))
+  })
+
+  test("preset click emits underlying bezier", () => {
+    const onChange = vi.fn()
+    render(<EasingPanel value="cubic-bezier(0.42, 0, 0.58, 1)" onChange={onChange} />)
+    fireEvent.click(screen.getByTitle("ease"))
+    expect(onChange).toHaveBeenCalledWith("cubic-bezier(0.25, 0.1, 0.25, 1)")
+  })
+
+  test("basis prop locks tab visibility", () => {
+    render(
+      <EasingPanel
+        basis="bezier"
+        value="cubic-bezier(0.42, 0, 0.58, 1)"
+        onChange={() => {}}
+      />,
+    )
+    expect(screen.queryByText(/spring/i)).not.toBeInTheDocument()
   })
 })
