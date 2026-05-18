@@ -12,3 +12,11 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   })),
   putImageData: vi.fn(),
 })) as unknown as HTMLCanvasElement["getContext"]
+
+// jsdom does not implement pointer-lock. Stub the two APIs UnitInput
+// uses so scrub tests can assert call counts without throwing.
+Element.prototype.requestPointerLock = vi.fn()
+Object.defineProperty(document, "exitPointerLock", {
+  value: vi.fn(),
+  configurable: true,
+})

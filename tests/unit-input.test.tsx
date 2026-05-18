@@ -311,3 +311,93 @@ describe("UnitInput defensive behavior", () => {
     expect(container.querySelector('[data-testid="dial"]')).toBeTruthy()
   })
 })
+
+describe("UnitInput pointer-lock scrub", () => {
+  it("requests pointer lock on suffix pointerdown", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const suffix = container.querySelector(
+      '[data-slot="unit-input-suffix"]',
+    ) as HTMLElement
+    fireEvent.pointerDown(suffix, { pointerId: 1 })
+    expect(Element.prototype.requestPointerLock).toHaveBeenCalled()
+  })
+
+  it("commits with onChange while dragging (1px = 1 step)", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const suffix = container.querySelector(
+      '[data-slot="unit-input-suffix"]',
+    ) as HTMLElement
+    fireEvent.pointerDown(suffix, { pointerId: 1 })
+    fireEvent.pointerMove(window, { movementX: 5 })
+    expect(onChange).toHaveBeenCalledWith("50deg")
+  })
+
+  it("applies shift ×10 multiplier during scrub", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const suffix = container.querySelector(
+      '[data-slot="unit-input-suffix"]',
+    ) as HTMLElement
+    fireEvent.pointerDown(suffix, { pointerId: 1 })
+    fireEvent.pointerMove(window, { movementX: 2, shiftKey: true })
+    expect(onChange).toHaveBeenCalledWith("65deg")
+  })
+
+  it("exits pointer lock on pointerup", () => {
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={() => {}}
+        aria-label="Angle"
+      />,
+    )
+    const suffix = container.querySelector(
+      '[data-slot="unit-input-suffix"]',
+    ) as HTMLElement
+    fireEvent.pointerDown(suffix, { pointerId: 1 })
+    fireEvent.pointerUp(window)
+    expect(document.exitPointerLock).toHaveBeenCalled()
+  })
+
+  it("does not scrub when disabled", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        disabled
+        aria-label="Angle"
+      />,
+    )
+    const suffix = container.querySelector(
+      '[data-slot="unit-input-suffix"]',
+    ) as HTMLElement
+    fireEvent.pointerDown(suffix, { pointerId: 1 })
+    expect(Element.prototype.requestPointerLock).not.toHaveBeenCalled()
+  })
+})

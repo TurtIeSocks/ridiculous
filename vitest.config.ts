@@ -8,6 +8,7 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     setupFiles: ["./tests/setup.ts"],
+    clearMocks: true,
     typecheck: {
       enabled: true,
       tsconfig: "./tsconfig.app.json",

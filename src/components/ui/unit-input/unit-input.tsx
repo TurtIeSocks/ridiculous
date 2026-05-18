@@ -54,6 +54,7 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
   max,
   step: props_step = 1,
   precision = 0,
+  dragSensitivity = 1,
   prefix,
   suffix,
   disabled,
@@ -121,17 +122,61 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
     }
   }
 
+  const scrubRef = React.useRef<{
+    active: boolean
+    anchor: number
+    deltaPx: number
+  }>({ active: false, anchor: 0, deltaPx: 0 })
+
+  React.useEffect(() => {
+    const onPointerMove = (event: PointerEvent) => {
+      if (!scrubRef.current.active) return
+      scrubRef.current.deltaPx += event.movementX
+      const multiplier = event.shiftKey ? 10 : event.altKey ? 0.1 : 1
+      const next =
+        scrubRef.current.anchor +
+        scrubRef.current.deltaPx * props_step * dragSensitivity * multiplier
+      commit(String(next))
+    }
+    const onPointerUp = () => {
+      if (!scrubRef.current.active) return
+      scrubRef.current.active = false
+      document.exitPointerLock()
+    }
+    window.addEventListener("pointermove", onPointerMove)
+    window.addEventListener("pointerup", onPointerUp)
+    return () => {
+      window.removeEventListener("pointermove", onPointerMove)
+      window.removeEventListener("pointerup", onPointerUp)
+    }
+    // Re-bind when dependencies that the closures read change.
+    // commit is rebuilt every render and reads fresh props via closure, so
+    // depending on the primitives that drive it is sufficient.
+  }, [props_step, dragSensitivity, parsedFromValue, min, max, precision, unitStr])
+
+  const onSuffixPointerDown = (event: React.PointerEvent<HTMLElement>) => {
+    if (disabled) return
+    event.preventDefault()
+    scrubRef.current = {
+      active: true,
+      anchor: parsedFromValue,
+      deltaPx: 0,
+    }
+    event.currentTarget.requestPointerLock()
+  }
+
   const suffixNode =
     suffix === undefined ? (
       <span
         data-slot="unit-input-suffix"
         className="select-none cursor-ew-resize bg-muted/50 px-2 flex items-center text-xs font-mono text-muted-foreground"
         aria-hidden="true"
+        onPointerDown={onSuffixPointerDown}
       >
         {unitStr}
       </span>
     ) : (
-      <div data-slot="unit-input-suffix">{suffix}</div>
+      <div data-slot="unit-input-suffix" onPointerDown={onSuffixPointerDown}>{suffix}</div>
     )
 
   return (
