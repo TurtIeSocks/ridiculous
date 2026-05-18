@@ -72,3 +72,22 @@ test("InterpolationOf extracts the interpolation space", () => {
   >().toEqualTypeOf<"oklch">()
   expectTypeOf<InterpolationOf<"linear-gradient(red, blue)">>().toBeNever()
 })
+
+import { expect } from "vitest"
+import { isGradientString } from "@/components/ui/gradient-editor/gradient-editor"
+
+test("isGradientString accepts valid gradients", () => {
+  expect(isGradientString("linear-gradient(#ff0000, #0000ff)")).toBe(true)
+  expect(isGradientString("radial-gradient(#ff0000, #0000ff)")).toBe(true)
+  expect(isGradientString("conic-gradient(#ff0000, #0000ff)")).toBe(true)
+  expect(isGradientString("linear-gradient(in oklch, #ff0000, #0000ff)")).toBe(
+    true,
+  )
+})
+
+test("isGradientString rejects non-gradient strings", () => {
+  expect(isGradientString("not a gradient")).toBe(false)
+  expect(isGradientString("")).toBe(false)
+  expect(isGradientString("#ff0000")).toBe(false)
+  expect(isGradientString("linear-gradient(#ff0000)")).toBe(false) // single stop
+})

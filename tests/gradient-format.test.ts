@@ -69,7 +69,9 @@ describe("formatGradient", () => {
         fromAngle: 0,
         interpolation: { space: "srgb" },
       }),
-    ).toBe("radial-gradient(circle closest-side at 20% 30%, #ff0000 0%, #0000ff 100%)")
+    ).toBe(
+      "radial-gradient(circle closest-side at 20% 30%, #ff0000 0%, #0000ff 100%)",
+    )
   })
 
   it("emits conic with from + at", () => {
@@ -118,14 +120,16 @@ describe("parseGradient + formatGradient round-trip", () => {
   })
 
   it("round-trips with interpolation + hue method", () => {
-    const input = "linear-gradient(in oklch longer hue, 90deg, #ff0000 0%, #0000ff 100%)"
+    const input =
+      "linear-gradient(in oklch longer hue, 90deg, #ff0000 0%, #0000ff 100%)"
     const parsed = parseGradient(input)
     expect(parsed).not.toBeNull()
     expect(formatGradient(parsed!)).toBe(input)
   })
 
   it("round-trips a radial", () => {
-    const input = "radial-gradient(circle closest-side at 20% 30%, #ff0000 0%, #0000ff 100%)"
+    const input =
+      "radial-gradient(circle closest-side at 20% 30%, #ff0000 0%, #0000ff 100%)"
     const parsed = parseGradient(input)
     expect(parsed).not.toBeNull()
     expect(formatGradient(parsed!)).toBe(input)

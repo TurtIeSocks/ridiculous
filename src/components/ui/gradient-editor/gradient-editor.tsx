@@ -3,11 +3,15 @@
 import type { ColorString } from "@/components/ui/color-picker"
 import { parseColor } from "@/components/ui/color-picker/color-picker"
 import type {
+  ConicGradientString,
   GradientStop,
+  GradientString,
   GradientType,
   InterpolationHueMethod,
   InterpolationSpace,
+  LinearGradientString,
   PolarSpace,
+  RadialGradientString,
 } from "./gradient-editor.types"
 
 export interface InternalState {
@@ -305,6 +309,24 @@ function parsePercent(input: string | undefined): number | null {
   if (!input.endsWith("%")) return null
   const n = parseFloat(input.slice(0, -1))
   return Number.isNaN(n) ? null : n
+}
+
+/**
+ * Runtime type guard. Narrows wide `string` to `GradientString`.
+ *
+ * @example
+ * const v: string = userInput
+ * if (isGradientString(v)) {
+ *   // v is now GradientString
+ * }
+ */
+export function isGradientString(value: string): value is GradientString
+export function isGradientString<S extends string>(
+  value: S,
+): value is S &
+  (LinearGradientString | RadialGradientString | ConicGradientString)
+export function isGradientString(value: string): boolean {
+  return parseGradient(value) !== null
 }
 
 /**
