@@ -138,5 +138,6 @@ dist
 # Generated shadcn registry output (built from registry.json)
 public/r/
 
+# Brainstorming session content (Visual Companion mockups)
 .superpowers/
 .claude/worktrees
