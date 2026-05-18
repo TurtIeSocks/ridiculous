@@ -58,7 +58,12 @@
       "type": "registry:ui",
       "title": "Gradient Editor",
       "description": "Linear / radial / conic gradient editor with draggable stops, position picker, oklch-default interpolation, and reusable color-picker stops.",
-      "registryDependencies": ["button", "popover", "color-picker", "unit-input"],
+      "registryDependencies": [
+        "button",
+        "popover",
+        "color-picker",
+        "unit-input"
+      ],
       "dependencies": [],
       "files": [
         {

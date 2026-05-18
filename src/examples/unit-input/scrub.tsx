@@ -8,11 +8,13 @@ export function Scrub() {
       <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">
         <span className="text-gradient">/</span> drag-to-scrub
       </div>
-      <h3 className="text-xl font-semibold tracking-tight">Pointer-lock Scrub</h3>
+      <h3 className="text-xl font-semibold tracking-tight">
+        Pointer-lock Scrub
+      </h3>
       <p className="mt-2 text-sm text-muted-foreground max-w-prose">
         Hover the <code className="font-mono">px</code> suffix → cursor turns
-        into ↔ → drag horizontally. The cursor disappears (pointer-lock) and
-        the value tracks your delta. Shift = coarse (×10), Alt = fine (÷10).
+        into ↔ → drag horizontally. The cursor disappears (pointer-lock) and the
+        value tracks your delta. Shift = coarse (×10), Alt = fine (÷10).
       </p>
       <div className="mt-6 flex items-center gap-6">
         <UnitInput

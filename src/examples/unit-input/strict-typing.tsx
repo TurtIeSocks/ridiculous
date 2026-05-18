@@ -1,9 +1,5 @@
 import { useState } from "react"
-import {
-  UnitInput,
-  deg,
-  type DegString,
-} from "@/components/ui/unit-input"
+import { type DegString, deg, UnitInput } from "@/components/ui/unit-input"
 
 export function StrictTyping() {
   // DegString = `${number}deg`. The deg() helper validates a literal

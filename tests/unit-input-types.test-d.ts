@@ -1,13 +1,13 @@
 import { expectTypeOf, test } from "vitest"
 import type {
   DegLiteral,
+  EmLiteral,
   PercentLiteral,
   PxLiteral,
   RemLiteral,
-  EmLiteral,
-  VwLiteral,
-  VhLiteral,
   UnitLiteral,
+  VhLiteral,
+  VwLiteral,
 } from "@/components/ui/unit-input"
 
 test("DegLiteral accepts valid, rejects invalid", () => {
@@ -41,15 +41,6 @@ test("UnitLiteral is the union across all 7 unit literal types", () => {
   expectTypeOf<UnitLiteral<"45">>().toBeNever()
 })
 
-import {
-  deg,
-  em,
-  percent,
-  px,
-  rem,
-  vh,
-  vw,
-} from "@/components/ui/unit-input"
 import type {
   DegString,
   EmString,
@@ -62,6 +53,7 @@ import type {
   VhString,
   VwString,
 } from "@/components/ui/unit-input"
+import { deg, em, percent, px, rem, vh, vw } from "@/components/ui/unit-input"
 
 test("Suggestion strings extend their template shape", () => {
   expectTypeOf<DegString>().toExtend<`${number}deg`>()

@@ -805,8 +805,8 @@ function PositionPicker({
         />
       </div>
       <div className="flex flex-col gap-1">
-        <label className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-          x:
+        <div className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+          <span aria-hidden="true">x:</span>
           <UnitInput
             unit="%"
             value={toPct(x)}
@@ -816,9 +816,9 @@ function PositionPicker({
             aria-label="Position x"
             className="h-6 w-12"
           />
-        </label>
-        <label className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-          y:
+        </div>
+        <div className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+          <span aria-hidden="true">y:</span>
           <UnitInput
             unit="%"
             value={toPct(y)}
@@ -828,7 +828,7 @@ function PositionPicker({
             aria-label="Position y"
             className="h-6 w-12"
           />
-        </label>
+        </div>
       </div>
     </div>
   )
@@ -912,9 +912,7 @@ function ConicControls({
         <UnitInput
           unit="deg"
           value={toDeg(fromAngle)}
-          onChange={(v) =>
-            onChange({ fromAngle: fromUnitString(v), position })
-          }
+          onChange={(v) => onChange({ fromAngle: fromUnitString(v), position })}
           min={0}
           max={360}
           aria-label="Conic from-angle in degrees"

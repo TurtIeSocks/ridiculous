@@ -123,9 +123,8 @@ export type UnitString =
 // =====================================================================
 
 export const deg = <S extends string>(value: S & DegLiteral<S>): S => value
-export const percent = <S extends string>(
-  value: S & PercentLiteral<S>,
-): S => value
+export const percent = <S extends string>(value: S & PercentLiteral<S>): S =>
+  value
 export const px = <S extends string>(value: S & PxLiteral<S>): S => value
 export const rem = <S extends string>(value: S & RemLiteral<S>): S => value
 export const em = <S extends string>(value: S & EmLiteral<S>): S => value

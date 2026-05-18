@@ -3,17 +3,12 @@
 import * as React from "react"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
-import type {
-  KnownUnit,
-  UnitStringMap,
-} from "./unit-input.types"
+import type { KnownUnit, UnitStringMap } from "./unit-input.types"
 
 export interface UnitInputProps<
   TUnit extends KnownUnit | (string & {}) = KnownUnit | (string & {}),
 > {
-  value: TUnit extends KnownUnit
-    ? UnitStringMap[TUnit] | (string & {})
-    : string
+  value: TUnit extends KnownUnit ? UnitStringMap[TUnit] | (string & {}) : string
   onChange: (
     next: TUnit extends KnownUnit ? UnitStringMap[TUnit] : string,
   ) => void
@@ -128,16 +123,23 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
     deltaPx: number
   }>({ active: false, anchor: 0, deltaPx: 0 })
 
+  // `commit` and the scrub-arithmetic closures over props are rebuilt every
+  // render. Stash the latest scrub-step calculator in a ref so the window-
+  // level listeners can stay registered with an empty dep array — otherwise
+  // we'd thrash the addEventListener/removeEventListener pair on every render.
+  const scrubMoveRef = React.useRef<(event: PointerEvent) => void>(() => {})
+  scrubMoveRef.current = (event: PointerEvent) => {
+    if (!scrubRef.current.active) return
+    scrubRef.current.deltaPx += event.movementX
+    const multiplier = event.shiftKey ? 10 : event.altKey ? 0.1 : 1
+    const next =
+      scrubRef.current.anchor +
+      scrubRef.current.deltaPx * props_step * dragSensitivity * multiplier
+    commit(String(next))
+  }
+
   React.useEffect(() => {
-    const onPointerMove = (event: PointerEvent) => {
-      if (!scrubRef.current.active) return
-      scrubRef.current.deltaPx += event.movementX
-      const multiplier = event.shiftKey ? 10 : event.altKey ? 0.1 : 1
-      const next =
-        scrubRef.current.anchor +
-        scrubRef.current.deltaPx * props_step * dragSensitivity * multiplier
-      commit(String(next))
-    }
+    const onPointerMove = (event: PointerEvent) => scrubMoveRef.current(event)
     const onPointerUp = () => {
       if (!scrubRef.current.active) return
       scrubRef.current.active = false
@@ -149,10 +151,7 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
       window.removeEventListener("pointermove", onPointerMove)
       window.removeEventListener("pointerup", onPointerUp)
     }
-    // Re-bind when dependencies that the closures read change.
-    // commit is rebuilt every render and reads fresh props via closure, so
-    // depending on the primitives that drive it is sufficient.
-  }, [props_step, dragSensitivity, parsedFromValue, min, max, precision, unitStr])
+  }, [])
 
   const onSuffixPointerDown = (event: React.PointerEvent<HTMLElement>) => {
     if (disabled) return
@@ -176,7 +175,9 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
         {unitStr}
       </span>
     ) : (
-      <div data-slot="unit-input-suffix" onPointerDown={onSuffixPointerDown}>{suffix}</div>
+      <div data-slot="unit-input-suffix" onPointerDown={onSuffixPointerDown}>
+        {suffix}
+      </div>
     )
 
   return (

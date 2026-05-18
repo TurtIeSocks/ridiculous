@@ -13,9 +13,7 @@ describe("UnitInput shell", () => {
       />,
     )
     const input = container.querySelector("input")
-    const suffix = container.querySelector(
-      '[data-slot="unit-input-suffix"]',
-    )
+    const suffix = container.querySelector('[data-slot="unit-input-suffix"]')
     expect(input).toBeTruthy()
     expect(suffix?.textContent).toBe("deg")
   })
@@ -289,9 +287,7 @@ describe("UnitInput defensive behavior", () => {
         aria-label="Angle"
       />,
     )
-    const suffix = container.querySelector(
-      '[data-slot="unit-input-suffix"]',
-    )
+    const suffix = container.querySelector('[data-slot="unit-input-suffix"]')
     expect(suffix?.textContent).toBe("°")
   })
 
