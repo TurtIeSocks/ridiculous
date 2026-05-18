@@ -131,12 +131,17 @@ export function GradientEditor<TType extends GradientType | undefined>({
           type="button"
           aria-label={ariaLabel}
           className={cn(
-            "h-5 w-12 shrink-0 cursor-pointer rounded border outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
+            "h-5 w-12 shrink-0 cursor-pointer rounded outline-hidden focus-visible:ring-2 focus-visible:ring-ring",
             className,
           )}
-          style={{ background: value }}
           data-slot="gradient-editor-trigger"
-        />
+        >
+          <span
+            aria-hidden="true"
+            className="block h-full w-full rounded border"
+            style={{ background: value }}
+          />
+        </button>
       </PopoverTrigger>
       <PopoverContent
         className="w-fit min-w-[320px] p-3"
@@ -347,18 +352,26 @@ export function parseInterpolation(input: string): Interpolation | null {
 }
 
 /**
- * Format an interpolation as a clause for inclusion in a gradient string,
- * including the trailing comma. Returns empty string when the space is `srgb`
- * with no hue method (CSS default — keep output clean).
+ * Format an interpolation as a token for inclusion in a gradient prelude.
+ * Returns the bare token (e.g. `"in oklch"` or `"in oklch longer hue"`) with
+ * NO comma — the caller decides how to join it with the rest of the prelude.
+ * Returns empty string when the space is `srgb` with no hue method
+ * (CSS default — keep output clean).
+ *
+ * Important: the `in <space>` clause must be adjacent to the prelude (no
+ * comma separating them). Browsers reject e.g.
+ * `radial-gradient(in oklch, ellipse at 50% 50%, …)` as invalid CSS — the
+ * `in oklch` must instead sit next to the shape/at-position prelude:
+ * `radial-gradient(ellipse at 50% 50% in oklch, …)`.
  */
 export function formatInterpolation(interp: Interpolation): string {
   // srgb is CSS default — omit unless hue method is set (which is N/A for cartesian).
   if (interp.space === "srgb") return ""
   const isPolar = POLAR_SPACES.includes(interp.space as PolarSpace)
   if (isPolar && interp.hueMethod) {
-    return `in ${interp.space} ${interp.hueMethod} hue, `
+    return `in ${interp.space} ${interp.hueMethod} hue`
   }
-  return `in ${interp.space}, `
+  return `in ${interp.space}`
 }
 
 const SIDE_TO_ANGLE: Record<string, number> = {
@@ -394,7 +407,12 @@ export function parseGradient(value: string): InternalState | null {
   const segments = splitTopLevelCommas(body)
   if (segments.length === 0) return null
 
-  // Try to extract interpolation from first segment.
+  // Try to extract interpolation. Two forms accepted:
+  //   Form A — first segment is the bare `in <space>[ <method> hue]?` clause
+  //            (e.g. `linear-gradient(in oklch, red, blue)` when no prelude).
+  //   Form B — interpolation token is suffixed onto the prelude, separated by
+  //            whitespace (e.g. `radial-gradient(ellipse at 50% 50% in oklch, …)`).
+  //            This is the canonical CSS-valid form for radial/conic.
   let interpolation: {
     space: InterpolationSpace
     hueMethod?: InterpolationHueMethod
@@ -406,6 +424,21 @@ export function parseGradient(value: string): InternalState | null {
   if (interpFromFirst) {
     interpolation = interpFromFirst
     preludeAndStops = segments.slice(1)
+  } else {
+    // Try Form B: extract trailing `in <space>[ <method> hue]?` from segment 0.
+    const suffixMatch = segments[0].match(
+      /\s+(in\s+(?:srgb|oklch|oklab|hsl|hwb)(?:\s+(?:shorter|longer)\s+hue)?)$/i,
+    )
+    if (suffixMatch) {
+      const parsed = parseInterpolation(suffixMatch[1])
+      if (parsed) {
+        interpolation = parsed
+        preludeAndStops = [
+          segments[0].slice(0, suffixMatch.index ?? 0).trim(),
+          ...segments.slice(1),
+        ]
+      }
+    }
   }
 
   // Determine if the next segment is a prelude (angle/shape/from) or a stop.
@@ -529,17 +562,28 @@ export function isGradientString(value: string): boolean {
 
 /**
  * Serialize internal state to a CSS gradient string.
+ *
+ * Emission rule: the interpolation `in <space>` clause sits adjacent to the
+ * prelude with a space separator, NOT comma-separated. Browsers reject
+ * `radial-gradient(in oklch, ellipse at 50% 50%, …)` as invalid syntax;
+ * the correct form is `radial-gradient(ellipse at 50% 50% in oklch, …)`.
  */
 export function formatGradient(state: InternalState): string {
-  const interp = formatInterpolation(state.interpolation)
+  const interpToken = formatInterpolation(state.interpolation)
   const stops = state.stops.map(formatStop).join(", ")
+  const joinInterp = (positional: string) =>
+    interpToken ? `${positional} ${interpToken}` : positional
   switch (state.type) {
     case "linear":
-      return `linear-gradient(${interp}${state.angle}deg, ${stops})`
+      return `linear-gradient(${joinInterp(`${state.angle}deg`)}, ${stops})`
     case "radial":
-      return `radial-gradient(${interp}${state.shape} ${state.size} at ${Math.round(state.position.x)}% ${Math.round(state.position.y)}%, ${stops})`
+      return `radial-gradient(${joinInterp(
+        `${state.shape} ${state.size} at ${Math.round(state.position.x)}% ${Math.round(state.position.y)}%`,
+      )}, ${stops})`
     case "conic":
-      return `conic-gradient(${interp}from ${state.fromAngle}deg at ${Math.round(state.position.x)}% ${Math.round(state.position.y)}%, ${stops})`
+      return `conic-gradient(${joinInterp(
+        `from ${state.fromAngle}deg at ${Math.round(state.position.x)}% ${Math.round(state.position.y)}%`,
+      )}, ${stops})`
   }
 }
 

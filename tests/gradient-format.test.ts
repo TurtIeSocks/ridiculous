@@ -19,18 +19,18 @@ describe("formatInterpolation", () => {
   it("returns empty string for default srgb (no hue method)", () => {
     expect(formatInterpolation({ space: "srgb" })).toBe("")
   })
-  it("returns `in oklch, ` for non-default space", () => {
-    expect(formatInterpolation({ space: "oklch" })).toBe("in oklch, ")
+  it("returns bare `in <space>` token (no comma)", () => {
+    expect(formatInterpolation({ space: "oklch" })).toBe("in oklch")
   })
   it("includes hue method for polar spaces", () => {
     expect(formatInterpolation({ space: "oklch", hueMethod: "longer" })).toBe(
-      "in oklch longer hue, ",
+      "in oklch longer hue",
     )
   })
   it("ignores hue method for cartesian (sRGB / oklab)", () => {
     expect(formatInterpolation({ space: "srgb", hueMethod: "longer" })).toBe("")
     expect(formatInterpolation({ space: "oklab", hueMethod: "longer" })).toBe(
-      "in oklab, ",
+      "in oklab",
     )
   })
 })
@@ -92,7 +92,7 @@ describe("formatGradient", () => {
     ).toBe("conic-gradient(from 90deg at 50% 50%, #ff0000 0%, #0000ff 100%)")
   })
 
-  it("prepends interpolation when not default srgb", () => {
+  it("appends interpolation adjacent to prelude (no comma between)", () => {
     expect(
       formatGradient({
         type: "linear",
@@ -107,7 +107,47 @@ describe("formatGradient", () => {
         fromAngle: 0,
         interpolation: { space: "oklch" },
       }),
-    ).toBe("linear-gradient(in oklch, 90deg, #ff0000 0%, #0000ff 100%)")
+    ).toBe("linear-gradient(90deg in oklch, #ff0000 0%, #0000ff 100%)")
+  })
+
+  it("places interpolation after radial shape/at-position prelude", () => {
+    expect(
+      formatGradient({
+        type: "radial",
+        stops: [
+          { color: "#ff0000", position: 0 },
+          { color: "#0000ff", position: 100 },
+        ],
+        angle: 180,
+        shape: "ellipse",
+        size: "farthest-corner",
+        position: { x: 50, y: 50 },
+        fromAngle: 0,
+        interpolation: { space: "oklch" },
+      }),
+    ).toBe(
+      "radial-gradient(ellipse farthest-corner at 50% 50% in oklch, #ff0000 0%, #0000ff 100%)",
+    )
+  })
+
+  it("places interpolation after conic from/at-position prelude", () => {
+    expect(
+      formatGradient({
+        type: "conic",
+        stops: [
+          { color: "#ff0000", position: 0 },
+          { color: "#0000ff", position: 100 },
+        ],
+        angle: 0,
+        shape: "ellipse",
+        size: "farthest-corner",
+        position: { x: 50, y: 50 },
+        fromAngle: 90,
+        interpolation: { space: "oklch" },
+      }),
+    ).toBe(
+      "conic-gradient(from 90deg at 50% 50% in oklch, #ff0000 0%, #0000ff 100%)",
+    )
   })
 })
 
@@ -121,7 +161,7 @@ describe("parseGradient + formatGradient round-trip", () => {
 
   it("round-trips with interpolation + hue method", () => {
     const input =
-      "linear-gradient(in oklch longer hue, 90deg, #ff0000 0%, #0000ff 100%)"
+      "linear-gradient(90deg in oklch longer hue, #ff0000 0%, #0000ff 100%)"
     const parsed = parseGradient(input)
     expect(parsed).not.toBeNull()
     expect(formatGradient(parsed!)).toBe(input)
@@ -133,5 +173,17 @@ describe("parseGradient + formatGradient round-trip", () => {
     const parsed = parseGradient(input)
     expect(parsed).not.toBeNull()
     expect(formatGradient(parsed!)).toBe(input)
+  })
+
+  it("accepts legacy comma-separated interpolation form and re-emits adjacent form", () => {
+    // Old emitter form (browser is lenient on linear-gradient but rejects on
+    // radial). Parser still accepts it; formatter normalizes to the adjacent
+    // form on re-emit.
+    const legacy = "linear-gradient(in oklch, 90deg, #ff0000 0%, #0000ff 100%)"
+    const parsed = parseGradient(legacy)
+    expect(parsed).not.toBeNull()
+    expect(formatGradient(parsed!)).toBe(
+      "linear-gradient(90deg in oklch, #ff0000 0%, #0000ff 100%)",
+    )
   })
 })

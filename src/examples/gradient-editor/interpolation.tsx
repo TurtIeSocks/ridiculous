@@ -4,10 +4,10 @@ import { CopyButton } from "../color-picker/copy-button"
 
 export function Interpolation() {
   const [srgb, setSrgb] = useState<string>(
-    "linear-gradient(in srgb, 90deg, #ff0000, #0000ff)",
+    "linear-gradient(90deg in srgb, #ff0000, #0000ff)",
   )
   const [oklch, setOklch] = useState<string>(
-    "linear-gradient(in oklch, 90deg, #ff0000, #0000ff)",
+    "linear-gradient(90deg in oklch, #ff0000, #0000ff)",
   )
   return (
     <div className="glass-card rounded-2xl p-6 md:p-8">
