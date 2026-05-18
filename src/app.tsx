@@ -1,3 +1,5 @@
+import { BasicUsage } from "./examples/color-picker/basic-usage"
+
 export function App() {
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -18,7 +20,10 @@ export function App() {
         </div>
       </header>
       <main className="container mx-auto px-6 py-12 space-y-16">
-        {/* Sections populated in subsequent tasks */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-6">Color Picker</h2>
+          <BasicUsage />
+        </section>
       </main>
       <footer className="border-t mt-24">
         <div className="container mx-auto px-6 py-6 text-sm text-muted-foreground">
