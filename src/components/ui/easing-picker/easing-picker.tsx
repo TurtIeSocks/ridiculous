@@ -121,6 +121,31 @@ export function parseEasing(value: string): EasingState | null {
   return null
 }
 
+/** Round to up to 4 decimal places, strip trailing zeros + bare decimal point. */
+function fmtNum(n: number): string {
+  const rounded = Math.round(n * 10000) / 10000
+  return rounded.toString()
+}
+
+export function formatEasing(state: EasingState): EasingString {
+  switch (state.basis) {
+    case "bezier": {
+      const { x1, y1, x2, y2 } = state
+      return `cubic-bezier(${fmtNum(x1)}, ${fmtNum(y1)}, ${fmtNum(x2)}, ${fmtNum(y2)})` as EasingString
+    }
+    case "steps": {
+      const { n, position } = state
+      return position === "end" ? `steps(${n})` : `steps(${n}, ${position})`
+    }
+    case "spring":
+    case "bounce":
+    case "wiggle": {
+      // Filled in Phase 5 (Task 13/14/15)
+      return "linear(0, 1)" as const
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Physics samplers + baking (Phase 5)
 // ---------------------------------------------------------------------------
