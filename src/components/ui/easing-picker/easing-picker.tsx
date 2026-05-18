@@ -16,7 +16,7 @@ export function EasingPicker() {
 // Sub-components (filled in Phases 3-7)
 // ---------------------------------------------------------------------------
 
-import { useRef, useState } from "react"
+import { useRef } from "react"
 import { cn } from "@/lib/utils"
 
 export interface PresetGalleryProps {
@@ -148,7 +148,6 @@ export function BezierCanvas({
   className,
 }: BezierCanvasProps) {
   const svgRef = useRef<SVGSVGElement>(null)
-  const [dragging, setDragging] = useState<"p1" | "p2" | null>(null)
   const draggingRef = useRef<"p1" | "p2" | null>(null)
 
   const yMin = -extraBottom
@@ -176,7 +175,6 @@ export function BezierCanvas({
   const handlePointerDown = (which: "p1" | "p2") => (e: React.PointerEvent) => {
     e.currentTarget.setPointerCapture?.(e.pointerId)
     draggingRef.current = which
-    setDragging(which)
   }
 
   const handlePointerMove = (e: React.PointerEvent) => {
@@ -194,7 +192,6 @@ export function BezierCanvas({
   const handlePointerUp = (e: React.PointerEvent) => {
     e.currentTarget.releasePointerCapture?.(e.pointerId)
     draggingRef.current = null
-    setDragging(null)
   }
 
   return (
@@ -245,6 +242,71 @@ export function BezierCanvas({
 
 function clamp(v: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, v))
+}
+
+// ---------------------------------------------------------------------------
+// BezierInputs (internal)
+// ---------------------------------------------------------------------------
+
+interface BezierInputsProps {
+  value: {
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+    extraTop: number
+    extraBottom: number
+  }
+  onChange: (v: BezierInputsProps["value"]) => void
+}
+
+export function BezierInputs({ value, onChange }: BezierInputsProps) {
+  const set = (k: keyof BezierInputsProps["value"]) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const n = Number(e.target.value)
+    if (!Number.isFinite(n)) return
+    onChange({ ...value, [k]: n })
+  }
+  return (
+    <div className="grid grid-cols-2 gap-2 text-xs">
+      <Field label="X1" value={value.x1} min={0} max={1} step={0.01} onChange={set("x1")} />
+      <Field label="Y1" value={value.y1} step={0.01} onChange={set("y1")} />
+      <Field label="X2" value={value.x2} min={0} max={1} step={0.01} onChange={set("x2")} />
+      <Field label="Y2" value={value.y2} step={0.01} onChange={set("y2")} />
+      <Field label="Extra Top" value={value.extraTop} min={0} step={0.05} onChange={set("extraTop")} />
+      <Field label="Extra Bottom" value={value.extraBottom} min={0} step={0.05} onChange={set("extraBottom")} />
+    </div>
+  )
+}
+
+function Field({
+  label,
+  value,
+  min,
+  max,
+  step,
+  onChange,
+}: {
+  label: string
+  value: number
+  min?: number
+  max?: number
+  step?: number
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+}) {
+  return (
+    <label className="flex flex-col gap-0.5">
+      <span className="text-muted-foreground">{label}</span>
+      <input
+        type="number"
+        value={value}
+        min={min}
+        max={max}
+        step={step}
+        onChange={onChange}
+        className="px-2 py-1 bg-muted rounded text-foreground"
+      />
+    </label>
+  )
 }
 
 // ---------------------------------------------------------------------------
