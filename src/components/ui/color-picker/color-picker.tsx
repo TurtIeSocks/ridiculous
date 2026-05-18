@@ -1,12 +1,22 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import type {
   ColorMode,
   ColorString,
   ColorStringMap,
 } from "./color-picker.types"
+
+const COLOR_MODES = [
+  "oklch",
+  "oklab",
+  "hex",
+  "rgb",
+  "hsl",
+  "hwb",
+] as const satisfies readonly ColorMode[]
 
 // ---------------------------------------------------------------------------
 // Component (top of file — filled in Phase 5)
@@ -743,6 +753,38 @@ export function AlphaStrip({
         className="absolute top-1/2 h-5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white border border-black/40 shadow pointer-events-none"
         style={{ left: `${a * 100}%` }}
       />
+    </div>
+  )
+}
+
+export function ModeButtonGroup({
+  mode,
+  onChange,
+}: {
+  mode: ColorMode
+  onChange: (next: ColorMode) => void
+}) {
+  return (
+    <div
+      role="tablist"
+      aria-label="Color format"
+      className="flex gap-1"
+      data-slot="color-picker-modes"
+    >
+      {COLOR_MODES.map((m) => (
+        <Button
+          key={m}
+          type="button"
+          role="tab"
+          aria-selected={m === mode}
+          size="sm"
+          variant={m === mode ? "secondary" : "ghost"}
+          onClick={() => onChange(m)}
+          className="h-7 px-2 font-mono text-xs"
+        >
+          {m}
+        </Button>
+      ))}
     </div>
   )
 }
