@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { ColorPicker } from "@/components/ui/color-picker"
+import { CopyButton } from "./copy-button"
 
 export function TierCasual() {
   const [color, setColor] = useState<string>("#3b82f6")
@@ -20,11 +21,12 @@ export function TierCasual() {
         <code className="text-foreground">useState&lt;string&gt;</code>. No
         compile-time validation; runtime parser handles whatever you throw.
       </p>
-      <div className="mt-5 flex items-center gap-3">
+      <div className="mt-5 flex items-center gap-2">
         <ColorPicker value={color} onChange={setColor} />
         <code className="text-xs font-mono bg-black/40 border border-white/10 px-2.5 py-1 rounded-md truncate min-w-0 flex-1">
           {color}
         </code>
+        <CopyButton value={color} />
       </div>
       <pre className="mt-6 text-[11px] leading-relaxed font-mono bg-black/40 border border-white/10 p-4 rounded-lg overflow-x-auto">
         <span className="text-violet-glow">const</span>{" "}

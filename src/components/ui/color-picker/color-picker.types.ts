@@ -412,3 +412,65 @@ export interface ColorStringMap {
 }
 
 export type ColorMode = keyof ColorStringMap
+
+// =====================================================================
+// 4. UTILITY TYPES — operate on color string literals at the type level.
+// =====================================================================
+
+/**
+ * Extract the color mode from a color literal at the type level.
+ *
+ * @example
+ * type T1 = ModeOf<"#ff0000">              // "hex"
+ * type T2 = ModeOf<"oklch(0.5 0.1 240)">   // "oklch"
+ * type T3 = ModeOf<"not-a-color">          // never
+ */
+export type ModeOf<S extends string> = S extends `oklch(${string})`
+  ? "oklch"
+  : S extends `oklab(${string})`
+    ? "oklab"
+    : S extends `#${string}`
+      ? "hex"
+      : S extends `rgba(${string})`
+        ? "rgb"
+        : S extends `rgb(${string})`
+          ? "rgb"
+          : S extends `hsla(${string})`
+            ? "hsl"
+            : S extends `hsl(${string})`
+              ? "hsl"
+              : S extends `hwb(${string})`
+                ? "hwb"
+                : never
+
+/**
+ * Replace (or add) the alpha tag on a color literal that uses functional
+ * notation. Hex literals are NOT supported here because hex alpha is a
+ * byte-aligned digit pair; encoding a number-to-hex transform at the type
+ * level would require a 256-entry lookup table per nibble.
+ *
+ * @example
+ * type T1 = WithAlpha<"oklch(0.5 0.1 240)", 50>           // "oklch(0.5 0.1 240 / 50%)"
+ * type T2 = WithAlpha<"oklch(0.5 0.1 240 / 100%)", 50>    // "oklch(0.5 0.1 240 / 50%)"
+ * type T3 = WithAlpha<"rgb(255 0 0)", 25>                 // "rgb(255 0 0 / 25%)"
+ */
+export type WithAlpha<
+  S extends string,
+  A extends number,
+> = S extends `${infer Base} / ${string})`
+  ? `${Base} / ${A}%)`
+  : S extends `${infer Base})`
+    ? `${Base} / ${A}%)`
+    : never
+
+/**
+ * Strip the alpha tag from a color literal that uses functional notation.
+ * Hex literals pass through unchanged (use `slice` at runtime for 8-digit
+ * hex if needed).
+ *
+ * @example
+ * type T1 = WithoutAlpha<"oklch(0.5 0.1 240 / 50%)">  // "oklch(0.5 0.1 240)"
+ * type T2 = WithoutAlpha<"oklch(0.5 0.1 240)">        // "oklch(0.5 0.1 240)"
+ */
+export type WithoutAlpha<S extends string> =
+  S extends `${infer Base} / ${string})` ? `${Base})` : S

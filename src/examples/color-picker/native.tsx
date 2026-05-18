@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { ColorPicker } from "@/components/ui/color-picker"
+import { CopyButton } from "./copy-button"
 
 export function Native() {
   const [color, setColor] = useState("#ff0000")
@@ -17,11 +18,12 @@ export function Native() {
         . sRGB-only, no alpha — wide-gamut and transparent values lose
         information on edit.
       </p>
-      <div className="mt-6 flex items-center gap-4">
+      <div className="mt-6 flex items-center gap-3">
         <ColorPicker native value={color} onChange={setColor} />
-        <code className="text-sm font-mono bg-black/40 border border-white/10 px-3 py-1.5 rounded-lg">
+        <code className="flex-1 truncate text-sm font-mono bg-black/40 border border-white/10 px-3 py-1.5 rounded-lg">
           {color}
         </code>
+        <CopyButton value={color} />
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 export type { ColorPickerProps } from "./color-picker"
-export { ColorPicker } from "./color-picker"
+export { ColorPicker, isColorString } from "./color-picker"
 export type {
   ColorLiteral,
   ColorMode,
@@ -11,6 +11,7 @@ export type {
   HslString,
   HWBLiteral,
   HwbString,
+  ModeOf,
   OKLCHLiteral,
   OklabLiteral,
   OklabString,
@@ -18,5 +19,7 @@ export type {
   RGBALiteral,
   RGBLiteral,
   RgbString,
+  WithAlpha,
+  WithoutAlpha,
 } from "./color-picker.types"
 export { color } from "./color-picker.types"

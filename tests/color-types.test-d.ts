@@ -152,3 +152,54 @@ test("color() rejects invalid at type level", () => {
   // @ts-expect-error oklch L out of range
   color("oklch(2 0.1 240)")
 })
+
+import { isColorString } from "@/components/ui/color-picker/color-picker"
+import type {
+  ModeOf,
+  WithAlpha,
+  WithoutAlpha,
+} from "@/components/ui/color-picker/color-picker.types"
+
+test("ModeOf extracts the mode from a color literal", () => {
+  expectTypeOf<ModeOf<"#ff0000">>().toEqualTypeOf<"hex">()
+  expectTypeOf<ModeOf<"oklch(0.5 0.1 240)">>().toEqualTypeOf<"oklch">()
+  expectTypeOf<ModeOf<"oklab(0.5 0.1 -0.05)">>().toEqualTypeOf<"oklab">()
+  expectTypeOf<ModeOf<"rgb(255 0 0)">>().toEqualTypeOf<"rgb">()
+  expectTypeOf<ModeOf<"rgba(255 0 0 / 0.5)">>().toEqualTypeOf<"rgb">()
+  expectTypeOf<ModeOf<"hsl(0 100% 50%)">>().toEqualTypeOf<"hsl">()
+  expectTypeOf<ModeOf<"hwb(0 0% 0%)">>().toEqualTypeOf<"hwb">()
+  expectTypeOf<ModeOf<"not a color">>().toBeNever()
+})
+
+test("WithAlpha replaces or adds alpha tag", () => {
+  expectTypeOf<
+    WithAlpha<"oklch(0.5 0.1 240)", 50>
+  >().toEqualTypeOf<"oklch(0.5 0.1 240 / 50%)">()
+  expectTypeOf<
+    WithAlpha<"oklch(0.5 0.1 240 / 100%)", 50>
+  >().toEqualTypeOf<"oklch(0.5 0.1 240 / 50%)">()
+  expectTypeOf<
+    WithAlpha<"rgb(255 0 0)", 25>
+  >().toEqualTypeOf<"rgb(255 0 0 / 25%)">()
+})
+
+test("WithoutAlpha strips alpha tag", () => {
+  expectTypeOf<
+    WithoutAlpha<"oklch(0.5 0.1 240 / 50%)">
+  >().toEqualTypeOf<"oklch(0.5 0.1 240)">()
+  expectTypeOf<
+    WithoutAlpha<"oklch(0.5 0.1 240)">
+  >().toEqualTypeOf<"oklch(0.5 0.1 240)">()
+  expectTypeOf<
+    WithoutAlpha<"rgb(255 0 0 / 50%)">
+  >().toEqualTypeOf<"rgb(255 0 0)">()
+})
+
+test("isColorString narrows + validates at runtime", () => {
+  expect(isColorString("#ff0000")).toBe(true)
+  expect(isColorString("rgb(255 0 0)")).toBe(true)
+  expect(isColorString("oklch(0.5 0.1 240)")).toBe(true)
+  expect(isColorString("hwb(0 0% 0%)")).toBe(true)
+  expect(isColorString("not a color")).toBe(false)
+  expect(isColorString("")).toBe(false)
+})

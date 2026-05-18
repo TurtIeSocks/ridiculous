@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { ColorPicker } from "@/components/ui/color-picker"
+import { CopyButton } from "./copy-button"
 
 export function BasicUsage() {
   const [color, setColor] = useState<string>("oklch(0.628 0.258 29.234)")
@@ -13,11 +14,12 @@ export function BasicUsage() {
         Mode unset → switcher visible → onChange emits whichever mode the user
         last selected.
       </p>
-      <div className="mt-6 flex items-center gap-4">
+      <div className="mt-6 flex items-center gap-3">
         <ColorPicker value={color} onChange={setColor} />
-        <code className="text-sm font-mono bg-black/40 border border-white/10 px-3 py-1.5 rounded-lg">
+        <code className="flex-1 truncate text-sm font-mono bg-black/40 border border-white/10 px-3 py-1.5 rounded-lg">
           {color}
         </code>
+        <CopyButton value={color} />
       </div>
     </div>
   )

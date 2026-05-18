@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import type {
+  ColorLiteral,
   ColorMode,
   ColorString,
   ColorStringMap,
@@ -63,6 +64,7 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
     () => modeProp ?? parsedFromValue?.mode ?? "oklch",
   )
   const lastEmittedRef = useRef<string | null>(null)
+  const [hasEyeDropper, setHasEyeDropper] = useState(false)
 
   useEffect(() => {
     if (value === lastEmittedRef.current) return
@@ -72,6 +74,10 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
       if (modeProp == null) setInternalMode(parsed.mode)
     }
   }, [value, modeProp])
+
+  useEffect(() => {
+    setHasEyeDropper(typeof window !== "undefined" && "EyeDropper" in window)
+  }, [])
 
   if (native) {
     const hex = parsedFromValue
@@ -129,6 +135,25 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
     onChange(formatted as Parameters<typeof onChange>[0])
   }
 
+  const handleEyeDropper = async () => {
+    if (typeof window === "undefined") return
+    const EyeDropper = (
+      window as unknown as {
+        EyeDropper?: new () => { open(): Promise<{ sRGBHex: string }> }
+      }
+    ).EyeDropper
+    if (!EyeDropper) return
+    try {
+      const result = await new EyeDropper().open()
+      const parsed = parseHex(result.sRGBHex)
+      if (parsed) {
+        emit(srgbToOklch(parsed.r, parsed.g, parsed.b, 1))
+      }
+    } catch {
+      // user cancelled — ignore
+    }
+  }
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -160,6 +185,32 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
               onChange={(next) => emit(internal, next)}
             />
           )}
+          <div className="flex items-center gap-1.5">
+            {hasEyeDropper && (
+              <button
+                type="button"
+                onClick={handleEyeDropper}
+                aria-label="Pick color from screen"
+                data-slot="color-picker-eyedropper"
+                className="flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded border bg-muted/40 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              >
+                <svg
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-3 w-3"
+                  aria-hidden="true"
+                >
+                  <path d="m11.5 1.5 3 3-2 2-3-3z" />
+                  <path d="m9.5 3.5-7 7v3h3l7-7" />
+                </svg>
+              </button>
+            )}
+            <PresetPalette onPick={emit} />
+          </div>
           <LcPad
             l={internal.l}
             c={internal.c}
@@ -648,6 +699,24 @@ export function parseColor(value: string): ParseResult | null {
   return null
 }
 
+/**
+ * Runtime type guard for color strings. Narrows `string` to `ColorString`
+ * and a literal `S` to `S & ColorLiteral<S>`.
+ *
+ * @example
+ * const v: string = userInput
+ * if (isColorString(v)) {
+ *   // v is now typed ColorString
+ * }
+ */
+export function isColorString(value: string): value is ColorString
+export function isColorString<S extends string>(
+  value: S,
+): value is S & ColorLiteral<S>
+export function isColorString(value: string): boolean {
+  return parseColor(value) !== null
+}
+
 export function formatColor(
   oklch: { l: number; c: number; h: number; a: number },
   mode: ColorMode,
@@ -723,7 +792,11 @@ function LcPad({
   return (
     <div
       data-slot="color-picker-pad"
-      className="relative w-full touch-none cursor-crosshair rounded border overflow-hidden"
+      role="application"
+      aria-label="Lightness and chroma"
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: 2D pad needs to be keyboard-focusable for arrow-key nudge
+      tabIndex={0}
+      className="relative w-full touch-none cursor-crosshair rounded border overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       style={{ height: PAD_HEIGHT }}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId)
@@ -731,6 +804,22 @@ function LcPad({
       }}
       onPointerMove={(event) => {
         if (event.buttons) handlePointer(event)
+      }}
+      onKeyDown={(event) => {
+        const step = event.shiftKey ? 0.05 : 0.01
+        if (event.key === "ArrowLeft") {
+          event.preventDefault()
+          onChange(l, Math.max(0, c - step * CHROMA_MAX))
+        } else if (event.key === "ArrowRight") {
+          event.preventDefault()
+          onChange(l, Math.min(CHROMA_MAX, c + step * CHROMA_MAX))
+        } else if (event.key === "ArrowUp") {
+          event.preventDefault()
+          onChange(Math.min(1, l + step), c)
+        } else if (event.key === "ArrowDown") {
+          event.preventDefault()
+          onChange(Math.max(0, l - step), c)
+        }
       }}
     >
       <canvas
@@ -876,6 +965,48 @@ function ModeButtonGroup({
         >
           {m}
         </Button>
+      ))}
+    </div>
+  )
+}
+
+const PRESETS: ReadonlyArray<{
+  l: number
+  c: number
+  h: number
+  name: string
+}> = [
+  { l: 0.637, c: 0.237, h: 25.331, name: "red" },
+  { l: 0.705, c: 0.213, h: 47.604, name: "orange" },
+  { l: 0.769, c: 0.188, h: 70.08, name: "amber" },
+  { l: 0.768, c: 0.233, h: 130.85, name: "lime" },
+  { l: 0.696, c: 0.17, h: 162.48, name: "emerald" },
+  { l: 0.715, c: 0.143, h: 215.221, name: "cyan" },
+  { l: 0.623, c: 0.214, h: 259.815, name: "blue" },
+  { l: 0.606, c: 0.25, h: 292.717, name: "violet" },
+  { l: 0.667, c: 0.295, h: 322.15, name: "fuchsia" },
+  { l: 0.656, c: 0.241, h: 354.308, name: "pink" },
+]
+
+function PresetPalette({
+  onPick,
+}: {
+  onPick: (next: { l: number; c: number; h: number; a: number }) => void
+}) {
+  return (
+    <div
+      data-slot="color-picker-presets"
+      className="flex flex-1 items-center gap-1.5"
+    >
+      {PRESETS.map((p) => (
+        <button
+          key={p.name}
+          type="button"
+          aria-label={`preset ${p.name}`}
+          onClick={() => onPick({ l: p.l, c: p.c, h: p.h, a: 1 })}
+          className="h-5 w-5 shrink-0 cursor-pointer rounded border transition hover:scale-110"
+          style={{ backgroundColor: `oklch(${p.l} ${p.c} ${p.h})` }}
+        />
       ))}
     </div>
   )

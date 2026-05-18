@@ -4,6 +4,7 @@ import {
   ColorPicker,
   type ColorStringMap,
 } from "@/components/ui/color-picker"
+import { CopyButton } from "./copy-button"
 
 const MODES: readonly ColorMode[] = [
   "oklch",
@@ -31,7 +32,7 @@ function ModeCard<M extends ColorMode>({ mode }: { mode: M }) {
       <div className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">
         <span className="text-gradient">→</span> {mode}
       </div>
-      <div className="mt-3 flex items-center gap-3">
+      <div className="mt-3 flex items-center gap-2">
         <ColorPicker<M>
           value={color}
           mode={mode}
@@ -40,6 +41,7 @@ function ModeCard<M extends ColorMode>({ mode }: { mode: M }) {
         <code className="text-xs font-mono bg-black/40 border border-white/10 px-2.5 py-1 rounded-md truncate min-w-0 flex-1">
           {color}
         </code>
+        <CopyButton value={color} />
       </div>
     </div>
   )
