@@ -98,6 +98,59 @@ export function parseHsl(
   return { h, s, l, a }
 }
 
+const OKLCH_RE =
+  /^oklch\(\s*([\d.]+%?)\s+([\d.]+%?)\s+([\d.]+(?:deg)?)\s*(?:\/\s*([\d.]+%?)\s*)?\)$/i
+
+export function parseOklch(value: string): {
+  l: number
+  c: number
+  h: number
+  a: number
+} | null {
+  const match = value.match(OKLCH_RE)
+  if (!match) return null
+  const l = match[1].endsWith("%")
+    ? parseFloat(match[1]) / 100
+    : parseFloat(match[1])
+  const c = match[2].endsWith("%")
+    ? (parseFloat(match[2]) / 100) * 0.4
+    : parseFloat(match[2])
+  const h = parseFloat(match[3].replace(/deg$/i, ""))
+  const a = match[4] != null ? parseAlphaToken(match[4]) : 1
+  if ([l, c, h].some((n) => Number.isNaN(n))) return null
+  return { l, c, h, a }
+}
+
+export function formatOklch({
+  l,
+  c,
+  h,
+  a,
+}: {
+  l: number
+  c: number
+  h: number
+  a: number
+}): string {
+  const base = `oklch(${trimNumber(l)} ${trimNumber(c)} ${trimNumber(h)}`
+  if (a >= 1) return `${base})`
+  return `${base} / ${trimNumber(a * 100)}%)`
+}
+
+export function formatHex(
+  oklch: { l: number; c: number; h: number; a: number },
+  includeAlpha: boolean,
+): string {
+  const [r, g, b] = oklchToSrgb(oklch.l, oklch.c, oklch.h)
+  const channel = (n: number) =>
+    Math.round(clamp01(n) * 255)
+      .toString(16)
+      .padStart(2, "0")
+  const base = `#${channel(r)}${channel(g)}${channel(b)}`
+  if (!includeAlpha) return base
+  return `${base}${channel(oklch.a)}`
+}
+
 // ---------------------------------------------------------------------------
 // Color space conversions
 // ---------------------------------------------------------------------------
@@ -153,4 +206,60 @@ export function srgbToHsl(
   h *= 60
   if (h < 0) h += 360
   return { h, s, l }
+}
+
+export function oklchToSrgb(
+  L: number,
+  C: number,
+  hDeg: number,
+): [number, number, number] {
+  const hRad = (hDeg * Math.PI) / 180
+  const a = C * Math.cos(hRad)
+  const b = C * Math.sin(hRad)
+
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b
+  const s_ = L - 0.0894841775 * a - 1.291485548 * b
+
+  const lCubed = l_ * l_ * l_
+  const mCubed = m_ * m_ * m_
+  const sCubed = s_ * s_ * s_
+
+  const rLin =
+    4.0767416621 * lCubed - 3.3077115913 * mCubed + 0.2309699292 * sCubed
+  const gLin =
+    -1.2684380046 * lCubed + 2.6097574011 * mCubed - 0.3413193965 * sCubed
+  const bLin =
+    -0.0041960863 * lCubed - 0.7034186147 * mCubed + 1.707614701 * sCubed
+
+  return [linearToSrgb(rLin), linearToSrgb(gLin), linearToSrgb(bLin)]
+}
+
+export function srgbToOklch(
+  r: number,
+  g: number,
+  b: number,
+  alpha: number,
+): { l: number; c: number; h: number; a: number } {
+  const rLin = srgbToLinear(r)
+  const gLin = srgbToLinear(g)
+  const bLin = srgbToLinear(b)
+
+  const lLms = 0.4122214708 * rLin + 0.5363325363 * gLin + 0.0514459929 * bLin
+  const mLms = 0.2119034982 * rLin + 0.6806995451 * gLin + 0.1073969566 * bLin
+  const sLms = 0.0883024619 * rLin + 0.2817188376 * gLin + 0.6299787005 * bLin
+
+  const l_ = Math.cbrt(lLms)
+  const m_ = Math.cbrt(mLms)
+  const s_ = Math.cbrt(sLms)
+
+  const L = 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_
+  const aAxis = 1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_
+  const bAxis = 0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_
+
+  const C = Math.sqrt(aAxis * aAxis + bAxis * bAxis)
+  let H = (Math.atan2(bAxis, aAxis) * 180) / Math.PI
+  if (H < 0) H += 360
+
+  return { l: L, c: C, h: H, a: alpha }
 }

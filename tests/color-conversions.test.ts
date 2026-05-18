@@ -66,10 +66,7 @@ describe("linearToSrgb / srgbToLinear", () => {
   })
 })
 
-import {
-  hslToSrgb,
-  srgbToHsl,
-} from "@/components/ui/color-picker/color-picker"
+import { hslToSrgb, srgbToHsl } from "@/components/ui/color-picker/color-picker"
 
 describe("hslToSrgb / srgbToHsl", () => {
   it("round-trips pure red", () => {
@@ -97,5 +94,32 @@ describe("hslToSrgb / srgbToHsl", () => {
     expect(rgb.r).toBeCloseTo(1, 6)
     expect(rgb.g).toBeCloseTo(0, 6)
     expect(rgb.b).toBeCloseTo(0, 6)
+  })
+})
+
+import {
+  oklchToSrgb,
+  srgbToOklch,
+} from "@/components/ui/color-picker/color-picker"
+
+describe("oklchToSrgb / srgbToOklch", () => {
+  it("round-trips a few sRGB colors", () => {
+    const samples = [
+      { r: 1, g: 0, b: 0 },
+      { r: 0, g: 1, b: 0 },
+      { r: 0, g: 0, b: 1 },
+      { r: 0.5, g: 0.25, b: 0.75 },
+    ]
+    for (const { r, g, b } of samples) {
+      const oklch = srgbToOklch(r, g, b, 1)
+      const [r2, g2, b2] = oklchToSrgb(oklch.l, oklch.c, oklch.h)
+      expect(r2).toBeCloseTo(r, 3)
+      expect(g2).toBeCloseTo(g, 3)
+      expect(b2).toBeCloseTo(b, 3)
+    }
+  })
+  it("returns gray for desaturated input (C ≈ 0)", () => {
+    const oklch = srgbToOklch(0.5, 0.5, 0.5, 1)
+    expect(oklch.c).toBeCloseTo(0, 3)
   })
 })

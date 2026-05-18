@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import {
   parseHex,
   parseHsl,
+  parseOklch,
   parseRgb,
 } from "@/components/ui/color-picker/color-picker"
 
@@ -98,5 +99,30 @@ describe("parseHsl", () => {
   })
   it("returns null for invalid", () => {
     expect(parseHsl("hsl(garbage)")).toBeNull()
+  })
+})
+
+describe("parseOklch", () => {
+  it("parses bare numeric form", () => {
+    expect(parseOklch("oklch(0.5 0.1 240)")).toEqual({
+      l: 0.5,
+      c: 0.1,
+      h: 240,
+      a: 1,
+    })
+  })
+  it("parses percentage L (relative to 1)", () => {
+    expect(parseOklch("oklch(50% 0.1 240)")).toMatchObject({ l: 0.5 })
+  })
+  it("parses percentage C (relative to 0.4)", () => {
+    expect(parseOklch("oklch(0.5 50% 240)")).toMatchObject({ c: 0.2 })
+  })
+  it("parses alpha", () => {
+    expect(parseOklch("oklch(0.5 0.1 240 / 50%)")).toEqual({
+      l: 0.5,
+      c: 0.1,
+      h: 240,
+      a: 0.5,
+    })
   })
 })
