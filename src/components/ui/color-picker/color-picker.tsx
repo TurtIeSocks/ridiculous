@@ -164,6 +164,22 @@ export function formatRgb(oklch: {
   return `${base} / ${Math.round(oklch.a * 100)}%)`
 }
 
+export function formatHsl(oklch: {
+  l: number
+  c: number
+  h: number
+  a: number
+}): string {
+  const [r, g, b] = oklchToSrgb(oklch.l, oklch.c, oklch.h)
+  const hsl = srgbToHsl(clamp01(r), clamp01(g), clamp01(b))
+  const h = Math.round(hsl.h)
+  const s = Math.round(hsl.s * 100)
+  const l = Math.round(hsl.l * 100)
+  const base = `hsl(${h} ${s}% ${l}%`
+  if (oklch.a >= 1) return `${base})`
+  return `${base} / ${Math.round(oklch.a * 100)}%)`
+}
+
 // ---------------------------------------------------------------------------
 // Color space conversions
 // ---------------------------------------------------------------------------

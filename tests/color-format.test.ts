@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import {
   formatHex,
+  formatHsl,
   formatRgb,
 } from "@/components/ui/color-picker/color-picker"
 
@@ -26,6 +27,19 @@ describe("formatRgb", () => {
   it("emits rgb(... / x%) with alpha < 1", () => {
     expect(formatRgb({ l: 0.628, c: 0.258, h: 29.234, a: 0.5 })).toMatch(
       /^rgb\(\d+ \d+ \d+ \/ \d+%\)$/,
+    )
+  })
+})
+
+describe("formatHsl", () => {
+  it("emits hsl(h s% l%)", () => {
+    expect(formatHsl({ l: 0.5, c: 0.18, h: 0, a: 1 })).toMatch(
+      /^hsl\(\d+ \d+% \d+%\)$/,
+    )
+  })
+  it("emits alpha when a < 1", () => {
+    expect(formatHsl({ l: 0.5, c: 0.18, h: 0, a: 0.5 })).toMatch(
+      /^hsl\(\d+ \d+% \d+% \/ \d+%\)$/,
     )
   })
 })
