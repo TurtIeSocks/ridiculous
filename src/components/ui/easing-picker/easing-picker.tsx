@@ -259,6 +259,96 @@ export function formatEasing(state: EasingState): EasingString {
 // Physics samplers + baking (Phase 5)
 // ---------------------------------------------------------------------------
 
+export interface Sample {
+  y: number
+  t: number
+}
+
+const SETTLE_EPSILON = 0.001
+
+export function sampleSpring(
+  stiffness: number,
+  damping: number,
+  mass: number,
+  samples: number,
+): Sample[] {
+  const k = stiffness
+  const c = damping
+  const m = mass
+  const w0 = Math.sqrt(k / m)
+  const zeta = c / (2 * Math.sqrt(k * m))
+
+  // Total simulation time scales inversely with natural frequency.
+  // Pick a window long enough for the curve to settle.
+  const tMax = Math.max(3 / (zeta * w0), 5) // seconds-equivalent; normalized below
+  const dt = tMax / samples
+
+  const out: Sample[] = []
+  for (let i = 0; i < samples; i++) {
+    const t = i * dt
+    let y: number
+    if (zeta < 1) {
+      // Underdamped
+      const wd = w0 * Math.sqrt(1 - zeta * zeta)
+      y =
+        1 -
+        Math.exp(-zeta * w0 * t) *
+          (Math.cos(wd * t) + ((zeta * w0) / wd) * Math.sin(wd * t))
+    } else if (zeta === 1) {
+      // Critically damped
+      y = 1 - Math.exp(-w0 * t) * (1 + w0 * t)
+    } else {
+      // Overdamped
+      const r1 = -w0 * (zeta - Math.sqrt(zeta * zeta - 1))
+      const r2 = -w0 * (zeta + Math.sqrt(zeta * zeta - 1))
+      y = 1 - (r2 * Math.exp(r1 * t) - r1 * Math.exp(r2 * t)) / (r2 - r1)
+    }
+    out.push({ y, t: i / (samples - 1) })
+    // Early-exit once settled within epsilon for several consecutive samples
+    if (
+      i > samples / 4 &&
+      Math.abs(y - 1) < SETTLE_EPSILON &&
+      out.slice(-3).every((s) => Math.abs(s.y - 1) < SETTLE_EPSILON)
+    ) {
+      // Force last sample to exactly 1, t=1
+      out[out.length - 1] = { y: 1, t: 1 }
+      break
+    }
+  }
+  // Always force endpoint t=1, y=1
+  if (out[out.length - 1].t < 1) out.push({ y: 1, t: 1 })
+  return out
+}
+
+const PRUNE_TOLERANCE = 0.005
+
+/** Drop stops that fall on the line between their neighbors within tolerance. */
+function pruneCollinear(samples: Sample[]): Sample[] {
+  if (samples.length <= 3) return samples
+  const out: Sample[] = [samples[0]]
+  for (let i = 1; i < samples.length - 1; i++) {
+    const prev = out[out.length - 1]
+    const curr = samples[i]
+    const next = samples[i + 1]
+    const slope = (next.y - prev.y) / (next.t - prev.t)
+    const expectedY = prev.y + slope * (curr.t - prev.t)
+    if (Math.abs(curr.y - expectedY) >= PRUNE_TOLERANCE) {
+      out.push(curr)
+    }
+  }
+  out.push(samples[samples.length - 1])
+  return out
+}
+
+export function bakeLinear(samples: Sample[]): string {
+  const pruned = pruneCollinear(samples)
+  const parts = pruned.map((s, i) => {
+    if (i === 0 || i === pruned.length - 1) return fmtNum(s.y)
+    return `${fmtNum(s.y)} ${fmtNum(s.t * 100)}%`
+  })
+  return `linear(${parts.join(", ")})`
+}
+
 // ---------------------------------------------------------------------------
 // Preset table (Phase 3)
 // ---------------------------------------------------------------------------
