@@ -29,6 +29,31 @@
       ]
     },
     {
+      "name": "unit-input",
+      "type": "registry:ui",
+      "title": "Unit Input",
+      "description": "Ridiculously typed CSS-unit input with built-in deg/%/px/rem/em/vw/vh validators, pointer-locked drag scrubbing, and pluggable custom units.",
+      "registryDependencies": ["input"],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/unit-input/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/unit-input/index.ts"
+        },
+        {
+          "path": "src/components/ui/unit-input/unit-input.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/unit-input/unit-input.tsx"
+        },
+        {
+          "path": "src/components/ui/unit-input/unit-input.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/unit-input/unit-input.types.ts"
+        }
+      ]
+    },
+    {
       "name": "gradient-editor",
       "type": "registry:ui",
       "title": "Gradient Editor",
