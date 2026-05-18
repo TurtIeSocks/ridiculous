@@ -34,6 +34,22 @@ export function App() {
           <TierIntellisense />
           <TierStrict />
         </section>
+        <section>
+          <h2 className="text-2xl font-semibold mb-4">Install</h2>
+          <div className="rounded-lg border p-6 space-y-4">
+            <p className="text-sm">
+              Drop the component into any shadcn-configured project:
+            </p>
+            <pre className="text-sm font-mono bg-muted p-3 rounded overflow-x-auto">
+              npx shadcn add
+              https://turtiesocks.github.io/ridiculous/r/color-picker.json
+            </pre>
+            <p className="text-xs text-muted-foreground">
+              <code>button</code> and <code>popover</code> dependencies resolve
+              against the shadcn-ui registry automatically.
+            </p>
+          </div>
+        </section>
       </main>
       <footer className="border-t mt-24">
         <div className="container mx-auto px-6 py-6 text-sm text-muted-foreground">
