@@ -1,7 +1,7 @@
 import { useState } from "react"
 import {
-  ColorPicker,
   type ColorMode,
+  ColorPicker,
   type ColorStringMap,
 } from "@/components/ui/color-picker"
 

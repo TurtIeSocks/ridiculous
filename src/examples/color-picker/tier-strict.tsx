@@ -1,8 +1,8 @@
 import { useState } from "react"
 import {
   ColorPicker,
-  color,
   type ColorString,
+  color,
 } from "@/components/ui/color-picker"
 
 export function TierStrict() {

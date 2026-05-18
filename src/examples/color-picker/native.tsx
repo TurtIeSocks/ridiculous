@@ -13,9 +13,9 @@ export function Native() {
         </code>
       </div>
       <p className="mt-4 text-sm text-muted-foreground">
-        Falls back to the browser&apos;s <code>&lt;input type=&quot;color&quot;&gt;</code>.
-        sRGB-only, no alpha — wide-gamut and transparent values lose information
-        on edit.
+        Falls back to the browser&apos;s{" "}
+        <code>&lt;input type=&quot;color&quot;&gt;</code>. sRGB-only, no alpha —
+        wide-gamut and transparent values lose information on edit.
       </p>
     </div>
   )
