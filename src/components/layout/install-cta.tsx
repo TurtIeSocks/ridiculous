@@ -98,21 +98,47 @@ function CopyButton({ text }: { text: string }) {
   }, [copied])
 
   return (
-    <button
-      type="button"
-      aria-label={copied ? "Copied" : "Copy command"}
-      onClick={async () => {
-        try {
-          await navigator.clipboard.writeText(text)
-          setCopied(true)
-        } catch {
-          /* clipboard unavailable */
-        }
-      }}
-      className="absolute top-3 right-3 z-10 inline-flex size-8 items-center justify-center rounded-md border border-white/10 bg-background/80 text-muted-foreground backdrop-blur-sm transition hover:border-white/20 hover:bg-white/5 hover:text-foreground"
-    >
-      {copied ? <CheckIcon /> : <CopyIcon />}
-    </button>
+    <div className="absolute top-3 right-3 z-10">
+      <button
+        type="button"
+        aria-label={copied ? "Copied" : "Copy command"}
+        onClick={async () => {
+          try {
+            await navigator.clipboard.writeText(text)
+            setCopied(true)
+          } catch {
+            /* clipboard unavailable */
+          }
+        }}
+        className="inline-flex size-8 items-center justify-center rounded-md border border-white/10 bg-background/80 text-muted-foreground backdrop-blur-sm transition hover:border-white/20 hover:bg-white/5 hover:text-foreground"
+      >
+        <span
+          className={cn(
+            "transition-all duration-200",
+            copied ? "scale-100 opacity-100" : "scale-75 opacity-0 absolute",
+          )}
+        >
+          <CheckIcon />
+        </span>
+        <span
+          className={cn(
+            "transition-all duration-200",
+            copied ? "scale-75 opacity-0 absolute" : "scale-100 opacity-100",
+          )}
+        >
+          <CopyIcon />
+        </span>
+      </button>
+      <span
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute right-0 bottom-full mb-2 rounded-md bg-foreground px-2 py-1 text-xs font-mono text-background shadow-lg transition-all duration-200",
+          copied ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1",
+        )}
+      >
+        Copied
+      </span>
+    </div>
   )
 }
 
