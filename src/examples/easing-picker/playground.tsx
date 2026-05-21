@@ -3,6 +3,7 @@
 import { useState } from "react"
 import {
   BezierCanvas,
+  BounceControls,
   type EasingString,
   EasingPreview,
   formatEasing,
@@ -12,6 +13,7 @@ import {
   SpringControls,
   type StepPosition,
   StepsControls,
+  WiggleControls,
 } from "@/components/ui/easing-picker"
 import { cn } from "@/lib/utils"
 
@@ -29,8 +31,14 @@ const FAMILIES: ReadonlyArray<PolynomialFamily> = [
 type PlaygroundDirection = "In" | "Out" | "InOut"
 const DIRECTIONS: ReadonlyArray<PlaygroundDirection> = ["In", "Out", "InOut"]
 
-type Basis = "bezier" | "spring" | "steps"
-const BASES: ReadonlyArray<Basis> = ["bezier", "spring", "steps"]
+type Basis = "bezier" | "spring" | "bounce" | "wiggle" | "steps"
+const BASES: ReadonlyArray<Basis> = [
+  "bezier",
+  "spring",
+  "bounce",
+  "wiggle",
+  "steps",
+]
 
 const PROPERTIES: ReadonlyArray<PreviewProperty> = [
   "moveX",
@@ -66,6 +74,8 @@ function formatSnippet(easing: string, format: OutputFormat): string {
 
 interface PlaygroundState {
   basis: Basis
+
+  // bezier
   x1: number
   y1: number
   x2: number
@@ -74,15 +84,30 @@ interface PlaygroundState {
   extraBottom: number
   family: PolynomialFamily | null
   direction: PlaygroundDirection
-  stiffness: number
-  damping: number
-  mass: number
+
+  // spring
+  springStiffness: number
+  springDamping: number
+  springMass: number
+
+  // bounce
+  bounces: number
+  bounceStiffness: number
+
+  // wiggle
+  wiggles: number
+  wiggleDamping: number
+
+  // steps
   n: number
   position: StepPosition
+
+  // preview
   property: PreviewProperty
   duration: number
   loop: boolean
-  replayKey: number
+
+  // output
   format: OutputFormat
 }
 
@@ -97,15 +122,18 @@ const INITIAL_STATE: PlaygroundState = {
   extraBottom: 0.25,
   family: "Cubic",
   direction: "InOut",
-  stiffness: 100,
-  damping: 10,
-  mass: 1,
+  springStiffness: 100,
+  springDamping: 10,
+  springMass: 1,
+  bounces: 3,
+  bounceStiffness: 50,
+  wiggles: 4,
+  wiggleDamping: 5,
   n: 4,
   position: "end",
   property: "moveX",
-  duration: 600,
+  duration: 1500,
   loop: true,
-  replayKey: 0,
   format: "css",
 }
 
@@ -122,30 +150,43 @@ function resolveBezier(
 }
 
 function computeEasing(state: PlaygroundState): EasingString {
-  if (state.basis === "bezier") {
-    return formatEasing({
-      basis: "bezier",
-      x1: state.x1,
-      y1: state.y1,
-      x2: state.x2,
-      y2: state.y2,
-      extraTop: state.extraTop,
-      extraBottom: state.extraBottom,
-    })
+  switch (state.basis) {
+    case "bezier":
+      return formatEasing({
+        basis: "bezier",
+        x1: state.x1,
+        y1: state.y1,
+        x2: state.x2,
+        y2: state.y2,
+        extraTop: state.extraTop,
+        extraBottom: state.extraBottom,
+      })
+    case "spring":
+      return formatEasing({
+        basis: "spring",
+        stiffness: state.springStiffness,
+        damping: state.springDamping,
+        mass: state.springMass,
+      })
+    case "bounce":
+      return formatEasing({
+        basis: "bounce",
+        bounces: state.bounces,
+        stiffness: state.bounceStiffness,
+      })
+    case "wiggle":
+      return formatEasing({
+        basis: "wiggle",
+        wiggles: state.wiggles,
+        damping: state.wiggleDamping,
+      })
+    case "steps":
+      return formatEasing({
+        basis: "steps",
+        n: state.n,
+        position: state.position,
+      })
   }
-  if (state.basis === "spring") {
-    return formatEasing({
-      basis: "spring",
-      stiffness: state.stiffness,
-      damping: state.damping,
-      mass: state.mass,
-    })
-  }
-  return formatEasing({
-    basis: "steps",
-    n: state.n,
-    position: state.position,
-  })
 }
 
 const pillClass = (active: boolean) =>
@@ -156,8 +197,24 @@ const pillClass = (active: boolean) =>
       : "bg-white/5 border-white/10 hover:bg-white/10",
   )
 
+const compactPillClass = (active: boolean) =>
+  cn(
+    "rounded-md px-2 py-0.5 text-[11px] font-mono border transition",
+    active
+      ? "bg-gradient-to-br from-violet-glow to-pink-glow text-background border-transparent"
+      : "bg-white/5 border-white/10 hover:bg-white/10",
+  )
+
 const sectionLabelClass =
   "font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground mb-2"
+
+// Background grid pattern shared by curve canvas + preview pane
+const gridBackground = {
+  backgroundImage:
+    "linear-gradient(to right, oklch(0.4 0.04 290 / 0.18) 1px, transparent 1px), linear-gradient(to bottom, oklch(0.4 0.04 290 / 0.18) 1px, transparent 1px)",
+  backgroundSize: "20px 20px",
+  backgroundPosition: "0 0",
+} as const
 
 function CopyButton({
   text,
@@ -209,8 +266,6 @@ export function EasingPlayground() {
     setState((s) => ({ ...s, ...b, family: null }))
   const setProperty = (property: PreviewProperty) =>
     setState((s) => ({ ...s, property }))
-  const bumpReplay = () =>
-    setState((s) => ({ ...s, replayKey: s.replayKey + 1 }))
   const toggleLoop = () => setState((s) => ({ ...s, loop: !s.loop }))
   const setDuration = (duration: number) =>
     setState((s) => ({ ...s, duration }))
@@ -220,27 +275,16 @@ export function EasingPlayground() {
   return (
     <section
       data-slot="easing-playground"
-      data-replay-key={state.replayKey}
       className={cn(
         "glass-card rounded-2xl p-6 md:p-8 border border-white/10",
         "bg-[linear-gradient(135deg,oklch(0.18_0.04_290),oklch(0.14_0.03_270))]",
       )}
     >
-      <div className="flex items-baseline justify-between mb-6">
-        <div>
-          <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
-            / component · playground
-          </div>
-          <h3 className="mt-1 text-xl font-bold tracking-tight">
-            Easing Picker
-          </h3>
+      <div className="mb-6">
+        <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
+          / component · playground
         </div>
-        <div
-          data-slot="easing-playground-value"
-          className="text-xs font-mono text-muted-foreground"
-        >
-          {easing}
-        </div>
+        <h3 className="mt-1 text-xl font-bold tracking-tight">Easing Picker</h3>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[0.7fr_1fr] items-stretch">
@@ -248,24 +292,24 @@ export function EasingPlayground() {
           data-slot="easing-playground-left"
           className="flex flex-col gap-4"
         >
-          <div>
-            <div className={sectionLabelClass}>Basis</div>
-            <div className="flex gap-1.5">
-              {BASES.map((b) => (
-                <button
-                  key={b}
-                  type="button"
-                  onClick={() => setBasis(b)}
-                  className={pillClass(state.basis === b)}
-                >
-                  {b}
-                </button>
-              ))}
+          {/* Basis + Direction on the same row (Direction only when basis=bezier) */}
+          <div className="flex flex-wrap items-end gap-4">
+            <div>
+              <div className={sectionLabelClass}>Basis</div>
+              <div className="flex gap-1.5">
+                {BASES.map((b) => (
+                  <button
+                    key={b}
+                    type="button"
+                    onClick={() => setBasis(b)}
+                    className={compactPillClass(state.basis === b)}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-
-          {state.basis === "bezier" && (
-            <>
+            {state.basis === "bezier" && (
               <div>
                 <div className={sectionLabelClass}>Direction</div>
                 <div className="flex gap-1.5">
@@ -274,23 +318,27 @@ export function EasingPlayground() {
                       key={d}
                       type="button"
                       onClick={() => setDirection(d)}
-                      className={pillClass(state.direction === d)}
+                      className={compactPillClass(state.direction === d)}
                     >
                       {d}
                     </button>
                   ))}
                 </div>
               </div>
+            )}
+          </div>
 
+          {state.basis === "bezier" && (
+            <>
               <div>
                 <div className={sectionLabelClass}>Presets</div>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="grid grid-cols-4 gap-1.5">
                   {FAMILIES.map((f) => (
                     <button
                       key={f}
                       type="button"
                       onClick={() => setFamily(f)}
-                      className={pillClass(state.family === f)}
+                      className={compactPillClass(state.family === f)}
                     >
                       {f}
                     </button>
@@ -300,7 +348,10 @@ export function EasingPlayground() {
 
               <div>
                 <div className={sectionLabelClass}>Curve</div>
-                <div className="aspect-square max-w-60">
+                <div
+                  className="aspect-square max-w-60 rounded border border-white/10"
+                  style={gridBackground}
+                >
                   <BezierCanvas
                     value={{
                       x1: state.x1,
@@ -320,11 +371,56 @@ export function EasingPlayground() {
               <div className={sectionLabelClass}>Spring</div>
               <SpringControls
                 value={{
-                  stiffness: state.stiffness,
-                  damping: state.damping,
-                  mass: state.mass,
+                  stiffness: state.springStiffness,
+                  damping: state.springDamping,
+                  mass: state.springMass,
                 }}
-                onChange={(v) => setState((s) => ({ ...s, ...v }))}
+                onChange={(v) =>
+                  setState((s) => ({
+                    ...s,
+                    springStiffness: v.stiffness,
+                    springDamping: v.damping,
+                    springMass: v.mass,
+                  }))
+                }
+              />
+            </div>
+          )}
+
+          {state.basis === "bounce" && (
+            <div>
+              <div className={sectionLabelClass}>Bounce</div>
+              <BounceControls
+                value={{
+                  bounces: state.bounces,
+                  stiffness: state.bounceStiffness,
+                }}
+                onChange={(v) =>
+                  setState((s) => ({
+                    ...s,
+                    bounces: v.bounces,
+                    bounceStiffness: v.stiffness,
+                  }))
+                }
+              />
+            </div>
+          )}
+
+          {state.basis === "wiggle" && (
+            <div>
+              <div className={sectionLabelClass}>Wiggle</div>
+              <WiggleControls
+                value={{
+                  wiggles: state.wiggles,
+                  damping: state.wiggleDamping,
+                }}
+                onChange={(v) =>
+                  setState((s) => ({
+                    ...s,
+                    wiggles: v.wiggles,
+                    wiggleDamping: v.damping,
+                  }))
+                }
               />
             </div>
           )}
@@ -342,14 +438,16 @@ export function EasingPlayground() {
 
         <div
           data-slot="easing-playground-right"
-          className="flex flex-col gap-4 min-w-0"
+          className="flex flex-col gap-6 min-w-0"
         >
-          <div className="flex-1 rounded-lg border border-white/10 bg-background/40 p-4">
+          <div
+            className="flex-1 rounded-lg border border-white/10 bg-background/40 p-4"
+            style={gridBackground}
+          >
             <div className={sectionLabelClass}>
               Preview · {state.property} (linear ghost shown)
             </div>
             <EasingPreview
-              key={state.replayKey}
               easing={easing}
               property={state.property}
               duration={state.duration}
@@ -375,17 +473,6 @@ export function EasingPlayground() {
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
-            <button
-              type="button"
-              aria-label="Restart playground animation"
-              onClick={bumpReplay}
-              className={cn(
-                "rounded-full px-3 py-1 text-xs font-mono border transition",
-                "bg-white/5 border-white/10 hover:bg-white/10",
-              )}
-            >
-              ▶ Restart
-            </button>
             <label className="flex items-center gap-2 text-xs font-mono">
               <input
                 type="checkbox"
@@ -402,7 +489,7 @@ export function EasingPlayground() {
                 type="range"
                 aria-label="duration"
                 min={200}
-                max={2000}
+                max={5000}
                 step={50}
                 value={state.duration}
                 onChange={(e) => setDuration(Number(e.target.value))}

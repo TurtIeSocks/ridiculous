@@ -5,9 +5,6 @@ import { Native } from "./examples/color-picker/native"
 import { TierCasual } from "./examples/color-picker/tier-casual"
 import { TierIntellisense } from "./examples/color-picker/tier-intellisense"
 import { TierStrict } from "./examples/color-picker/tier-strict"
-import { BasicUsageExample as EasingBasicUsage } from "./examples/easing-picker/basic-usage"
-import { InlinePanelExample as EasingInlinePanel } from "./examples/easing-picker/inline-panel"
-import { OutputFormatsExample as EasingOutputFormats } from "./examples/easing-picker/output-formats"
 import { EasingPlayground } from "./examples/easing-picker/playground"
 import { SubComponentBezierExample as EasingSubBezier } from "./examples/easing-picker/sub-component-bezier"
 import { SubComponentSpringExample as EasingSubSpring } from "./examples/easing-picker/sub-component-spring"
@@ -122,17 +119,9 @@ export function App() {
           />
           <div className="mt-12 space-y-10">
             <EasingPlayground />
-            <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
-              <span className="text-gradient">/</span> API surface
-            </div>
-            <div className="grid gap-8 lg:grid-cols-2">
-              <EasingBasicUsage />
-              <EasingTypeLocked />
-              <EasingOutputFormats />
-              <EasingInlinePanel />
-              <EasingSubBezier />
-              <EasingSubSpring />
-            </div>
+            <EasingTypeLocked />
+            <EasingSubBezier />
+            <EasingSubSpring />
           </div>
 
           <SectionHeader

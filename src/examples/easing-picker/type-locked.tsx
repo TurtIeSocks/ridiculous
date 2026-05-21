@@ -16,18 +16,35 @@ export function TypeLockedExample() {
   const [steps, setSteps] = useState<StepsString>("steps(4)")
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-1">
-        <div className="text-sm font-medium">basis="bezier"</div>
-        <EasingPicker basis="bezier" value={bezier} onChange={setBezier} />
+    <div className="glass-card rounded-2xl p-6 md:p-8">
+      <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">
+        <span className="text-gradient">/</span> basis-narrow
       </div>
-      <div className="space-y-1">
-        <div className="text-sm font-medium">basis="spring"</div>
-        <EasingPicker basis="spring" value={spring} onChange={setSpring} />
-      </div>
-      <div className="space-y-1">
-        <div className="text-sm font-medium">basis="steps"</div>
-        <EasingPicker basis="steps" value={steps} onChange={setSteps} />
+      <h3 className="text-xl font-semibold tracking-tight">Type-Locked</h3>
+      <p className="mt-2 text-sm text-muted-foreground max-w-prose">
+        Setting <code className="font-mono text-foreground">basis</code> narrows
+        the value and onChange types at compile time. Each picker below emits a
+        different literal-string flavor.
+      </p>
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="space-y-1">
+          <div className="text-xs font-mono uppercase tracking-[0.1em] text-muted-foreground">
+            → bezier
+          </div>
+          <EasingPicker basis="bezier" value={bezier} onChange={setBezier} />
+        </div>
+        <div className="space-y-1">
+          <div className="text-xs font-mono uppercase tracking-[0.1em] text-muted-foreground">
+            → spring
+          </div>
+          <EasingPicker basis="spring" value={spring} onChange={setSpring} />
+        </div>
+        <div className="space-y-1">
+          <div className="text-xs font-mono uppercase tracking-[0.1em] text-muted-foreground">
+            → steps
+          </div>
+          <EasingPicker basis="steps" value={steps} onChange={setSteps} />
+        </div>
       </div>
     </div>
   )

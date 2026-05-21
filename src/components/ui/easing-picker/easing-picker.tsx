@@ -226,7 +226,7 @@ export function EasingPanel<
             }}
           />
           <div className="grid grid-cols-[1fr_180px] gap-3">
-            <div className="size-60">
+            <div className="size-44">
               <BezierCanvas
                 value={{
                   x1: internal.x1,
@@ -528,6 +528,7 @@ function PresetRow({
             preset={p}
             active={value === p.name}
             onClick={() => onChange(p.name, bezierFromPreset(p.name))}
+            iconOnly
           />
         ))}
       </div>
@@ -545,13 +546,14 @@ function PresetGrid({
   onChange: (preset: PresetName, bezier: CubicBezierString) => void
 }) {
   return (
-    <div className="grid grid-cols-4 gap-1">
+    <div className="grid grid-cols-10 gap-1">
       {presets.map((p) => (
         <PresetCard
           key={p.name}
           preset={p}
           active={value === p.name}
           onClick={() => onChange(p.name, bezierFromPreset(p.name))}
+          iconOnly
         />
       ))}
     </div>
@@ -562,10 +564,12 @@ function PresetCard({
   preset,
   active,
   onClick,
+  iconOnly = false,
 }: {
   preset: PresetEntry
   active: boolean
   onClick: () => void
+  iconOnly?: boolean
 }) {
   const [x1, y1, x2, y2] = preset.bezier
   return (
@@ -573,19 +577,28 @@ function PresetCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center gap-0.5 p-1.5 rounded text-xs border transition-colors",
+        "flex flex-col items-center gap-0.5 rounded border transition-colors",
+        iconOnly ? "p-0.5" : "p-1.5 text-xs",
         active
           ? "bg-accent border-accent-foreground/20"
           : "bg-transparent border-transparent hover:bg-accent/50",
       )}
       title={preset.name}
+      aria-label={preset.name}
     >
-      <div className="size-10 text-muted-foreground">
+      <div
+        className={cn(
+          "text-muted-foreground",
+          iconOnly ? "size-6" : "size-10",
+        )}
+      >
         <PresetThumb x1={x1} y1={y1} x2={x2} y2={y2} />
       </div>
-      <span className="text-[10px] truncate w-full text-center">
-        {preset.name}
-      </span>
+      {!iconOnly && (
+        <span className="text-[10px] truncate w-full text-center">
+          {preset.name}
+        </span>
+      )}
     </button>
   )
 }
@@ -1630,7 +1643,7 @@ export interface EasingPreviewProps {
 const PROP_KEYFRAMES: Record<PreviewProperty, { from: string; to: string }> = {
   moveX: {
     from: "transform: translateX(0)",
-    to: "transform: translateX(200px)",
+    to: "transform: translateX(400px)",
   },
   moveY: {
     from: "transform: translateY(0)",

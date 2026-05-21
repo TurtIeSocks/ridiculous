@@ -5,24 +5,23 @@ import { EasingPlayground } from "@/examples/easing-picker/playground"
 describe("EasingPlayground", () => {
   test("renders the playground container with eyebrow + heading", () => {
     const { container, getByText } = render(<EasingPlayground />)
-    expect(container.querySelector("[data-slot='easing-playground']")).not.toBeNull()
+    expect(
+      container.querySelector("[data-slot='easing-playground']"),
+    ).not.toBeNull()
     expect(getByText("Easing Picker")).toBeInTheDocument()
   })
 
   test("clicking a family pill updates the displayed easing string", async () => {
     const { container, findByRole } = render(<EasingPlayground />)
-    // Initially: Cubic + InOut → cubic-bezier(0.45, 0, 0.55, 1)
-    const initial = container.querySelector(
-      "[data-slot='easing-playground-value']",
-    )?.textContent
+    const code = () =>
+      container.querySelector("[data-slot='easing-playground-code']")
+        ?.textContent ?? ""
+    const initial = code()
     expect(initial).toContain("cubic-bezier")
-    // Click Sine pill
     const sinePill = await findByRole("button", { name: /^Sine$/i })
     fireEvent.click(sinePill)
     // Sine + InOut → cubic-bezier(0.37, 0, 0.63, 1)
-    const after = container.querySelector(
-      "[data-slot='easing-playground-value']",
-    )?.textContent
+    const after = code()
     expect(after).not.toBe(initial)
     expect(after).toContain("0.37")
   })
@@ -31,26 +30,43 @@ describe("EasingPlayground", () => {
     const { container, findByRole } = render(<EasingPlayground />)
     const springTab = await findByRole("button", { name: /^spring$/i })
     fireEvent.click(springTab)
-    // Sliders for stiffness / damping / mass appear
-    // (jsdom doesn't surface implicit role="slider" via querySelector, so
-    // assert directly on the underlying <input type="range"> elements.)
     const sliders = container.querySelectorAll('input[type="range"]')
+    // 3 spring sliders + 1 duration slider = 4
     expect(sliders.length).toBeGreaterThanOrEqual(3)
-    // Easing string updates to linear(...)
-    const value = container.querySelector(
-      "[data-slot='easing-playground-value']",
+    const code = container.querySelector(
+      "[data-slot='easing-playground-code']",
     )?.textContent
-    expect(value).toMatch(/^linear\(/)
+    expect(code).toMatch(/^linear\(/)
+  })
+
+  test("switching basis to bounce renders BounceControls and emits linear(...)", async () => {
+    const { container, findByRole } = render(<EasingPlayground />)
+    const bounceTab = await findByRole("button", { name: /^bounce$/i })
+    fireEvent.click(bounceTab)
+    const code = container.querySelector(
+      "[data-slot='easing-playground-code']",
+    )?.textContent
+    expect(code).toMatch(/^linear\(/)
+  })
+
+  test("switching basis to wiggle renders WiggleControls and emits linear(...)", async () => {
+    const { container, findByRole } = render(<EasingPlayground />)
+    const wiggleTab = await findByRole("button", { name: /^wiggle$/i })
+    fireEvent.click(wiggleTab)
+    const code = container.querySelector(
+      "[data-slot='easing-playground-code']",
+    )?.textContent
+    expect(code).toMatch(/^linear\(/)
   })
 
   test("switching basis to steps renders StepsControls and emits steps(...)", async () => {
     const { container, findByRole } = render(<EasingPlayground />)
     const stepsTab = await findByRole("button", { name: /^steps$/i })
     fireEvent.click(stepsTab)
-    const value = container.querySelector(
-      "[data-slot='easing-playground-value']",
+    const code = container.querySelector(
+      "[data-slot='easing-playground-code']",
     )?.textContent
-    expect(value).toMatch(/^steps\(/)
+    expect(code).toMatch(/^steps\(/)
   })
 
   test("clicking a property toggle updates the EasingPreview keyframe name", async () => {
@@ -68,21 +84,11 @@ describe("EasingPlayground", () => {
     expect(after).not.toContain("easing-preview-moveX")
   })
 
-  test("restart button bumps the playground's replay key", async () => {
-    const { container, findByRole } = render(<EasingPlayground />)
-    const section = container.querySelector("[data-slot='easing-playground']")
-    const initialKey = section?.getAttribute("data-replay-key")
-    const restartBtn = await findByRole("button", { name: /restart playground/i })
-    fireEvent.click(restartBtn)
-    const newKey = container
-      .querySelector("[data-slot='easing-playground']")
-      ?.getAttribute("data-replay-key")
-    expect(newKey).not.toBe(initialKey)
-  })
-
   test("loop checkbox toggles loop on EasingPreview", async () => {
     const { findByRole } = render(<EasingPlayground />)
-    const loopBox = (await findByRole("checkbox", { name: /loop/i })) as HTMLInputElement
+    const loopBox = (await findByRole("checkbox", {
+      name: /loop/i,
+    })) as HTMLInputElement
     expect(loopBox.checked).toBe(true)
     fireEvent.click(loopBox)
     expect(loopBox.checked).toBe(false)
@@ -91,7 +97,8 @@ describe("EasingPlayground", () => {
   test("switching format tab changes the displayed code snippet", async () => {
     const { container, findByRole } = render(<EasingPlayground />)
     const codeBlock = () =>
-      container.querySelector("[data-slot='easing-playground-code']")?.textContent ?? ""
+      container.querySelector("[data-slot='easing-playground-code']")
+        ?.textContent ?? ""
     expect(codeBlock()).toMatch(/cubic-bezier/)
     expect(codeBlock()).not.toMatch(/ease-\[/)
     const tw3 = await findByRole("button", { name: /tailwind v3/i })
