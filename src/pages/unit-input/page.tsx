@@ -18,6 +18,15 @@ export function UnitInputPage() {
         <BasicUsage />
         <Scrub />
         <StrictTyping />
+      </div>
+
+      <SectionHeader
+        className="mt-24"
+        eyebrow="api"
+        title="API"
+        description="Public surface — component props, runtime helpers, and the type exports."
+      />
+      <div className="mt-8">
         <ApiReference />
       </div>
 

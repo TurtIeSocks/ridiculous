@@ -1,6 +1,7 @@
 import { InstallCta } from "@/components/layout/install-cta"
 import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
+import { ApiReference } from "@/examples/easing-picker/api-reference"
 import { EasingPlayground } from "@/examples/easing-picker/playground"
 import { SubComponentBezierExample } from "@/examples/easing-picker/sub-component-bezier"
 import { SubComponentSpringExample } from "@/examples/easing-picker/sub-component-spring"
@@ -19,6 +20,16 @@ export function EasingPickerPage() {
         <TypeLockedExample />
         <SubComponentBezierExample />
         <SubComponentSpringExample />
+      </div>
+
+      <SectionHeader
+        className="mt-24"
+        eyebrow="api"
+        title="API"
+        description="Public surface — component props, runtime helpers, and the type exports."
+      />
+      <div className="mt-8">
+        <ApiReference />
       </div>
 
       <SectionHeader
