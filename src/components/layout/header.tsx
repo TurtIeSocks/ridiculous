@@ -22,25 +22,19 @@ function GitHubLink() {
   )
 }
 
-function HamburgerButton() {
+function HamburgerIcon() {
   return (
-    <button
-      type="button"
-      aria-label="Open navigation"
-      className="md:hidden inline-flex size-10 items-center justify-center rounded-md border border-white/10 bg-white/5"
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      className="size-5"
+      aria-hidden="true"
     >
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        className="size-5"
-        aria-hidden="true"
-      >
-        <title>Menu</title>
-        <path d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    </button>
+      <title>Menu</title>
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
   )
 }
 
@@ -89,7 +83,13 @@ export function CompactHeader() {
         <div className="flex items-center gap-3">
           <GitHubLink />
           <MobileSidebarSheet>
-            <HamburgerButton />
+            <button
+              type="button"
+              aria-label="Open navigation"
+              className="md:hidden inline-flex size-10 items-center justify-center rounded-md border border-white/10 bg-white/5"
+            >
+              <HamburgerIcon />
+            </button>
           </MobileSidebarSheet>
         </div>
       </div>

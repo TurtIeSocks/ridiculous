@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+@source "./**/*.{ts,tsx}";
+@source "../pages/**/*.{ts,tsx,html}";
+
 @theme {
   --color-background: oklch(0.13 0.01 280);
   --color-foreground: oklch(0.97 0.005 280);
