@@ -16,7 +16,8 @@
     "format": "biome format --write .",
     "check": "biome check .",
     "check:fix": "biome check --write --unsafe .",
-    "ci:check": "biome ci ."
+    "ci:check": "biome ci .",
+    "pr:check": "pnpm run typecheck && pnpm run check && pnpm run test"
   },
   "dependencies": {
     "@radix-ui/react-popover": "^1.1.15",

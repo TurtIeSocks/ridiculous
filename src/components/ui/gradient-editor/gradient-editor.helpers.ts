@@ -319,13 +319,17 @@ export function parseGradient(value: string): InternalState | null {
   if (stopSegments.length < 2) return null
 
   const rawStops = stopSegments.map(parseStop)
-  if (rawStops.some((s) => s == null)) return null
+  const validStops: NonNullable<(typeof rawStops)[number]>[] = []
+  for (const raw of rawStops) {
+    if (raw == null) return null
+    validStops.push(raw)
+  }
 
   // Auto-distribute positions when null.
-  const count = rawStops.length
-  const stops: GradientStop[] = rawStops.map((raw, i) => ({
-    color: raw?.color,
-    position: raw?.position != null ? raw?.position : (i / (count - 1)) * 100,
+  const count = validStops.length
+  const stops: GradientStop[] = validStops.map((raw, i) => ({
+    color: raw.color,
+    position: raw.position != null ? raw.position : (i / (count - 1)) * 100,
   }))
 
   return {

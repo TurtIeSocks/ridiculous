@@ -394,8 +394,8 @@ function formatSnippet(
     case "css":
       return easing
     case "tailwind-v3": {
-      // Tailwind v3 arbitrary values: spaces become _ (Tailwind decodes back)
-      const encoded = easing.replace(/\s+/g, "_")
+      // Tailwind v3 arbitrary values: strip spaces (cubic-bezier args stay valid).
+      const encoded = easing.replace(/\s+/g, "")
       return `class="ease-[${encoded}]"`
     }
     case "tailwind-v4":

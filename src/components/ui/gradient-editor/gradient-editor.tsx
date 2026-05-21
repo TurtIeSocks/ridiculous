@@ -761,6 +761,7 @@ function GradientPreview({
                 wasDraggedThisPressRef.current = true
                 const trackRect =
                   event.currentTarget.parentElement?.getBoundingClientRect()
+                if (!trackRect) return
                 const pct = computePct(event.clientX, trackRect)
                 onMoveStop(i, Math.round(pct))
               }
