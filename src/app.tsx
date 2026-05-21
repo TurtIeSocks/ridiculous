@@ -5,6 +5,10 @@ import { Native } from "./examples/color-picker/native"
 import { TierCasual } from "./examples/color-picker/tier-casual"
 import { TierIntellisense } from "./examples/color-picker/tier-intellisense"
 import { TierStrict } from "./examples/color-picker/tier-strict"
+import { EasingPlayground } from "./examples/easing-picker/playground"
+import { SubComponentBezierExample as EasingSubBezier } from "./examples/easing-picker/sub-component-bezier"
+import { SubComponentSpringExample as EasingSubSpring } from "./examples/easing-picker/sub-component-spring"
+import { TypeLockedExample as EasingTypeLocked } from "./examples/easing-picker/type-locked"
 import { ApiReference as GradientApiReference } from "./examples/gradient-editor/api-reference"
 import { BasicUsage as GradientBasicUsage } from "./examples/gradient-editor/basic-usage"
 import { Interpolation as GradientInterpolation } from "./examples/gradient-editor/interpolation"
@@ -109,6 +113,19 @@ export function App() {
 
           <SectionHeader
             className="mt-32"
+            eyebrow="component"
+            title="Easing Picker"
+            description="CSS easing function picker — bezier canvas, spring/bounce/wiggle physics baked to linear(), polynomial preset gallery, 6-property animation preview, 3-format output (CSS/Tailwind v3/v4)."
+          />
+          <div className="mt-12 space-y-10">
+            <EasingPlayground />
+            <EasingTypeLocked />
+            <EasingSubBezier />
+            <EasingSubSpring />
+          </div>
+
+          <SectionHeader
+            className="mt-32"
             eyebrow="types"
             title="Three usage tiers"
             description="Pick the level of compile-time validation you want. From useState-and-go to literal-validated."
@@ -163,6 +180,15 @@ export function App() {
                 <span className="text-foreground">npx shadcn add </span>
                 <span className="text-gradient">
                   https://turtiesocks.github.io/ridiculous/r/gradient-editor.json
+                </span>
+              </pre>
+            </div>
+            <div className="glass-card rounded-2xl p-6 md:p-8">
+              <pre className="text-sm md:text-base font-mono overflow-x-auto">
+                <span className="text-muted-foreground select-none">$ </span>
+                <span className="text-foreground">npx shadcn add </span>
+                <span className="text-gradient">
+                  https://turtiesocks.github.io/ridiculous/r/easing-picker.json
                 </span>
               </pre>
             </div>
