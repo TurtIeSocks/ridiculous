@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils"
 interface SectionHeaderProps {
   eyebrow: string
   title: string
-  description: string
+  description?: string
   className?: string
   id?: string
 }
@@ -23,7 +23,9 @@ export function SectionHeader({
       <h2 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight">
         {title}
       </h2>
-      <p className="mt-3 max-w-2xl text-muted-foreground">{description}</p>
+      {description ? (
+        <p className="mt-3 max-w-2xl text-muted-foreground">{description}</p>
+      ) : null}
     </div>
   )
 }
