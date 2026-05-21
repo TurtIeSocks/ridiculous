@@ -87,4 +87,18 @@ describe("EasingPlayground", () => {
     fireEvent.click(loopBox)
     expect(loopBox.checked).toBe(false)
   })
+
+  test("switching format tab changes the displayed code snippet", async () => {
+    const { container, findByRole } = render(<EasingPlayground />)
+    const codeBlock = () =>
+      container.querySelector("[data-slot='easing-playground-code']")?.textContent ?? ""
+    expect(codeBlock()).toMatch(/cubic-bezier/)
+    expect(codeBlock()).not.toMatch(/ease-\[/)
+    const tw3 = await findByRole("button", { name: /tailwind v3/i })
+    fireEvent.click(tw3)
+    expect(codeBlock()).toMatch(/ease-\[/)
+    const tw4 = await findByRole("button", { name: /tailwind v4/i })
+    fireEvent.click(tw4)
+    expect(codeBlock()).toMatch(/@theme/)
+  })
 })

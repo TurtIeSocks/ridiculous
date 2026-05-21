@@ -47,6 +47,23 @@ const PROPERTIES: ReadonlyArray<PreviewProperty> = [
 
 type OutputFormat = "css" | "tailwind-v3" | "tailwind-v4"
 
+const FORMATS: ReadonlyArray<OutputFormat> = [
+  "css",
+  "tailwind-v3",
+  "tailwind-v4",
+]
+
+function formatSnippet(easing: string, format: OutputFormat): string {
+  switch (format) {
+    case "css":
+      return easing
+    case "tailwind-v3":
+      return `class="ease-[${easing.replace(/\s+/g, "_")}]"`
+    case "tailwind-v4":
+      return `@theme {\n  --ease-custom: ${easing};\n}\n/* usage: class="ease-custom" */`
+  }
+}
+
 interface PlaygroundState {
   basis: Basis
   x1: number
@@ -142,6 +159,36 @@ const pillClass = (active: boolean) =>
 const sectionLabelClass =
   "font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground mb-2"
 
+function CopyButton({
+  text,
+  className,
+}: {
+  text: string
+  className?: string
+}) {
+  const [copied, setCopied] = useState(false)
+  return (
+    <button
+      type="button"
+      onClick={async () => {
+        try {
+          await navigator.clipboard.writeText(text)
+          setCopied(true)
+          setTimeout(() => setCopied(false), 1500)
+        } catch {
+          /* clipboard blocked — ignore */
+        }
+      }}
+      className={cn(
+        "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-[0.05em] border border-white/10 bg-white/5 hover:bg-white/10",
+        className,
+      )}
+    >
+      {copied ? "Copied" : "Copy"}
+    </button>
+  )
+}
+
 export function EasingPlayground() {
   const [state, setState] = useState<PlaygroundState>(INITIAL_STATE)
   const easing = computeEasing(state)
@@ -167,6 +214,8 @@ export function EasingPlayground() {
   const toggleLoop = () => setState((s) => ({ ...s, loop: !s.loop }))
   const setDuration = (duration: number) =>
     setState((s) => ({ ...s, duration }))
+  const setFormat = (format: OutputFormat) =>
+    setState((s) => ({ ...s, format }))
 
   return (
     <section
@@ -363,6 +412,40 @@ export function EasingPlayground() {
                 {state.duration}ms
               </span>
             </label>
+          </div>
+
+          <div className="rounded-lg border border-white/10 bg-background/60 p-3 mt-2 space-y-2">
+            <div className="flex items-center gap-1">
+              {FORMATS.map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setFormat(f)}
+                  className={cn(
+                    "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-[0.05em] border",
+                    state.format === f
+                      ? "bg-violet-500/20 border-violet-400/40 text-violet-200"
+                      : "border-transparent text-muted-foreground hover:bg-white/5",
+                  )}
+                >
+                  {f === "tailwind-v3"
+                    ? "Tailwind v3"
+                    : f === "tailwind-v4"
+                      ? "Tailwind v4"
+                      : "CSS"}
+                </button>
+              ))}
+              <CopyButton
+                text={formatSnippet(easing, state.format)}
+                className="ml-auto"
+              />
+            </div>
+            <pre
+              data-slot="easing-playground-code"
+              className="text-xs font-mono text-foreground/90 whitespace-pre-wrap break-all"
+            >
+              {formatSnippet(easing, state.format)}
+            </pre>
           </div>
         </div>
       </div>
