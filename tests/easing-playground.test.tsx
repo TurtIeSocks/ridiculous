@@ -26,4 +26,30 @@ describe("EasingPlayground", () => {
     expect(after).not.toBe(initial)
     expect(after).toContain("0.37")
   })
+
+  test("switching basis to spring renders SpringControls and emits linear(...)", async () => {
+    const { container, findByRole } = render(<EasingPlayground />)
+    const springTab = await findByRole("button", { name: /^spring$/i })
+    fireEvent.click(springTab)
+    // Sliders for stiffness / damping / mass appear
+    // (jsdom doesn't surface implicit role="slider" via querySelector, so
+    // assert directly on the underlying <input type="range"> elements.)
+    const sliders = container.querySelectorAll('input[type="range"]')
+    expect(sliders.length).toBeGreaterThanOrEqual(3)
+    // Easing string updates to linear(...)
+    const value = container.querySelector(
+      "[data-slot='easing-playground-value']",
+    )?.textContent
+    expect(value).toMatch(/^linear\(/)
+  })
+
+  test("switching basis to steps renders StepsControls and emits steps(...)", async () => {
+    const { container, findByRole } = render(<EasingPlayground />)
+    const stepsTab = await findByRole("button", { name: /^steps$/i })
+    fireEvent.click(stepsTab)
+    const value = container.querySelector(
+      "[data-slot='easing-playground-value']",
+    )?.textContent
+    expect(value).toMatch(/^steps\(/)
+  })
 })

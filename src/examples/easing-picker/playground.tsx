@@ -8,7 +8,9 @@ import {
   type PolynomialFamily,
   PRESETS,
   type PreviewProperty,
+  SpringControls,
   type StepPosition,
+  StepsControls,
 } from "@/components/ui/easing-picker"
 import { cn } from "@/lib/utils"
 
@@ -241,6 +243,30 @@ export function EasingPlayground() {
                 </div>
               </div>
             </>
+          )}
+
+          {state.basis === "spring" && (
+            <div>
+              <div className={sectionLabelClass}>Spring</div>
+              <SpringControls
+                value={{
+                  stiffness: state.stiffness,
+                  damping: state.damping,
+                  mass: state.mass,
+                }}
+                onChange={(v) => setState((s) => ({ ...s, ...v }))}
+              />
+            </div>
+          )}
+
+          {state.basis === "steps" && (
+            <div>
+              <div className={sectionLabelClass}>Steps</div>
+              <StepsControls
+                value={{ n: state.n, position: state.position }}
+                onChange={(v) => setState((s) => ({ ...s, ...v }))}
+              />
+            </div>
           )}
         </div>
 
