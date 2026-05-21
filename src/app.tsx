@@ -8,6 +8,7 @@ import { TierStrict } from "./examples/color-picker/tier-strict"
 import { BasicUsageExample as EasingBasicUsage } from "./examples/easing-picker/basic-usage"
 import { InlinePanelExample as EasingInlinePanel } from "./examples/easing-picker/inline-panel"
 import { OutputFormatsExample as EasingOutputFormats } from "./examples/easing-picker/output-formats"
+import { EasingPlayground } from "./examples/easing-picker/playground"
 import { SubComponentBezierExample as EasingSubBezier } from "./examples/easing-picker/sub-component-bezier"
 import { SubComponentSpringExample as EasingSubSpring } from "./examples/easing-picker/sub-component-spring"
 import { TypeLockedExample as EasingTypeLocked } from "./examples/easing-picker/type-locked"
@@ -120,12 +121,18 @@ export function App() {
             description="CSS easing function picker — bezier canvas, spring/bounce/wiggle physics baked to linear(), polynomial preset gallery, 6-property animation preview, 3-format output (CSS/Tailwind v3/v4)."
           />
           <div className="mt-12 space-y-10">
-            <EasingBasicUsage />
-            <EasingTypeLocked />
-            <EasingOutputFormats />
-            <EasingInlinePanel />
-            <EasingSubBezier />
-            <EasingSubSpring />
+            <EasingPlayground />
+            <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
+              <span className="text-gradient">/</span> API surface
+            </div>
+            <div className="grid gap-8 lg:grid-cols-2">
+              <EasingBasicUsage />
+              <EasingTypeLocked />
+              <EasingOutputFormats />
+              <EasingInlinePanel />
+              <EasingSubBezier />
+              <EasingSubSpring />
+            </div>
           </div>
 
           <SectionHeader
