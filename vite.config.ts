@@ -5,10 +5,35 @@ import { defineConfig } from "vite"
 
 export default defineConfig({
   base: "/ridiculous/",
+  root: "pages",
+  publicDir: path.resolve(__dirname, "public"),
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  build: {
+    outDir: path.resolve(__dirname, "dist"),
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        index: path.resolve(__dirname, "pages/index.html"),
+        404: path.resolve(__dirname, "pages/404.html"),
+        "color-picker": path.resolve(
+          __dirname,
+          "pages/color-picker/index.html",
+        ),
+        "gradient-editor": path.resolve(
+          __dirname,
+          "pages/gradient-editor/index.html",
+        ),
+        "unit-input": path.resolve(__dirname, "pages/unit-input/index.html"),
+        "easing-picker": path.resolve(
+          __dirname,
+          "pages/easing-picker/index.html",
+        ),
+      },
     },
   },
 })
