@@ -5,6 +5,10 @@
   "type": "module",
   "packageManager": "pnpm@11.1.2",
   "scripts": {
+    "nav:build": "node scripts/build-nav.mjs",
+    "predev": "pnpm nav:build",
+    "prebuild": "pnpm nav:build",
+    "pretypecheck": "pnpm nav:build",
     "dev": "vite",
     "build": "pnpm registry:build && tsc -b && vite build",
     "preview": "vite preview",
