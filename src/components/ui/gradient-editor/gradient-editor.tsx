@@ -16,8 +16,8 @@ import {
   GRADIENT_TYPES,
   INTERPOLATION_SPACES,
   type InternalState,
-  parseGradient,
   POLAR_SPACES,
+  parseGradient,
   toDeg,
   toPct,
 } from "./gradient-editor.helpers"
@@ -760,7 +760,7 @@ function GradientPreview({
               if (event.buttons) {
                 wasDraggedThisPressRef.current = true
                 const trackRect =
-                  event.currentTarget.parentElement!.getBoundingClientRect()
+                  event.currentTarget.parentElement?.getBoundingClientRect()
                 const pct = computePct(event.clientX, trackRect)
                 onMoveStop(i, Math.round(pct))
               }

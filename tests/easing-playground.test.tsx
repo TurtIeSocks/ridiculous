@@ -1,5 +1,5 @@
-import { describe, expect, test } from "vitest"
 import { fireEvent, render } from "@testing-library/react"
+import { describe, expect, test } from "vitest"
 import { EasingPlayground } from "@/examples/easing-picker/playground"
 
 describe("EasingPlayground", () => {

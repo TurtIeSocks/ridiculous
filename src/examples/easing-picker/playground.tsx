@@ -4,8 +4,8 @@ import { useState } from "react"
 import {
   BezierCanvas,
   BounceControls,
-  type EasingString,
   EasingPreview,
+  type EasingString,
   formatEasing,
   type PolynomialFamily,
   PRESETS,
