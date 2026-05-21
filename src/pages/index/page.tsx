@@ -7,11 +7,6 @@ import { TierIntellisense } from "@/examples/color-picker/tier-intellisense"
 import { TierStrict } from "@/examples/color-picker/tier-strict"
 import { NAV } from "@/generated/nav"
 
-const REGISTRY_BASE = "https://turtiesocks.github.io/ridiculous/r"
-const ALL_URLS = NAV.map((item) => `${REGISTRY_BASE}/${item.name}.json`).join(
-  " ",
-)
-
 export function IndexPage() {
   return (
     <Layout variant="hero">
@@ -23,7 +18,7 @@ export function IndexPage() {
         />
         <div className="mt-6 space-y-3">
           <InstallCta args="init" />
-          <InstallCta args={`add ${ALL_URLS}`} />
+          <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/all.json" />
         </div>
       </section>
 
