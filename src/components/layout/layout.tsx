@@ -22,7 +22,7 @@ export function Layout({ variant, children }: LayoutProps) {
       <Header variant={variant} />
       <div className="container mx-auto max-w-6xl px-6">
         <div className="flex gap-8 py-12">
-          <DesktopSidebar />
+          {variant === "compact" && <DesktopSidebar />}
           <main className="min-w-0 flex-1">{children}</main>
         </div>
       </div>
