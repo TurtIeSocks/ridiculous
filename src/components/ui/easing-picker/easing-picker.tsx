@@ -1610,9 +1610,13 @@ export type PreviewProperty =
   | "moveX"
   | "moveY"
   | "scale"
+  | "scaleX"
+  | "scaleY"
   | "rotate"
   | "opacity"
   | "width"
+  | "color"
+  | "blur"
 
 export interface EasingPreviewProps {
   easing: EasingString | (string & {})
@@ -1633,9 +1637,16 @@ const PROP_KEYFRAMES: Record<PreviewProperty, { from: string; to: string }> = {
     to: "transform: translateY(100px)",
   },
   scale: { from: "transform: scale(0.5)", to: "transform: scale(1.5)" },
+  scaleX: { from: "transform: scaleX(0.5)", to: "transform: scaleX(1.5)" },
+  scaleY: { from: "transform: scaleY(0.5)", to: "transform: scaleY(1.5)" },
   rotate: { from: "transform: rotate(0)", to: "transform: rotate(360deg)" },
   opacity: { from: "opacity: 0", to: "opacity: 1" },
   width: { from: "width: 50px", to: "width: 200px" },
+  color: {
+    from: "background-color: oklch(0.55 0.2 300)",
+    to: "background-color: oklch(0.55 0.2 30)",
+  },
+  blur: { from: "filter: blur(0px)", to: "filter: blur(8px)" },
 }
 
 export function EasingPreview({

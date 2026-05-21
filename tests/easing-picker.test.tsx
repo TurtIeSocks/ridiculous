@@ -158,6 +158,20 @@ describe("EasingPreview", () => {
       ?.getAttribute("data-animation-key")
     expect(newKey).not.toBe(initialKey)
   })
+
+  test.each([
+    ["scaleX", /scaleX/],
+    ["scaleY", /scaleY/],
+    ["color", /background-color/],
+    ["blur", /blur\(/],
+  ] as const)("emits keyframes for property=%s", (prop, expectedFragment) => {
+    const { container } = render(
+      <EasingPreview easing="ease" property={prop} />,
+    )
+    const styleEl = container.querySelector("style")
+    expect(styleEl).not.toBeNull()
+    expect(styleEl?.textContent ?? "").toMatch(expectedFragment)
+  })
 })
 
 describe("EasingPanel integration", () => {

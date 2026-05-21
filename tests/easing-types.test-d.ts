@@ -174,3 +174,22 @@ test("EasingPicker without basis keeps full EasingString union", () => {
   type Props = Parameters<typeof EasingPicker>[0]
   expectTypeOf<Props["onChange"]>().parameter(0).toEqualTypeOf<EasingString>()
 })
+
+import type { PreviewProperty } from "@/components/ui/easing-picker"
+
+// Compile-time assertion: PreviewProperty must list every property the playground exposes.
+// If a property is added/removed in PROP_KEYFRAMES without updating PreviewProperty
+// (or vice versa), this fails at type-check time via the exhaustive list below.
+const _EXHAUSTIVE_PREVIEW_PROPERTIES: ReadonlyArray<PreviewProperty> = [
+  "moveX",
+  "moveY",
+  "scale",
+  "scaleX",
+  "scaleY",
+  "rotate",
+  "opacity",
+  "width",
+  "color",
+  "blur",
+] as const
+void _EXHAUSTIVE_PREVIEW_PROPERTIES
