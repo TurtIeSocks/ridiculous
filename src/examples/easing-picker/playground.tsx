@@ -4,6 +4,7 @@ import { useState } from "react"
 import {
   BezierCanvas,
   type EasingString,
+  EasingPreview,
   formatEasing,
   type PolynomialFamily,
   PRESETS,
@@ -30,6 +31,19 @@ const DIRECTIONS: ReadonlyArray<PlaygroundDirection> = ["In", "Out", "InOut"]
 
 type Basis = "bezier" | "spring" | "steps"
 const BASES: ReadonlyArray<Basis> = ["bezier", "spring", "steps"]
+
+const PROPERTIES: ReadonlyArray<PreviewProperty> = [
+  "moveX",
+  "moveY",
+  "scale",
+  "scaleX",
+  "scaleY",
+  "rotate",
+  "opacity",
+  "width",
+  "color",
+  "blur",
+]
 
 type OutputFormat = "css" | "tailwind-v3" | "tailwind-v4"
 
@@ -146,6 +160,8 @@ export function EasingPlayground() {
     })
   const setBezier = (b: { x1: number; y1: number; x2: number; y2: number }) =>
     setState((s) => ({ ...s, ...b, family: null }))
+  const setProperty = (property: PreviewProperty) =>
+    setState((s) => ({ ...s, property }))
 
   return (
     <section
@@ -270,7 +286,40 @@ export function EasingPlayground() {
           )}
         </div>
 
-        <div data-slot="easing-playground-right">{/* filled in Task 5 */}</div>
+        <div
+          data-slot="easing-playground-right"
+          className="flex flex-col gap-4 min-w-0"
+        >
+          <div className="flex-1 rounded-lg border border-white/10 bg-background/40 p-4">
+            <div className={sectionLabelClass}>
+              Preview · {state.property} (linear ghost shown)
+            </div>
+            <EasingPreview
+              key={state.replayKey}
+              easing={easing}
+              property={state.property}
+              duration={state.duration}
+              loop={state.loop}
+              showLinearComparison
+            />
+          </div>
+
+          <div>
+            <div className={sectionLabelClass}>Property</div>
+            <div className="flex flex-wrap gap-1.5">
+              {PROPERTIES.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setProperty(p)}
+                  className={pillClass(state.property === p)}
+                >
+                  {p}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   )

@@ -52,4 +52,19 @@ describe("EasingPlayground", () => {
     )?.textContent
     expect(value).toMatch(/^steps\(/)
   })
+
+  test("clicking a property toggle updates the EasingPreview keyframe name", async () => {
+    const { container, findByRole } = render(<EasingPlayground />)
+    const initialAnim = (
+      container.querySelector("[data-preview-target]") as HTMLElement
+    ).style.animation
+    expect(initialAnim).toContain("easing-preview-moveX")
+    const scalePill = await findByRole("button", { name: /^scale$/i })
+    fireEvent.click(scalePill)
+    const after = (
+      container.querySelector("[data-preview-target]") as HTMLElement
+    ).style.animation
+    expect(after).toContain("easing-preview-scale")
+    expect(after).not.toContain("easing-preview-moveX")
+  })
 })
