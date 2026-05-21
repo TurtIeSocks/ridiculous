@@ -1,22 +1,38 @@
 "use client"
 
 import { useState } from "react"
-import type {
-  EasingString,
-  PolynomialFamily,
-  PreviewProperty,
-  StepPosition,
+import {
+  BezierCanvas,
+  type EasingString,
+  formatEasing,
+  type PolynomialFamily,
+  PRESETS,
+  type PreviewProperty,
+  type StepPosition,
 } from "@/components/ui/easing-picker"
 import { cn } from "@/lib/utils"
 
-type PlaygroundDirection = "In" | "Out" | "InOut" // subset of registry's Direction (4-way); playground UX exposes 3
+const FAMILIES: ReadonlyArray<PolynomialFamily> = [
+  "Sine",
+  "Quad",
+  "Cubic",
+  "Quart",
+  "Quint",
+  "Expo",
+  "Circ",
+  "Back",
+]
+
+type PlaygroundDirection = "In" | "Out" | "InOut"
+const DIRECTIONS: ReadonlyArray<PlaygroundDirection> = ["In", "Out", "InOut"]
+
 type Basis = "bezier" | "spring" | "steps"
+const BASES: ReadonlyArray<Basis> = ["bezier", "spring", "steps"]
+
 type OutputFormat = "css" | "tailwind-v3" | "tailwind-v4"
 
 interface PlaygroundState {
   basis: Basis
-
-  // bezier — extraTop/Bottom required by EasingState; canvas-viewport-only, not user-tweakable here
   x1: number
   y1: number
   x2: number
@@ -25,23 +41,15 @@ interface PlaygroundState {
   extraBottom: number
   family: PolynomialFamily | null
   direction: PlaygroundDirection
-
-  // spring
   stiffness: number
   damping: number
   mass: number
-
-  // steps — `n` matches StepsControlsProps.value.n (not `steps`)
   n: number
   position: StepPosition
-
-  // preview
   property: PreviewProperty
   duration: number
   loop: boolean
   replayKey: number
-
-  // output
   format: OutputFormat
 }
 
@@ -68,11 +76,74 @@ const INITIAL_STATE: PlaygroundState = {
   format: "css",
 }
 
-export function EasingPlayground() {
-  const [state] = useState<PlaygroundState>(INITIAL_STATE)
+function resolveBezier(
+  family: PolynomialFamily,
+  direction: PlaygroundDirection,
+): { x1: number; y1: number; x2: number; y2: number } | null {
+  const match = PRESETS.find(
+    (p) => p.family === family && p.direction === direction,
+  )
+  if (!match) return null
+  const [x1, y1, x2, y2] = match.bezier
+  return { x1, y1, x2, y2 }
+}
 
-  // Placeholder — replaced in later tasks once derived helpers are wired.
-  const easing: EasingString = "cubic-bezier(0.42, 0, 0.58, 1)" as EasingString
+function computeEasing(state: PlaygroundState): EasingString {
+  if (state.basis === "bezier") {
+    return formatEasing({
+      basis: "bezier",
+      x1: state.x1,
+      y1: state.y1,
+      x2: state.x2,
+      y2: state.y2,
+      extraTop: state.extraTop,
+      extraBottom: state.extraBottom,
+    })
+  }
+  if (state.basis === "spring") {
+    return formatEasing({
+      basis: "spring",
+      stiffness: state.stiffness,
+      damping: state.damping,
+      mass: state.mass,
+    })
+  }
+  return formatEasing({
+    basis: "steps",
+    n: state.n,
+    position: state.position,
+  })
+}
+
+const pillClass = (active: boolean) =>
+  cn(
+    "rounded-full px-3 py-1 text-xs font-mono border transition",
+    active
+      ? "bg-gradient-to-br from-violet-glow to-pink-glow text-background border-transparent"
+      : "bg-white/5 border-white/10 hover:bg-white/10",
+  )
+
+const sectionLabelClass =
+  "font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground mb-2"
+
+export function EasingPlayground() {
+  const [state, setState] = useState<PlaygroundState>(INITIAL_STATE)
+  const easing = computeEasing(state)
+
+  const setBasis = (basis: Basis) => setState((s) => ({ ...s, basis }))
+  const setDirection = (direction: PlaygroundDirection) =>
+    setState((s) => {
+      if (s.family == null) return { ...s, direction }
+      const bezier = resolveBezier(s.family, direction)
+      return bezier ? { ...s, direction, ...bezier } : { ...s, direction }
+    })
+  const setFamily = (family: PolynomialFamily) =>
+    setState((s) => {
+      const bezier = resolveBezier(family, s.direction)
+      return bezier ? { ...s, family, ...bezier } : { ...s, family }
+    })
+  const setBezier = (b: { x1: number; y1: number; x2: number; y2: number }) =>
+    setState((s) => ({ ...s, ...b, family: null }))
 
   return (
     <section
@@ -92,11 +163,87 @@ export function EasingPlayground() {
             Easing Picker
           </h3>
         </div>
-        <div className="text-xs font-mono text-muted-foreground">{easing}</div>
+        <div
+          data-slot="easing-playground-value"
+          className="text-xs font-mono text-muted-foreground"
+        >
+          {easing}
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[0.7fr_1fr] items-stretch">
-        <div data-slot="easing-playground-left">{/* filled in Task 3 */}</div>
+        <div
+          data-slot="easing-playground-left"
+          className="flex flex-col gap-4"
+        >
+          <div>
+            <div className={sectionLabelClass}>Basis</div>
+            <div className="flex gap-1.5">
+              {BASES.map((b) => (
+                <button
+                  key={b}
+                  type="button"
+                  onClick={() => setBasis(b)}
+                  className={pillClass(state.basis === b)}
+                >
+                  {b}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {state.basis === "bezier" && (
+            <>
+              <div>
+                <div className={sectionLabelClass}>Direction</div>
+                <div className="flex gap-1.5">
+                  {DIRECTIONS.map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => setDirection(d)}
+                      className={pillClass(state.direction === d)}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className={sectionLabelClass}>Presets</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {FAMILIES.map((f) => (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => setFamily(f)}
+                      className={pillClass(state.family === f)}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className={sectionLabelClass}>Curve</div>
+                <div className="aspect-square max-w-60">
+                  <BezierCanvas
+                    value={{
+                      x1: state.x1,
+                      y1: state.y1,
+                      x2: state.x2,
+                      y2: state.y2,
+                    }}
+                    onChange={setBezier}
+                  />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
         <div data-slot="easing-playground-right">{/* filled in Task 5 */}</div>
       </div>
     </section>
