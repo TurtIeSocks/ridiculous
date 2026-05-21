@@ -262,7 +262,7 @@ describe("OutputPanel via EasingPanel", () => {
       />,
     )
     expect(
-      screen.getByText('class="ease-[cubic-bezier(0.42,_0,_0.58,_1)]"'),
+      screen.getByText('class="ease-[cubic-bezier(0.42,0,0.58,1)]"'),
     ).toBeInTheDocument()
   })
 
@@ -293,7 +293,7 @@ describe("OutputPanel via EasingPanel", () => {
     )
     fireEvent.click(screen.getByRole("button", { name: "tailwind-v3" }))
     expect(
-      screen.getByText('class="ease-[cubic-bezier(0.42,_0,_0.58,_1)]"'),
+      screen.getByText('class="ease-[cubic-bezier(0.42,0,0.58,1)]"'),
     ).toBeInTheDocument()
   })
 })

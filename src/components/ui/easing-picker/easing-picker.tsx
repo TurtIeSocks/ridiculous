@@ -587,10 +587,7 @@ function PresetCard({
       aria-label={preset.name}
     >
       <div
-        className={cn(
-          "text-muted-foreground",
-          iconOnly ? "size-6" : "size-10",
-        )}
+        className={cn("text-muted-foreground", iconOnly ? "size-6" : "size-10")}
       >
         <PresetThumb x1={x1} y1={y1} x2={x2} y2={y2} />
       </div>

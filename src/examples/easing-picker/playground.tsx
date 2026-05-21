@@ -193,7 +193,7 @@ const pillClass = (active: boolean) =>
   cn(
     "rounded-full px-3 py-1 text-xs font-mono border transition",
     active
-      ? "bg-gradient-to-br from-violet-glow to-pink-glow text-background border-transparent"
+      ? "bg-linear-to-br from-violet-glow to-pink-glow text-background border-transparent"
       : "bg-white/5 border-white/10 hover:bg-white/10",
   )
 
@@ -201,12 +201,12 @@ const compactPillClass = (active: boolean) =>
   cn(
     "rounded-md px-2 py-0.5 text-[11px] font-mono border transition",
     active
-      ? "bg-gradient-to-br from-violet-glow to-pink-glow text-background border-transparent"
+      ? "bg-linear-to-br from-violet-glow to-pink-glow text-background border-transparent"
       : "bg-white/5 border-white/10 hover:bg-white/10",
   )
 
 const sectionLabelClass =
-  "font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground mb-2"
+  "font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2"
 
 // Background grid pattern shared by curve canvas + preview pane
 const gridBackground = {
@@ -216,13 +216,7 @@ const gridBackground = {
   backgroundPosition: "0 0",
 } as const
 
-function CopyButton({
-  text,
-  className,
-}: {
-  text: string
-  className?: string
-}) {
+function CopyButton({ text, className }: { text: string; className?: string }) {
   const [copied, setCopied] = useState(false)
   return (
     <button
@@ -237,7 +231,7 @@ function CopyButton({
         }
       }}
       className={cn(
-        "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-[0.05em] border border-white/10 bg-white/5 hover:bg-white/10",
+        "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-wider border border-white/10 bg-white/5 hover:bg-white/10",
         className,
       )}
     >
@@ -288,10 +282,7 @@ export function EasingPlayground() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[0.7fr_1fr] items-stretch">
-        <div
-          data-slot="easing-playground-left"
-          className="flex flex-col gap-4"
-        >
+        <div data-slot="easing-playground-left" className="flex flex-col gap-4">
           {/* Basis + Direction on the same row (Direction only when basis=bezier) */}
           <div className="flex flex-wrap items-end gap-4">
             <div>
@@ -509,7 +500,7 @@ export function EasingPlayground() {
                   type="button"
                   onClick={() => setFormat(f)}
                   className={cn(
-                    "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-[0.05em] border",
+                    "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-wider border",
                     state.format === f
                       ? "bg-violet-500/20 border-violet-400/40 text-violet-200"
                       : "border-transparent text-muted-foreground hover:bg-white/5",

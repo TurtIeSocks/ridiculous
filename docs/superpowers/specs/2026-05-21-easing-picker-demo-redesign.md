@@ -198,16 +198,16 @@ Reuses existing site palette and utility classes. No new design tokens.
 |---------|-------|
 | Container | `glass-card rounded-2xl p-6 md:p-8 border border-white/10` |
 | Eyebrow / curve string | `font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground` |
-| Section labels (left col) | `font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground` |
+| Section labels (left col) | `font-mono text-[10px] uppercase tracking-widest text-muted-foreground` |
 | Code block | `font-mono text-sm bg-background/60 rounded-lg p-3` |
 | Pill (default) | `bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs font-mono` |
-| Pill (active) | `bg-gradient-to-br from-violet-glow to-pink-glow text-background border-transparent` |
+| Pill (active) | `bg-linear-to-br from-violet-glow to-pink-glow text-background border-transparent` |
 | Pill (hover) | `hover:bg-white/10` |
 | Bezier canvas bg | `bg-background/40` |
 | Bezier curve stroke | `oklch(0.7 0.2 300)` (violet-glow) |
 | Bezier linear ghost | `oklch(0.4 0.05 290)` dashed |
 | Bezier handles | `oklch(0.8 0.2 340)` filled circles |
-| Preview animating box | `bg-gradient-to-br from-violet-glow to-pink-glow size-12 rounded-lg shadow-[0_4px_24px_oklch(0.5_0.2_300/0.5)]` |
+| Preview animating box | `bg-linear-to-br from-violet-glow to-pink-glow size-12 rounded-lg shadow-[0_4px_24px_oklch(0.5_0.2_300/0.5)]` |
 | Linear ghost box | `bg-muted size-12 rounded-lg opacity-40` |
 | Duration slider track | `h-1 rounded-full bg-white/10` |
 | Duration slider thumb | `size-3 bg-violet-glow rounded-full` |

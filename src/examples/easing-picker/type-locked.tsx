@@ -28,19 +28,19 @@ export function TypeLockedExample() {
       </p>
       <div className="mt-6 grid gap-4 md:grid-cols-3">
         <div className="space-y-1">
-          <div className="text-xs font-mono uppercase tracking-[0.1em] text-muted-foreground">
+          <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             → bezier
           </div>
           <EasingPicker basis="bezier" value={bezier} onChange={setBezier} />
         </div>
         <div className="space-y-1">
-          <div className="text-xs font-mono uppercase tracking-[0.1em] text-muted-foreground">
+          <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             → spring
           </div>
           <EasingPicker basis="spring" value={spring} onChange={setSpring} />
         </div>
         <div className="space-y-1">
-          <div className="text-xs font-mono uppercase tracking-[0.1em] text-muted-foreground">
+          <div className="text-xs font-mono uppercase tracking-widest text-muted-foreground">
             → steps
           </div>
           <EasingPicker basis="steps" value={steps} onChange={setSteps} />

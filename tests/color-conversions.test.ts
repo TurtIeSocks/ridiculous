@@ -66,7 +66,10 @@ describe("linearToSrgb / srgbToLinear", () => {
   })
 })
 
-import { hslToSrgb, srgbToHsl } from "@/components/ui/color-picker/color-picker.helpers"
+import {
+  hslToSrgb,
+  srgbToHsl,
+} from "@/components/ui/color-picker/color-picker.helpers"
 
 describe("hslToSrgb / srgbToHsl", () => {
   it("round-trips pure red", () => {
@@ -144,7 +147,10 @@ describe("oklch ↔ oklab", () => {
   })
 })
 
-import { hwbToSrgb, srgbToHwb } from "@/components/ui/color-picker/color-picker.helpers"
+import {
+  hwbToSrgb,
+  srgbToHwb,
+} from "@/components/ui/color-picker/color-picker.helpers"
 
 describe("hwbToSrgb / srgbToHwb", () => {
   it("round-trips pure red", () => {

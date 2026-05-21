@@ -17,7 +17,11 @@ import {
   parseHex,
   srgbToOklch,
 } from "./color-picker.helpers"
-import type { ColorMode, ColorString, ColorStringMap } from "./color-picker.types"
+import type {
+  ColorMode,
+  ColorString,
+  ColorStringMap,
+} from "./color-picker.types"
 
 const COLOR_MODES = [
   "oklch",

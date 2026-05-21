@@ -26,8 +26,9 @@ export function SubComponentSpringExample() {
         Spring physics (standalone)
       </h3>
       <p className="mt-2 text-sm text-muted-foreground max-w-prose">
-        Compose <code className="font-mono text-foreground">SpringControls</code>{" "}
-        + <code className="font-mono text-foreground">sampleSpring</code> +{" "}
+        Compose{" "}
+        <code className="font-mono text-foreground">SpringControls</code> +{" "}
+        <code className="font-mono text-foreground">sampleSpring</code> +{" "}
         <code className="font-mono text-foreground">bakeLinear</code> to roll
         your own spring picker. The picker baking happens client-side; no
         runtime physics in production.

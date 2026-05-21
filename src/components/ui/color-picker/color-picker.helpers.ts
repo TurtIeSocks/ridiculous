@@ -1,8 +1,4 @@
-import type {
-  ColorLiteral,
-  ColorMode,
-  ColorString,
-} from "./color-picker.types"
+import type { ColorLiteral, ColorMode, ColorString } from "./color-picker.types"
 
 // ---------------------------------------------------------------------------
 // Parsing / formatting

@@ -483,12 +483,12 @@ const pillClass = (active: boolean) =>
   cn(
     "rounded-full px-3 py-1 text-xs font-mono border transition",
     active
-      ? "bg-gradient-to-br from-violet-glow to-pink-glow text-background border-transparent"
+      ? "bg-linear-to-br from-violet-glow to-pink-glow text-background border-transparent"
       : "bg-white/5 border-white/10 hover:bg-white/10",
   )
 
 const sectionLabelClass =
-  "font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground mb-2"
+  "font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-2"
 
 export function EasingPlayground() {
   const [state, setState] = useState<PlaygroundState>(INITIAL_STATE)
@@ -982,7 +982,7 @@ Then insert a controls row INSIDE the right column, AFTER the property pill row 
               loop
             </label>
             <div className="flex flex-1 items-center gap-2">
-              <span className="text-[10px] font-mono uppercase tracking-[0.1em] text-muted-foreground">
+              <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                 duration
               </span>
               <input
@@ -1104,7 +1104,7 @@ c) Append the output block at the end of the right column (after the duration/re
                   type="button"
                   onClick={() => setFormat(f)}
                   className={cn(
-                    "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-[0.05em] border",
+                    "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-wider border",
                     state.format === f
                       ? "bg-violet-500/20 border-violet-400/40 text-violet-200"
                       : "border-transparent text-muted-foreground hover:bg-white/5",
@@ -1155,7 +1155,7 @@ function CopyButton({
         }
       }}
       className={cn(
-        "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-[0.05em] border border-white/10 bg-white/5 hover:bg-white/10",
+        "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-wider border border-white/10 bg-white/5 hover:bg-white/10",
         className,
       )}
     >
