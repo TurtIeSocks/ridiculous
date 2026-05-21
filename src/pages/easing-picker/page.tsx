@@ -39,7 +39,7 @@ export function EasingPickerPage() {
         description="One command via the shadcn CLI."
       />
       <div className="mt-6">
-        <InstallCta command="npx shadcn add https://turtiesocks.github.io/ridiculous/r/easing-picker.json" />
+        <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/easing-picker.json" />
       </div>
     </Layout>
   )

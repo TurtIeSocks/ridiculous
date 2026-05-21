@@ -37,7 +37,7 @@ export function ColorPickerPage() {
         description="One command. Resolves button + popover against the shadcn-ui registry automatically."
       />
       <div className="mt-6">
-        <InstallCta command="npx shadcn add https://turtiesocks.github.io/ridiculous/r/color-picker.json" />
+        <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/color-picker.json" />
       </div>
     </Layout>
   )

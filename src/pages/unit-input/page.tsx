@@ -37,7 +37,7 @@ export function UnitInputPage() {
         description="One command via the shadcn CLI."
       />
       <div className="mt-6">
-        <InstallCta command="npx shadcn add https://turtiesocks.github.io/ridiculous/r/unit-input.json" />
+        <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/unit-input.json" />
       </div>
     </Layout>
   )

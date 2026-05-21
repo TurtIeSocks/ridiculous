@@ -39,7 +39,7 @@ export function GradientEditorPage() {
         description="One command. Resolves color-picker + unit-input transitively."
       />
       <div className="mt-6">
-        <InstallCta command="npx shadcn add https://turtiesocks.github.io/ridiculous/r/gradient-editor.json" />
+        <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/gradient-editor.json" />
       </div>
     </Layout>
   )
