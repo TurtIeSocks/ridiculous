@@ -74,7 +74,7 @@ test("InterpolationOf extracts the interpolation space", () => {
 })
 
 import { expect } from "vitest"
-import { isGradientString } from "@/components/ui/gradient-editor/gradient-editor"
+import { isGradientString } from "@/components/ui/gradient-editor/gradient-editor.helpers"
 
 test("isGradientString accepts valid gradients", () => {
   expect(isGradientString("linear-gradient(#ff0000, #0000ff)")).toBe(true)

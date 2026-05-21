@@ -153,7 +153,7 @@ test("color() rejects invalid at type level", () => {
   color("oklch(2 0.1 240)")
 })
 
-import { isColorString } from "@/components/ui/color-picker/color-picker"
+import { isColorString } from "@/components/ui/color-picker/color-picker.helpers"
 import type {
   ModeOf,
   WithAlpha,

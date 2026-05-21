@@ -4,7 +4,7 @@ import {
   formatInterpolation,
   formatStop,
   parseGradient,
-} from "@/components/ui/gradient-editor/gradient-editor"
+} from "@/components/ui/gradient-editor/gradient-editor.helpers"
 
 describe("formatStop", () => {
   it("emits color + integer percent", () => {

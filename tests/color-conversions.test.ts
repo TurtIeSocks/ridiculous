@@ -3,7 +3,7 @@ import {
   clamp01,
   parseAlphaToken,
   trimNumber,
-} from "@/components/ui/color-picker/color-picker"
+} from "@/components/ui/color-picker/color-picker.helpers"
 
 describe("clamp01", () => {
   it("returns 0 for negatives", () => {
@@ -45,7 +45,7 @@ describe("parseAlphaToken", () => {
 import {
   linearToSrgb,
   srgbToLinear,
-} from "@/components/ui/color-picker/color-picker"
+} from "@/components/ui/color-picker/color-picker.helpers"
 
 describe("linearToSrgb / srgbToLinear", () => {
   it("clamps below 0 and above 1", () => {
@@ -66,7 +66,7 @@ describe("linearToSrgb / srgbToLinear", () => {
   })
 })
 
-import { hslToSrgb, srgbToHsl } from "@/components/ui/color-picker/color-picker"
+import { hslToSrgb, srgbToHsl } from "@/components/ui/color-picker/color-picker.helpers"
 
 describe("hslToSrgb / srgbToHsl", () => {
   it("round-trips pure red", () => {
@@ -100,7 +100,7 @@ describe("hslToSrgb / srgbToHsl", () => {
 import {
   oklchToSrgb,
   srgbToOklch,
-} from "@/components/ui/color-picker/color-picker"
+} from "@/components/ui/color-picker/color-picker.helpers"
 
 describe("oklchToSrgb / srgbToOklch", () => {
   it("round-trips a few sRGB colors", () => {
@@ -127,7 +127,7 @@ describe("oklchToSrgb / srgbToOklch", () => {
 import {
   oklabToOklch,
   oklchToOklab,
-} from "@/components/ui/color-picker/color-picker"
+} from "@/components/ui/color-picker/color-picker.helpers"
 
 describe("oklch ↔ oklab", () => {
   it("round-trips polar/cartesian", () => {
@@ -144,7 +144,7 @@ describe("oklch ↔ oklab", () => {
   })
 })
 
-import { hwbToSrgb, srgbToHwb } from "@/components/ui/color-picker/color-picker"
+import { hwbToSrgb, srgbToHwb } from "@/components/ui/color-picker/color-picker.helpers"
 
 describe("hwbToSrgb / srgbToHwb", () => {
   it("round-trips pure red", () => {

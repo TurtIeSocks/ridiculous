@@ -22,6 +22,11 @@
           "target": "components/ui/color-picker/color-picker.tsx"
         },
         {
+          "path": "src/components/ui/color-picker/color-picker.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/color-picker.helpers.ts"
+        },
+        {
           "path": "src/components/ui/color-picker/color-picker.types.ts",
           "type": "registry:ui",
           "target": "components/ui/color-picker/color-picker.types.ts"
@@ -75,6 +80,11 @@
           "path": "src/components/ui/gradient-editor/gradient-editor.tsx",
           "type": "registry:ui",
           "target": "components/ui/gradient-editor/gradient-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/gradient-editor/gradient-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/gradient-editor/gradient-editor.helpers.ts"
         },
         {
           "path": "src/components/ui/gradient-editor/gradient-editor.types.ts",

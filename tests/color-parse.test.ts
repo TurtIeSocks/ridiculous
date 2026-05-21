@@ -7,7 +7,7 @@ import {
   parseOklab,
   parseOklch,
   parseRgb,
-} from "@/components/ui/color-picker/color-picker"
+} from "@/components/ui/color-picker/color-picker.helpers"
 
 describe("parseHex", () => {
   it("parses 6-digit hex", () => {

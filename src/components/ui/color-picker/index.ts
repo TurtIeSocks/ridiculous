@@ -1,5 +1,6 @@
 export type { ColorPickerProps } from "./color-picker"
-export { ColorPicker, isColorString } from "./color-picker"
+export { ColorPicker } from "./color-picker"
+export { isColorString } from "./color-picker.helpers"
 export type {
   ColorLiteral,
   ColorMode,

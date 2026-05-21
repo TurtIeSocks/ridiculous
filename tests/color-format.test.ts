@@ -6,7 +6,7 @@ import {
   formatHwb,
   formatOklab,
   formatRgb,
-} from "@/components/ui/color-picker/color-picker"
+} from "@/components/ui/color-picker/color-picker.helpers"
 
 describe("formatHex", () => {
   it("emits 6-digit hex without alpha", () => {

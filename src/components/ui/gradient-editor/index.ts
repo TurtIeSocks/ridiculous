@@ -1,5 +1,6 @@
 export type { GradientEditorProps } from "./gradient-editor"
-export { GradientEditor, isGradientString } from "./gradient-editor"
+export { GradientEditor } from "./gradient-editor"
+export { isGradientString } from "./gradient-editor.helpers"
 export type {
   ConicGradientString,
   GradientStop,

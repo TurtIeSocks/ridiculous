@@ -4,7 +4,7 @@ import {
   parseInterpolation,
   parseStop,
   splitTopLevelCommas,
-} from "@/components/ui/gradient-editor/gradient-editor"
+} from "@/components/ui/gradient-editor/gradient-editor.helpers"
 
 describe("splitTopLevelCommas", () => {
   it("splits a flat list", () => {
