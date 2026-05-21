@@ -162,6 +162,11 @@ export function EasingPlayground() {
     setState((s) => ({ ...s, ...b, family: null }))
   const setProperty = (property: PreviewProperty) =>
     setState((s) => ({ ...s, property }))
+  const bumpReplay = () =>
+    setState((s) => ({ ...s, replayKey: s.replayKey + 1 }))
+  const toggleLoop = () => setState((s) => ({ ...s, loop: !s.loop }))
+  const setDuration = (duration: number) =>
+    setState((s) => ({ ...s, duration }))
 
   return (
     <section
@@ -318,6 +323,46 @@ export function EasingPlayground() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              aria-label="Restart playground animation"
+              onClick={bumpReplay}
+              className={cn(
+                "rounded-full px-3 py-1 text-xs font-mono border transition",
+                "bg-white/5 border-white/10 hover:bg-white/10",
+              )}
+            >
+              ▶ Restart
+            </button>
+            <label className="flex items-center gap-2 text-xs font-mono">
+              <input
+                type="checkbox"
+                aria-label="loop"
+                checked={state.loop}
+                onChange={toggleLoop}
+                className="accent-violet-glow"
+              />
+              loop
+            </label>
+            <label className="flex items-center gap-2 text-xs font-mono">
+              <span className="text-muted-foreground">duration</span>
+              <input
+                type="range"
+                aria-label="duration"
+                min={200}
+                max={2000}
+                step={50}
+                value={state.duration}
+                onChange={(e) => setDuration(Number(e.target.value))}
+                className="w-32"
+              />
+              <span className="tabular-nums w-12 text-right">
+                {state.duration}ms
+              </span>
+            </label>
           </div>
         </div>
       </div>

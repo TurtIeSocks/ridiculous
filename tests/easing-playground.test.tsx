@@ -67,4 +67,24 @@ describe("EasingPlayground", () => {
     expect(after).toContain("easing-preview-scale")
     expect(after).not.toContain("easing-preview-moveX")
   })
+
+  test("restart button bumps the playground's replay key", async () => {
+    const { container, findByRole } = render(<EasingPlayground />)
+    const section = container.querySelector("[data-slot='easing-playground']")
+    const initialKey = section?.getAttribute("data-replay-key")
+    const restartBtn = await findByRole("button", { name: /restart playground/i })
+    fireEvent.click(restartBtn)
+    const newKey = container
+      .querySelector("[data-slot='easing-playground']")
+      ?.getAttribute("data-replay-key")
+    expect(newKey).not.toBe(initialKey)
+  })
+
+  test("loop checkbox toggles loop on EasingPreview", async () => {
+    const { findByRole } = render(<EasingPlayground />)
+    const loopBox = (await findByRole("checkbox", { name: /loop/i })) as HTMLInputElement
+    expect(loopBox.checked).toBe(true)
+    fireEvent.click(loopBox)
+    expect(loopBox.checked).toBe(false)
+  })
 })
