@@ -25,8 +25,8 @@ export function InstallCta({ args, showTabs = true }: InstallCtaProps) {
   const copyPayload = commands.join("\n")
   return (
     <div className="glass-card rounded-2xl overflow-hidden">
-      <div className="flex items-center justify-between gap-2 border-b border-white/10 bg-black/20 px-2">
-        {showTabs ? (
+      {showTabs ? (
+        <div className="border-b border-white/10 bg-black/20 px-2">
           <div role="tablist" aria-label="Package manager" className="flex">
             {PACKAGE_MANAGERS.map((option) => {
               const active = option === pm
@@ -49,21 +49,21 @@ export function InstallCta({ args, showTabs = true }: InstallCtaProps) {
               )
             })}
           </div>
-        ) : (
-          <span aria-hidden="true" />
-        )}
+        </div>
+      ) : null}
+      <div className="relative">
+        <pre className="px-6 md:px-8 py-5 pr-14 text-sm md:text-base font-mono overflow-x-auto whitespace-pre">
+          {commands.map((command, index) => (
+            <CommandLine
+              // biome-ignore lint/suspicious/noArrayIndexKey: lines are positional and stable
+              key={index}
+              command={command}
+              isLast={index === commands.length - 1}
+            />
+          ))}
+        </pre>
         <CopyButton text={copyPayload} />
       </div>
-      <pre className="px-6 md:px-8 py-5 text-sm md:text-base font-mono overflow-x-auto whitespace-pre">
-        {commands.map((command, index) => (
-          <CommandLine
-            // biome-ignore lint/suspicious/noArrayIndexKey: lines are positional and stable
-            key={index}
-            command={command}
-            isLast={index === commands.length - 1}
-          />
-        ))}
-      </pre>
     </div>
   )
 }
@@ -100,7 +100,7 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       type="button"
-      aria-label="Copy command"
+      aria-label={copied ? "Copied" : "Copy command"}
       onClick={async () => {
         try {
           await navigator.clipboard.writeText(text)
@@ -109,19 +109,9 @@ function CopyButton({ text }: { text: string }) {
           /* clipboard unavailable */
         }
       }}
-      className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-mono text-muted-foreground transition hover:bg-white/5 hover:text-foreground"
+      className="absolute top-3 right-3 z-10 inline-flex size-8 items-center justify-center rounded-md border border-white/10 bg-background/80 text-muted-foreground backdrop-blur-sm transition hover:border-white/20 hover:bg-white/5 hover:text-foreground"
     >
-      {copied ? (
-        <>
-          <CheckIcon />
-          <span>Copied</span>
-        </>
-      ) : (
-        <>
-          <CopyIcon />
-          <span>Copy</span>
-        </>
-      )}
+      {copied ? <CheckIcon /> : <CopyIcon />}
     </button>
   )
 }
@@ -135,7 +125,7 @@ function CopyIcon() {
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="size-3.5"
+      className="size-4"
       aria-hidden="true"
     >
       <title>Copy</title>
@@ -154,7 +144,7 @@ function CheckIcon() {
       strokeWidth={2.5}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="size-3.5 text-violet-glow"
+      className="size-4 text-violet-glow"
       aria-hidden="true"
     >
       <title>Copied</title>
