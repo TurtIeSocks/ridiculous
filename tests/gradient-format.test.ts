@@ -155,24 +155,24 @@ describe("parseGradient + formatGradient round-trip", () => {
   it("round-trips a basic linear gradient", () => {
     const input = "linear-gradient(90deg, #ff0000 0%, #0000ff 100%)"
     const parsed = parseGradient(input)
-    expect(parsed).not.toBeNull()
-    expect(formatGradient(parsed!)).toBe(input)
+    if (!parsed) throw new Error("parseGradient returned null")
+    expect(formatGradient(parsed)).toBe(input)
   })
 
   it("round-trips with interpolation + hue method", () => {
     const input =
       "linear-gradient(90deg in oklch longer hue, #ff0000 0%, #0000ff 100%)"
     const parsed = parseGradient(input)
-    expect(parsed).not.toBeNull()
-    expect(formatGradient(parsed!)).toBe(input)
+    if (!parsed) throw new Error("parseGradient returned null")
+    expect(formatGradient(parsed)).toBe(input)
   })
 
   it("round-trips a radial", () => {
     const input =
       "radial-gradient(circle closest-side at 20% 30%, #ff0000 0%, #0000ff 100%)"
     const parsed = parseGradient(input)
-    expect(parsed).not.toBeNull()
-    expect(formatGradient(parsed!)).toBe(input)
+    if (!parsed) throw new Error("parseGradient returned null")
+    expect(formatGradient(parsed)).toBe(input)
   })
 
   it("accepts legacy comma-separated interpolation form and re-emits adjacent form", () => {
@@ -181,8 +181,8 @@ describe("parseGradient + formatGradient round-trip", () => {
     // form on re-emit.
     const legacy = "linear-gradient(in oklch, 90deg, #ff0000 0%, #0000ff 100%)"
     const parsed = parseGradient(legacy)
-    expect(parsed).not.toBeNull()
-    expect(formatGradient(parsed!)).toBe(
+    if (!parsed) throw new Error("parseGradient returned null")
+    expect(formatGradient(parsed)).toBe(
       "linear-gradient(90deg in oklch, #ff0000 0%, #0000ff 100%)",
     )
   })
