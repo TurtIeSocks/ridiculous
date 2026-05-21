@@ -138,6 +138,9 @@ dist
 # Generated shadcn registry output (built from registry.json)
 public/r/
 
+# Codegenned nav (built from registry.json by scripts/build-nav.mjs)
+src/generated/
+
 # Brainstorming session content (Visual Companion mockups)
 .superpowers/
 .claude/worktrees

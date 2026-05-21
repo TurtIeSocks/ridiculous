@@ -117,6 +117,20 @@
           "target": "components/ui/easing-picker/easing-picker.types.ts"
         }
       ]
+    },
+    {
+      "name": "all",
+      "type": "registry:ui",
+      "title": "All ridiculous components",
+      "description": "Bundle — installs color-picker, gradient-editor, unit-input, and easing-picker in one command.",
+      "registryDependencies": [
+        "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
+        "https://turtiesocks.github.io/ridiculous/r/unit-input.json",
+        "https://turtiesocks.github.io/ridiculous/r/gradient-editor.json",
+        "https://turtiesocks.github.io/ridiculous/r/easing-picker.json"
+      ],
+      "dependencies": [],
+      "files": []
     }
   ]
 }

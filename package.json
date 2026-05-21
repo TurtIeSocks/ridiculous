@@ -5,6 +5,10 @@
   "type": "module",
   "packageManager": "pnpm@11.1.2",
   "scripts": {
+    "nav:build": "node scripts/build-nav.mjs",
+    "predev": "pnpm nav:build",
+    "prebuild": "pnpm nav:build",
+    "pretypecheck": "pnpm nav:build",
     "dev": "vite",
     "build": "pnpm registry:build && tsc -b && vite build",
     "preview": "vite preview",
@@ -20,10 +24,12 @@
     "pr:check": "pnpm run typecheck && pnpm run check && pnpm run test"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-slot": "^1.2.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "lucide-react": "^1.16.0",
     "react": "^19",
     "react-dom": "^19",
     "tailwind-merge": "^3.6.0"
