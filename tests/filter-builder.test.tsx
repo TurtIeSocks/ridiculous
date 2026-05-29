@@ -129,6 +129,100 @@ describe("FilterFunctionRow — drop-shadow", () => {
       blur: "10px",
     })
   })
+
+  test("a colorless drop-shadow shows a + color affordance that adds a color", () => {
+    const onChange = vi.fn()
+    render(
+      <FilterFunctionRow
+        item={{ fn: "drop-shadow", x: "2px", y: "2px" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    // no color control yet
+    expect(screen.queryByLabelText("drop-shadow color")).not.toBeInTheDocument()
+    fireEvent.click(
+      screen.getByRole("button", { name: /add drop-shadow color/i }),
+    )
+    expect(onChange).toHaveBeenCalledWith({
+      fn: "drop-shadow",
+      x: "2px",
+      y: "2px",
+      color: "rgb(0 0 0 / 0.5)",
+    })
+  })
+
+  test("clearing the color removes it from the item", () => {
+    const onChange = vi.fn()
+    render(
+      <FilterFunctionRow
+        item={{ fn: "drop-shadow", x: "2px", y: "2px", color: "#000" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    fireEvent.click(
+      screen.getByRole("button", { name: /remove drop-shadow color/i }),
+    )
+    expect(onChange).toHaveBeenCalledWith({
+      fn: "drop-shadow",
+      x: "2px",
+      y: "2px",
+    })
+  })
+
+  test("editing a drop-shadow offset clears the blur when emptied is not triggered here", () => {
+    const onChange = vi.fn()
+    render(
+      <FilterFunctionRow
+        item={{ fn: "drop-shadow", x: "2px", y: "2px", blur: "4px" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    // typing into the blur slot updates it; emptying it drops the key
+    fireEvent.change(screen.getByLabelText("drop-shadow blur"), {
+      target: { value: "" },
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      fn: "drop-shadow",
+      x: "2px",
+      y: "2px",
+    })
+  })
+})
+
+describe("FilterFunctionRow — amount + opaque", () => {
+  test("an amount editor exposes a % unit toggle that recomposes the value", () => {
+    const onChange = vi.fn()
+    render(
+      <FilterFunctionRow
+        item={{ fn: "saturate", value: "1.5" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("saturate amount unit"), {
+      target: { value: "%" },
+    })
+    expect(onChange).toHaveBeenCalledWith({ fn: "saturate", value: "1.5%" })
+  })
+
+  test("an opaque calc() argument renders as a raw text input (no unit select)", () => {
+    const onChange = vi.fn()
+    render(
+      <FilterFunctionRow
+        item={{ fn: "blur", value: "calc(2px + 1px)" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    const input = screen.getByLabelText("blur radius")
+    expect(input).toHaveValue("calc(2px + 1px)")
+    expect(screen.queryByLabelText("blur radius unit")).not.toBeInTheDocument()
+    fireEvent.change(input, { target: { value: "var(--b)" } })
+    expect(onChange).toHaveBeenCalledWith({ fn: "blur", value: "var(--b)" })
+  })
 })
 
 describe("FilterFunctionRow — url", () => {
@@ -212,6 +306,31 @@ describe("FilterPreview", () => {
     const slider = screen.getByLabelText(/^blur$/i)
     fireEvent.change(slider, { target: { value: "6" } })
     expect(onChange).toHaveBeenCalledWith(expect.stringMatching(/blur\(6px\)/))
+  })
+
+  test("a scrubber replaces the matching function in an existing list", () => {
+    const onChange = vi.fn()
+    render(
+      <FilterPreview value="blur(2px) saturate(1.5)" onChange={onChange} />,
+    )
+    fireEvent.change(screen.getByLabelText(/^blur$/i), {
+      target: { value: "9" },
+    })
+    expect(onChange).toHaveBeenCalledWith("blur(9px) saturate(1.5)")
+  })
+
+  test("a unitless scrubber (saturate) writes a bare number", () => {
+    const onChange = vi.fn()
+    render(<FilterPreview value="none" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText(/^saturate$/i), {
+      target: { value: "2" },
+    })
+    expect(onChange).toHaveBeenCalledWith("saturate(2)")
+  })
+
+  test("renders without scrubbers when onChange is omitted", () => {
+    render(<FilterPreview value="none" />)
+    expect(screen.queryByLabelText(/^blur$/i)).not.toBeInTheDocument()
   })
 })
 

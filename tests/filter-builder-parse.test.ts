@@ -3,6 +3,7 @@ import {
   argSpec,
   defaultItem,
   filterFunctions,
+  isAmountFn,
   parseFilter,
 } from "@/components/ui/filter-builder/filter-builder.helpers"
 import type { FilterItem } from "@/components/ui/filter-builder/filter-builder.types"
@@ -145,6 +146,14 @@ describe("defaultItem", () => {
     })
     expect(defaultItem("url")).toEqual({ fn: "url", url: "#filter" })
   })
+
+  test("additive amount functions default to 0, multipliers to 1", () => {
+    expect(defaultItem("grayscale")).toEqual({ fn: "grayscale", value: "0" })
+    expect(defaultItem("invert")).toEqual({ fn: "invert", value: "0" })
+    expect(defaultItem("sepia")).toEqual({ fn: "sepia", value: "0" })
+    expect(defaultItem("contrast")).toEqual({ fn: "contrast", value: "1" })
+    expect(defaultItem("opacity")).toEqual({ fn: "opacity", value: "1" })
+  })
 })
 
 describe("argSpec", () => {
@@ -166,5 +175,28 @@ describe("argSpec", () => {
       kind: "shadow",
     })
     expect(argSpec("url")).toMatchObject({ min: 1, max: 1, kind: "url" })
+  })
+})
+
+describe("isAmountFn", () => {
+  test("identifies the amount-function subset", () => {
+    expect(isAmountFn("brightness")).toBe(true)
+    expect(isAmountFn("saturate")).toBe(true)
+    expect(isAmountFn("sepia")).toBe(true)
+    expect(isAmountFn("blur")).toBe(false)
+    expect(isAmountFn("hue-rotate")).toBe(false)
+    expect(isAmountFn("drop-shadow")).toBe(false)
+    expect(isAmountFn("url")).toBe(false)
+  })
+})
+
+describe("parseFilter — drop-shadow edge cases", () => {
+  test("two non-length tokens (two colors) reject (null)", () => {
+    expect(parseFilter("drop-shadow(#000 #fff 2px 2px)")).toBeNull()
+  })
+
+  test("a drop-shadow with only one length rejects (null)", () => {
+    // arity allows 2-4 tokens, but a valid shadow needs >= 2 LENGTH tokens
+    expect(parseFilter("drop-shadow(2px #000 #fff)")).toBeNull()
   })
 })
