@@ -72,3 +72,117 @@ export type Length<
   S extends string,
   A extends unknown[] = [],
 > = S extends `${string}${infer R}` ? Length<R, [...A, unknown]> : A["length"]
+
+// --- integer range machinery -----------------------------------------
+
+type Enumerate<
+  N extends number,
+  A extends number[] = [],
+> = A["length"] extends N ? A[number] : Enumerate<N, [...A, A["length"]]>
+
+export type IntRange<From extends number, To extends number> = Exclude<
+  Enumerate<To>,
+  Enumerate<From>
+>
+
+type StripLeadingZeros<S extends string> = S extends `0${infer R}`
+  ? R extends ""
+    ? "0"
+    : StripLeadingZeros<R>
+  : S
+
+type NormalizeInt<S extends string> = S extends "" ? "0" : StripLeadingZeros<S>
+
+type IsIntPart<S extends string> = S extends ""
+  ? true
+  : NonEmptyAllChars<S, Digit>
+
+// --- number shape predicates -----------------------------------------
+
+export type IsNonNegativeNumber<S extends string> =
+  S extends `${infer I}.${infer F}`
+    ? And<IsIntPart<I>, NonEmptyAllChars<F, Digit>>
+    : NonEmptyAllChars<S, Digit>
+
+export type IsSignedDecimal<S extends string> = S extends `-${infer R}`
+  ? IsNonNegativeNumber<R>
+  : IsNonNegativeNumber<S>
+
+export type IsNumber<S extends string> = S extends `+${infer R}`
+  ? IsNonNegativeNumber<R>
+  : IsSignedDecimal<S>
+
+export type IsPositiveInt<S extends string> = S extends "0"
+  ? false
+  : S extends "" | "-"
+    ? false
+    : NonEmptyAllChars<S, Digit>
+
+// --- bounded-number predicates ---------------------------------------
+
+export type IsByte<S extends string> =
+  NonEmptyAllChars<S, Digit> extends true
+    ? NormalizeInt<S> extends `${IntRange<0, 256>}`
+      ? true
+      : false
+    : false
+
+export type IsNumber0To1<S extends string> = S extends `${infer I}.${infer F}`
+  ? And<IsIntPart<I>, NonEmptyAllChars<F, Digit>> extends true
+    ? NormalizeInt<I> extends "0"
+      ? true
+      : NormalizeInt<I> extends "1"
+        ? AllChars<F, "0">
+        : false
+    : false
+  : NonEmptyAllChars<S, Digit> extends true
+    ? NormalizeInt<S> extends "0" | "1"
+      ? true
+      : false
+    : false
+
+export type IsNumber0To100<S extends string> = S extends `${infer I}.${infer F}`
+  ? And<IsIntPart<I>, NonEmptyAllChars<F, Digit>> extends true
+    ? NormalizeInt<I> extends `${IntRange<0, 100>}`
+      ? true
+      : NormalizeInt<I> extends "100"
+        ? AllChars<F, "0">
+        : false
+    : false
+  : NonEmptyAllChars<S, Digit> extends true
+    ? NormalizeInt<S> extends `${IntRange<0, 101>}`
+      ? true
+      : false
+    : false
+
+export type IsNumber0To360<S extends string> = S extends `${infer I}.${infer F}`
+  ? And<IsIntPart<I>, NonEmptyAllChars<F, Digit>> extends true
+    ? NormalizeInt<I> extends `${IntRange<0, 360>}`
+      ? true
+      : NormalizeInt<I> extends "360"
+        ? AllChars<F, "0">
+        : false
+    : false
+  : NonEmptyAllChars<S, Digit> extends true
+    ? NormalizeInt<S> extends `${IntRange<0, 361>}`
+      ? true
+      : false
+    : false
+
+export type IsNumber0To400<S extends string> = S extends `${infer I}.${infer F}`
+  ? And<IsIntPart<I>, NonEmptyAllChars<F, Digit>> extends true
+    ? NormalizeInt<I> extends `${IntRange<0, 400>}`
+      ? true
+      : NormalizeInt<I> extends "400"
+        ? AllChars<F, "0">
+        : false
+    : false
+  : NonEmptyAllChars<S, Digit> extends true
+    ? NormalizeInt<S> extends `${IntRange<0, 401>}`
+      ? true
+      : false
+    : false
+
+export type IsPercent0To100<S extends string> = S extends `${infer N}%`
+  ? IsNumber0To100<N>
+  : false

@@ -2,6 +2,15 @@ import { expectTypeOf, test } from "vitest"
 import type {
   AllChars,
   And,
+  IsByte,
+  IsNonNegativeNumber,
+  IsNumber,
+  IsNumber0To1,
+  IsNumber0To100,
+  IsNumber0To360,
+  IsPercent0To100,
+  IsPositiveInt,
+  IsSignedDecimal,
   KeepIf,
   Length,
   Not,
@@ -35,4 +44,30 @@ test("KeepIf gates a literal", () => {
 test("Length counts characters", () => {
   expectTypeOf<Length<"abc">>().toEqualTypeOf<3>()
   expectTypeOf<Length<"">>().toEqualTypeOf<0>()
+})
+
+test("IsByte range-checks 0-255", () => {
+  expectTypeOf<IsByte<"0">>().toEqualTypeOf<true>()
+  expectTypeOf<IsByte<"255">>().toEqualTypeOf<true>()
+  expectTypeOf<IsByte<"256">>().toEqualTypeOf<false>()
+  expectTypeOf<IsByte<"-1">>().toEqualTypeOf<false>()
+})
+
+test("bounded number validators", () => {
+  expectTypeOf<IsNumber0To1<"0.5">>().toEqualTypeOf<true>()
+  expectTypeOf<IsNumber0To1<"1.1">>().toEqualTypeOf<false>()
+  expectTypeOf<IsNumber0To100<"100">>().toEqualTypeOf<true>()
+  expectTypeOf<IsNumber0To100<"101">>().toEqualTypeOf<false>()
+  expectTypeOf<IsNumber0To360<"360">>().toEqualTypeOf<true>()
+  expectTypeOf<IsPercent0To100<"50%">>().toEqualTypeOf<true>()
+  expectTypeOf<IsPercent0To100<"150%">>().toEqualTypeOf<false>()
+})
+
+test("number shape predicates", () => {
+  expectTypeOf<IsNonNegativeNumber<"3.14">>().toEqualTypeOf<true>()
+  expectTypeOf<IsSignedDecimal<"-0.05">>().toEqualTypeOf<true>()
+  expectTypeOf<IsNumber<"+2">>().toEqualTypeOf<true>()
+  expectTypeOf<IsNumber<"2px">>().toEqualTypeOf<false>()
+  expectTypeOf<IsPositiveInt<"3">>().toEqualTypeOf<true>()
+  expectTypeOf<IsPositiveInt<"0">>().toEqualTypeOf<false>()
 })
