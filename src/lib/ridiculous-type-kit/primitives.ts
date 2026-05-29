@@ -31,18 +31,14 @@ export type TrimRight<S extends string> = S extends `${infer R}${WS}`
   : S
 export type Trim<S extends string> = TrimLeft<TrimRight<S>>
 
-// `Allowed` may be either a union of single chars (e.g. `Digit`) or a single
-// concatenated char-set literal (e.g. `"0123456789"`). The `[C] extends
-// [Allowed]` branch (wrapped to suppress distribution) handles the union
-// form; the substring-containment fallback handles the concatenated form.
+// Every char of `S` must be a member of the `Allowed` union (e.g. `Digit`).
+// Faithful extraction from the shipped components — callers pass a char union.
 export type AllChars<S extends string, Allowed extends string> = S extends ""
   ? true
   : S extends `${infer C}${infer R}`
-    ? [C] extends [Allowed]
+    ? C extends Allowed
       ? AllChars<R, Allowed>
-      : Allowed extends `${string}${C}${string}`
-        ? AllChars<R, Allowed>
-        : false
+      : false
     : false
 
 export type NonEmptyAllChars<

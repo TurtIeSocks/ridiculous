@@ -2,6 +2,7 @@ import { expectTypeOf, test } from "vitest"
 import type {
   AllChars,
   And,
+  Digit,
   IsByte,
   IsNonNegativeNumber,
   IsNumber,
@@ -23,9 +24,9 @@ test("Trim strips surrounding whitespace", () => {
   expectTypeOf<Trim<"none">>().toEqualTypeOf<"none">()
 })
 
-test("AllChars checks membership", () => {
-  expectTypeOf<AllChars<"123", "0123456789">>().toEqualTypeOf<true>()
-  expectTypeOf<AllChars<"12a", "0123456789">>().toEqualTypeOf<false>()
+test("AllChars checks membership against a char union", () => {
+  expectTypeOf<AllChars<"123", Digit>>().toEqualTypeOf<true>()
+  expectTypeOf<AllChars<"12a", Digit>>().toEqualTypeOf<false>()
 })
 
 test("boolean logic", () => {
