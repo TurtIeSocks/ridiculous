@@ -205,6 +205,48 @@ describe("FluidTypePlayground visual", () => {
   })
 })
 
+describe("CalcEditorPanel function detection", () => {
+  test("detects min() and switching back to calc re-wraps", () => {
+    const onChange = vi.fn()
+    render(<CalcEditorPanel value="min(1rem, 2rem)" onChange={onChange} />)
+    // initial detection lands on the min tab
+    expect(screen.getByRole("tab", { name: /^min$/i })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    )
+    // switching to calc seeds a calc() wrapper (covers seedFor "calc")
+    fireEvent.click(screen.getByRole("tab", { name: /^calc$/i }))
+    expect(onChange).toHaveBeenCalledWith(expect.stringMatching(/^calc\(/))
+    expect(
+      (screen.getByLabelText(/expression/i) as HTMLInputElement).value,
+    ).toMatch(/^calc\(/)
+  })
+
+  test("detects max() from the initial value", () => {
+    render(<CalcEditorPanel value="max(1rem, 2rem)" onChange={() => {}} />)
+    expect(screen.getByRole("tab", { name: /^max$/i })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    )
+  })
+
+  test("resyncs the active tab when the external value switches functions", () => {
+    const { rerender } = render(
+      <CalcEditorPanel value="calc(1rem + 2rem)" onChange={() => {}} />,
+    )
+    rerender(<CalcEditorPanel value="min(1rem, 2rem)" onChange={() => {}} />)
+    expect(screen.getByRole("tab", { name: /^min$/i })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    )
+    rerender(<CalcEditorPanel value="max(1rem, 2rem)" onChange={() => {}} />)
+    expect(screen.getByRole("tab", { name: /^max$/i })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    )
+  })
+})
+
 describe("CalcEditor (popover)", () => {
   test("renders a trigger button", () => {
     render(<CalcEditor value="calc(10px + 2rem)" onChange={() => {}} />)

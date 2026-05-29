@@ -429,6 +429,42 @@ describe("UnitInput pointer-lock scrub", () => {
     expect(onChange).toHaveBeenCalledWith("45.5deg")
   })
 
+  it("snaps the anchor forward when the modifier changes mid-scrub", async () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="0deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const suffix = container.querySelector(
+      '[data-slot="unit-input-suffix"]',
+    ) as HTMLElement
+    const flush = () => new Promise((r) => requestAnimationFrame(() => r(null)))
+
+    fireEvent.pointerDown(suffix, { pointerId: 1 })
+    // Frame 1: 5px with no modifier → anchor 0 + deltaPx 5 *1*1*1 = 5deg.
+    fireEvent.pointerMove(window, { movementX: 5 })
+    await flush()
+    expect(onChange).toHaveBeenLastCalledWith("5deg")
+
+    // Frame 2: 2px more, now with shift held. The modifier flipped since the
+    // prior applied frame, so the snap branch folds the accumulated deltaPx (7)
+    // into the anchor under the OLD ×1 multiplier and zeroes deltaPx. With no
+    // residual motion this frame, the value lands at the snapped anchor: 7deg.
+    fireEvent.pointerMove(window, { movementX: 2, shiftKey: true })
+    await flush()
+    expect(onChange).toHaveBeenLastCalledWith("7deg")
+
+    // Frame 3: a further 3px now uses the ×10 shift multiplier from the snapped
+    // anchor: 7 + 3*1*1*10 = 37deg. Confirms the new multiplier took effect.
+    fireEvent.pointerMove(window, { movementX: 3, shiftKey: true })
+    await flush()
+    expect(onChange).toHaveBeenLastCalledWith("37deg")
+  })
+
   it("does not scrub when disabled", () => {
     const onChange = vi.fn()
     const { container } = render(
