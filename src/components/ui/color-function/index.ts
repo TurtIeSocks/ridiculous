@@ -1,3 +1,15 @@
+export type { ParseResult } from "./color-function.helpers"
+export {
+  CHANNEL_KEYWORDS,
+  CYLINDRICAL_SPACES,
+  colorFunctionKind,
+  defaultState,
+  formatColorFunction,
+  HUE_METHODS,
+  MIX_COLOR_SPACES,
+  parseColorFunction,
+  RELATIVE_FNS,
+} from "./color-function.helpers"
 export type {
   ColorFunctionLiteral,
   ColorFunctionMode,
