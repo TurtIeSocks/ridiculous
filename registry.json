@@ -412,10 +412,48 @@
       ]
     },
     {
+      "name": "font-editor",
+      "type": "registry:ui",
+      "title": "Font Editor",
+      "description": "Ridiculously typed CSS font-shorthand editor with a compile-time STRICT-ORDER PARSE — the most order-sensitive of the common shorthands. FontLiteral parses an order-free prefix (font-style/variant/weight/stretch, each at most once via a 4-flag accumulator), then a mandatory <font-size>, an optional / <line-height> (attached 16px/1.5 and every spaced form), then a mandatory comma-separated <font-family> list; or a system-font keyword (caption..status-bar) as the whole value. A missing size, missing family, duplicate prefix kind, or line-height without a size resolves to never; var()/calc(), the <number> weight range, oblique <angle>, and bare <custom-ident> family names are weak-validated / deferred to the tolerant runtime parser. Ships the cssFont call-site helper, parseFont/formatFont, and a live text preview that renders sample text with the built font applied.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "unit-input",
+        "button",
+        "popover",
+        "input",
+        "label",
+        "select"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/font-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/font-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/font-editor/font-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/font-editor/font-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/font-editor/font-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/font-editor/font-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/font-editor/font-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/font-editor/font-editor.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, and transition-editor in one command.",
+      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, and font-editor in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -428,7 +466,8 @@
         "https://turtiesocks.github.io/ridiculous/r/grid-builder.json",
         "https://turtiesocks.github.io/ridiculous/r/clip-path-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/box-shadow-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/transition-editor.json"
+        "https://turtiesocks.github.io/ridiculous/r/transition-editor.json",
+        "https://turtiesocks.github.io/ridiculous/r/font-editor.json"
       ],
       "dependencies": [],
       "files": []

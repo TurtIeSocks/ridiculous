@@ -27,6 +27,7 @@ export default defineConfig({
         "src/components/ui/clip-path-editor/**",
         "src/components/ui/box-shadow-editor/**",
         "src/components/ui/transition-editor/**",
+        "src/components/ui/font-editor/**",
       ],
       thresholds: {
         statements: 90,

@@ -150,3 +150,120 @@ describe("FontEditor (popover)", () => {
     expect(await screen.findByLabelText("Font size")).toBeInTheDocument()
   })
 })
+
+describe("FontEditorPanel — field controls", () => {
+  test("changing the size unit recomposes the value", () => {
+    const onChange = vi.fn()
+    render(<FontEditorPanel value="16px serif" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("Font size unit"), {
+      target: { value: "rem" },
+    })
+    expect(onChange).toHaveBeenCalledWith("16rem serif")
+  })
+
+  test("choosing the abs unit switches the size to a keyword", () => {
+    const onChange = vi.fn()
+    render(<FontEditorPanel value="16px serif" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("Font size unit"), {
+      target: { value: "keyword" },
+    })
+    expect(onChange).toHaveBeenCalledWith("medium serif")
+  })
+
+  test("an absolute-size keyword renders the unit select as keyword", () => {
+    render(<FontEditorPanel value="x-large serif" onChange={() => {}} />)
+    expect(
+      (screen.getByLabelText("Font size unit") as HTMLSelectElement).value,
+    ).toBe("keyword")
+  })
+
+  test("switching weight to number reveals the numeric input and seeds 400", () => {
+    const onChange = vi.fn()
+    render(<FontEditorPanel value="16px serif" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("Font weight keyword"), {
+      target: { value: "__number" },
+    })
+    expect(onChange).toHaveBeenCalledWith("400 16px serif")
+  })
+
+  test("editing the numeric weight emits the number", () => {
+    const onChange = vi.fn()
+    render(<FontEditorPanel value="350 16px serif" onChange={onChange} />)
+    const numeric = screen.getByLabelText("Font weight number")
+    expect(numeric).toHaveValue("350")
+    fireEvent.change(numeric, { target: { value: "700" } })
+    expect(onChange).toHaveBeenCalledWith("700 16px serif")
+  })
+
+  test("editing the line-height emits size/lh", () => {
+    const onChange = vi.fn()
+    render(<FontEditorPanel value="16px serif" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("Line height"), {
+      target: { value: "1.5" },
+    })
+    expect(onChange).toHaveBeenCalledWith("16px/1.5 serif")
+  })
+
+  test("clearing the line-height drops it", () => {
+    const onChange = vi.fn()
+    render(<FontEditorPanel value="16px/1.5 serif" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("Line height"), {
+      target: { value: "" },
+    })
+    expect(onChange).toHaveBeenCalledWith("16px serif")
+  })
+
+  test("editing the variant emits the prefix token", () => {
+    const onChange = vi.fn()
+    render(<FontEditorPanel value="16px serif" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("Font variant"), {
+      target: { value: "small-caps" },
+    })
+    expect(onChange).toHaveBeenCalledWith("small-caps 16px serif")
+  })
+
+  test("editing the stretch emits the prefix token", () => {
+    const onChange = vi.fn()
+    render(<FontEditorPanel value="16px serif" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("Font stretch"), {
+      target: { value: "condensed" },
+    })
+    expect(onChange).toHaveBeenCalledWith("condensed 16px serif")
+  })
+
+  test("editing a field while in system mode seeds a shorthand", () => {
+    const onChange = vi.fn()
+    render(<FontEditorPanel value="caption" onChange={onChange} />)
+    // switch into shorthand mode first, then it edits a real shorthand
+    fireEvent.click(screen.getByRole("button", { name: /^shorthand$/i }))
+    expect(onChange).toHaveBeenCalledWith("16px sans-serif")
+  })
+
+  test("adding a family via the panel select appends it", () => {
+    const onChange = vi.fn()
+    render(<FontEditorPanel value="16px serif" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("Add a font family"), {
+      target: { value: "monospace" },
+    })
+    expect(onChange).toHaveBeenCalledWith("16px serif, monospace")
+  })
+
+  test("resyncs when the external value changes", () => {
+    const { rerender } = render(
+      <FontEditorPanel value="16px serif" onChange={() => {}} />,
+    )
+    expect(screen.getByLabelText("Font size")).toHaveValue("16px")
+    rerender(
+      <FontEditorPanel value="bold 24px monospace" onChange={() => {}} />,
+    )
+    expect(screen.getByLabelText("Font size")).toHaveValue("24px")
+  })
+})
+
+describe("FontPreview — empty value", () => {
+  test("omits the inline font style when value is empty", () => {
+    const { container } = render(<FontPreview value="" />)
+    const node = container.querySelector("[data-font-preview]")
+    expect((node as HTMLElement).style.font).toBe("")
+  })
+})
