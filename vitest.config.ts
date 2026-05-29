@@ -20,6 +20,7 @@ export default defineConfig({
       include: [
         "src/components/ui/color-picker/**",
         "src/components/ui/unit-input/**",
+        "src/components/ui/calc-editor/**",
       ],
       thresholds: {
         statements: 90,

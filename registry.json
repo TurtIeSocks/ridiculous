@@ -149,16 +149,52 @@
       ]
     },
     {
+      "name": "calc-editor",
+      "type": "registry:ui",
+      "title": "Calc Editor",
+      "description": "Ridiculously typed CSS math editor — calc/clamp/min/max with compile-time DIMENSIONAL ANALYSIS (length±length ✓, length±angle ✗, length×length ✗, ÷ by non-number ✗), a full runtime parser/evaluator, and a fluid-type clamp() playground.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "button",
+        "popover",
+        "input"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/calc-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/calc-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/calc-editor/calc-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/calc-editor/calc-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/calc-editor/calc-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/calc-editor/calc-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/calc-editor/calc-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/calc-editor/calc-editor.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle — installs color-picker, gradient-editor, unit-input, and easing-picker in one command.",
+      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, and calc-editor in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
         "https://turtiesocks.github.io/ridiculous/r/unit-input.json",
         "https://turtiesocks.github.io/ridiculous/r/gradient-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/easing-picker.json"
+        "https://turtiesocks.github.io/ridiculous/r/easing-picker.json",
+        "https://turtiesocks.github.io/ridiculous/r/calc-editor.json"
       ],
       "dependencies": [],
       "files": []
