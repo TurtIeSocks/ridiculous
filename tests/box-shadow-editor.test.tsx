@@ -199,6 +199,27 @@ describe("ShadowLayerRow", () => {
       offsetY: "4px",
     })
   })
+
+  test("choosing a unit on an empty blur slot seeds a 0 value", () => {
+    const onChange = vi.fn()
+    render(
+      <ShadowLayerRow
+        layer={{ inset: false, offsetX: "0px", offsetY: "4px" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    // the blur slot is empty; picking a unit recomposes from "0"
+    fireEvent.change(screen.getByLabelText("blur unit"), {
+      target: { value: "rem" },
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      inset: false,
+      offsetX: "0px",
+      offsetY: "4px",
+      blur: "0rem",
+    })
+  })
 })
 
 describe("ShadowLengthEditor — opaque values", () => {
@@ -270,6 +291,52 @@ describe("BoxShadowPreview", () => {
     expect(last).toMatch(/^-\d+px 0px 8px #000$/)
   })
 
+  test("every arrow direction nudges; a non-arrow key is a no-op", () => {
+    const onChange = vi.fn()
+    render(<BoxShadowPreview value="0px 0px 8px #000" onChange={onChange} />)
+    const light = screen.getByRole("slider", { name: /light source/i })
+    for (const key of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]) {
+      fireEvent.keyDown(light, { key })
+    }
+    expect(onChange).toHaveBeenCalledTimes(4)
+    onChange.mockClear()
+    // shift makes a bigger nudge; still fires
+    fireEvent.keyDown(light, { key: "ArrowUp", shiftKey: true })
+    expect(onChange).toHaveBeenCalledTimes(1)
+    onChange.mockClear()
+    fireEvent.keyDown(light, { key: "Enter" })
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  test("dragging re-casts a multi-layer stack (layers fan out)", () => {
+    const onChange = vi.fn()
+    render(
+      <BoxShadowPreview
+        value="0px 1px 2px #000, 0px 4px 8px #0008"
+        onChange={onChange}
+      />,
+    )
+    stubRect(screen.getByTestId("box-shadow-stage"))
+    const light = screen.getByRole("slider", { name: /light source/i })
+    fireEvent.pointerDown(light, { clientX: 0, clientY: 0, pointerId: 1 })
+    fireEvent.pointerMove(window, { clientX: 200, clientY: 200, pointerId: 1 })
+    const last = onChange.mock.calls[onChange.mock.calls.length - 1][0]
+    // two layers, both re-cast; the second fans out further than the first
+    const layers = String(last).split(", ")
+    expect(layers).toHaveLength(2)
+    const x1 = Number.parseInt(layers[0], 10)
+    const x2 = Number.parseInt(layers[1], 10)
+    expect(Math.abs(x2)).toBeGreaterThan(Math.abs(x1))
+  })
+
+  test("a layer with a non-numeric blur falls back to default elevation", () => {
+    render(
+      <BoxShadowPreview value="0px 4px var(--b) #000" onChange={() => {}} />,
+    )
+    // dominantBlur skips the NaN blur and defaults to 8
+    expect(screen.getByLabelText(/elevation .* in px/i)).toHaveValue("8")
+  })
+
   test("the elevation scrubber scales blur across layers", () => {
     const onChange = vi.fn()
     render(<BoxShadowPreview value="0px 4px 8px #000" onChange={onChange} />)
@@ -287,6 +354,76 @@ describe("BoxShadowPreview", () => {
       screen.queryByRole("slider", { name: /light source/i }),
     ).not.toBeInTheDocument()
     expect(screen.queryByLabelText(/elevation/i)).not.toBeInTheDocument()
+  })
+
+  test("value='none' still shows a draggable light (default position)", () => {
+    const onChange = vi.fn()
+    render(<BoxShadowPreview value="none" onChange={onChange} />)
+    const light = screen.getByRole("slider", { name: /light source/i })
+    expect(light).toBeInTheDocument()
+    // dragging from none produces a single freshly-cast layer
+    stubRect(screen.getByTestId("box-shadow-stage"))
+    fireEvent.pointerDown(light, { clientX: 0, clientY: 0, pointerId: 1 })
+    fireEvent.pointerMove(window, { clientX: 200, clientY: 200, pointerId: 1 })
+    expect(onChange).toHaveBeenCalled()
+  })
+
+  test("the elevation scrubber seeds a layer from an empty stack", () => {
+    const onChange = vi.fn()
+    render(<BoxShadowPreview value="none" onChange={onChange} />)
+    const elevation = screen.getByLabelText(/elevation .* in px/i)
+    fireEvent.change(elevation, { target: { value: "16" } })
+    fireEvent.blur(elevation)
+    expect(onChange).toHaveBeenCalled()
+    const last = onChange.mock.calls[onChange.mock.calls.length - 1][0]
+    // applyElevation on [] seeds one soft drop shadow at the new blur
+    expect(last).toMatch(/16px rgb\(0 0 0 \/ 0\.25\)/)
+  })
+
+  test("a colorless, blurless layer defaults the elevation to 8px", () => {
+    render(<BoxShadowPreview value="0px 4px" onChange={() => {}} />)
+    // dominantBlur falls back to 8 when no layer carries a blur
+    const elevation = screen.getByLabelText(/elevation .* in px/i)
+    expect(elevation).toHaveValue("8")
+  })
+
+  test("a non-default light position renders the dot off-corner", () => {
+    // a layer whose offsets are already cast should place the light away from
+    // the default top-left, exercising the lightFromState non-default branch.
+    render(
+      <BoxShadowPreview value="-12px -12px 8px #000" onChange={() => {}} />,
+    )
+    const light = screen.getByRole("slider", { name: /light source/i })
+    // light vector inverts the negative offset → past center (>50%)
+    expect(light.style.left).not.toBe("30%")
+  })
+})
+
+describe("BoxShadowEditorPanel — resync + preview write-back", () => {
+  test("an external value change re-syncs the rows", () => {
+    const { rerender } = render(
+      <BoxShadowEditorPanel value="0px 4px 8px" onChange={() => {}} />,
+    )
+    expect(screen.getAllByLabelText(/^inset shadow/i)).toHaveLength(1)
+    rerender(
+      <BoxShadowEditorPanel
+        value="0px 1px 2px #000, 0px 4px 8px"
+        onChange={() => {}}
+      />,
+    )
+    expect(screen.getAllByLabelText(/^inset shadow/i)).toHaveLength(2)
+  })
+
+  test("dragging the light inside the panel writes the value back", () => {
+    const onChange = vi.fn()
+    render(
+      <BoxShadowEditorPanel value="0px 4px 8px #000" onChange={onChange} />,
+    )
+    stubRect(screen.getByTestId("box-shadow-stage"))
+    const light = screen.getByRole("slider", { name: /light source/i })
+    fireEvent.pointerDown(light, { clientX: 0, clientY: 0, pointerId: 1 })
+    fireEvent.pointerMove(window, { clientX: 200, clientY: 200, pointerId: 1 })
+    expect(onChange).toHaveBeenCalled()
   })
 })
 
