@@ -442,11 +442,13 @@ export function AreasEditor({ matrix, onChange, className }: AreasEditorProps) {
         </span>
         <Stepper
           label="rows"
+          unit="row"
           onDec={() => resize(rows - 1, cols)}
           onInc={() => resize(rows + 1, cols)}
         />
         <Stepper
           label="cols"
+          unit="column"
           onDec={() => resize(rows, cols - 1)}
           onInc={() => resize(rows, cols + 1)}
         />
@@ -457,10 +459,12 @@ export function AreasEditor({ matrix, onChange, className }: AreasEditorProps) {
 
 function Stepper({
   label,
+  unit,
   onDec,
   onInc,
 }: {
   label: string
+  unit: string
   onDec: () => void
   onInc: () => void
 }) {
@@ -469,7 +473,7 @@ function Stepper({
       <span className="font-mono text-muted-foreground">{label}</span>
       <button
         type="button"
-        aria-label={`Remove ${label.slice(0, -1)}`}
+        aria-label={`Remove ${unit}`}
         onClick={onDec}
         className="h-6 w-6 rounded border font-mono hover:bg-muted/50"
       >
@@ -477,7 +481,7 @@ function Stepper({
       </button>
       <button
         type="button"
-        aria-label={`Add ${label.slice(0, -1)}`}
+        aria-label={`Add ${unit}`}
         onClick={onInc}
         className="h-6 w-6 rounded border font-mono hover:bg-muted/50"
       >
