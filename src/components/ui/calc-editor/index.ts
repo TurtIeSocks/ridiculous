@@ -1,8 +1,32 @@
 export type {
   CalcEditorPanelProps,
   CalcEditorProps,
+  ExpressionFieldProps,
+  FluidTypePlaygroundProps,
+  TokenPaletteProps,
 } from "./calc-editor"
-export { CalcEditor, CalcEditorPanel } from "./calc-editor"
+export {
+  CalcEditor,
+  CalcEditorPanel,
+  ExpressionField,
+  FluidTypePlayground,
+  TokenPalette,
+} from "./calc-editor"
+export type {
+  ComputeContext,
+  EvaluateResult,
+  Token,
+  TokenType,
+} from "./calc-editor.helpers"
+export {
+  calcDimension,
+  computeCalc,
+  dimensionOf,
+  evaluateCalc,
+  formatCalc,
+  parseCalc,
+  tokenizeCalc,
+} from "./calc-editor.helpers"
 export type {
   ArgCountOf,
   CalcFn,
