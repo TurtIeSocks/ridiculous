@@ -276,6 +276,50 @@ describe("ColorPicker alpha strip", () => {
   })
 })
 
+describe("ColorPicker accessibility", () => {
+  it("exposes the L×C pad as a 2-axis application region", () => {
+    openPicker("oklch(0.6 0.1 240)")
+    const pad = document.querySelector(
+      '[data-slot="color-picker-pad"]',
+    ) as HTMLDivElement
+    expect(pad.getAttribute("role")).toBe("application")
+    // role="application" cannot carry aria-valuetext, so both axes plus the
+    // arrow-key affordance live in the accessible name itself.
+    const label = pad.getAttribute("aria-label") ?? ""
+    expect(label).toMatch(/lightness/i)
+    expect(label).toMatch(/chroma/i)
+    expect(label).toMatch(/arrow keys/i)
+  })
+
+  it("updates the pad accessible name as lightness is nudged", () => {
+    openPicker("oklch(0.6 0.1 240)")
+    const pad = document.querySelector(
+      '[data-slot="color-picker-pad"]',
+    ) as HTMLDivElement
+    const before = pad.getAttribute("aria-label")
+    fireEvent.keyDown(pad, { key: "ArrowUp" })
+    expect(pad.getAttribute("aria-label")).not.toBe(before)
+  })
+
+  it("gives the hue slider an aria-valuetext in degrees", () => {
+    openPicker("oklch(0.6 0.1 100)")
+    const hue = document.querySelector(
+      '[data-slot="color-picker-hue"]',
+    ) as HTMLDivElement
+    expect(hue.getAttribute("role")).toBe("slider")
+    expect(hue.getAttribute("aria-valuetext")).toBe("100 degrees")
+  })
+
+  it("gives the alpha slider a percentage aria-valuetext", () => {
+    openPicker("oklch(0.6 0.1 240 / 50%)")
+    const alpha = document.querySelector(
+      '[data-slot="color-picker-alpha"]',
+    ) as HTMLDivElement
+    expect(alpha.getAttribute("role")).toBe("slider")
+    expect(alpha.getAttribute("aria-valuetext")).toBe("50%")
+  })
+})
+
 describe("ColorPicker presets", () => {
   it("clicking a preset swatch emits that color", () => {
     const { onChange } = openPicker()

@@ -4,7 +4,17 @@ import { fileURLToPath } from "node:url"
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const registryPath = resolve(__dirname, "../registry.json")
-const registry = JSON.parse(readFileSync(registryPath, "utf8"))
+let registry
+try {
+  registry = JSON.parse(readFileSync(registryPath, "utf8"))
+} catch (err) {
+  throw new Error(
+    `build-nav: cannot read/parse ${registryPath}: ${err.message}`,
+  )
+}
+if (!Array.isArray(registry.items)) {
+  throw new Error("build-nav: registry.json is missing an `items` array")
+}
 
 // Items with no `files` are meta-bundles (e.g. "all"), not actual components.
 const items = registry.items

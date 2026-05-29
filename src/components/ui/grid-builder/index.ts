@@ -18,7 +18,6 @@ export {
 } from "./grid-builder"
 export type {
   ParseAreasOptions,
-  ParseResult,
   TrackToken,
 } from "./grid-builder.helpers"
 export {

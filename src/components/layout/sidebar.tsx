@@ -12,7 +12,7 @@ function SidebarNav() {
   return (
     <nav aria-label="Components" className="flex flex-col gap-1">
       <NavLink to="/">Home</NavLink>
-      <div className="mt-4 px-3 text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
+      <div className="mt-4 px-3 font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
         Components
       </div>
       {NAV.map((item) => (
@@ -26,7 +26,7 @@ function SidebarNav() {
 
 export function DesktopSidebar() {
   return (
-    <aside className="hidden md:block sticky top-24 self-start w-56 shrink-0">
+    <aside className="sticky top-24 hidden w-56 shrink-0 self-start md:block">
       <SidebarNav />
     </aside>
   )
@@ -36,7 +36,7 @@ export function MobileSidebarSheet({ children }: { children: ReactNode }) {
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
-      <SheetContent side="left" className="w-72 bg-background border-white/10">
+      <SheetContent side="left" className="w-72 border-white/10 bg-background">
         <SheetTitle className="sr-only">Navigation</SheetTitle>
         <div className="mt-8">
           <SidebarNav />

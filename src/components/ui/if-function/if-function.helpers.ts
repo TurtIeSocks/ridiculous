@@ -169,12 +169,3 @@ export function branchCount(src: string): number {
   const branches = parseIf(src)
   return branches === null ? 0 : branches.length
 }
-
-// ---------------------------------------------------------------------------
-// ParseResult facade (mirrors box-shadow / transition editors)
-// ---------------------------------------------------------------------------
-
-export interface ParseResult {
-  branches: IfBranch[] | null
-  error: string | null
-}

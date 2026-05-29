@@ -21,6 +21,12 @@
 //   "rgb(255 0 0)"                                   →  never (no `from`)
 // =====================================================================
 
+import type {
+  CYLINDRICAL_SPACES,
+  HUE_METHODS,
+  MIX_COLOR_SPACES,
+  RELATIVE_FNS,
+} from "@/components/ui/color-function/color-function.helpers"
 import type { ColorLiteral } from "@/components/ui/color-picker/color-picker.types"
 import type {
   And,
@@ -35,42 +41,25 @@ import type {
 
 // =====================================================================
 // 1. CONSTANT UNIONS (exported where useful for advanced composition)
+//
+// Each union DERIVES from the runtime `as const` array of the same set in
+// `color-function.helpers` — single source of truth. Add a member to the
+// array and the union (and every validator built on it) follows. The
+// `import type` is fully erased: `typeof ARRAY` is a type-only use, so no
+// runtime import cycle with helpers (which imports only types from here).
 // =====================================================================
 
-/** The 14-member CSS Color 5 `color-mix` interpolation colorspace set. */
-export type MixColorSpace =
-  | "srgb"
-  | "srgb-linear"
-  | "display-p3"
-  | "a98-rgb"
-  | "prophoto-rgb"
-  | "rec2020"
-  | "lab"
-  | "oklab"
-  | "xyz"
-  | "xyz-d50"
-  | "xyz-d65"
-  | "hsl"
-  | "hwb"
-  | "lch"
-  | "oklch"
+/** The CSS Color 5 `color-mix` interpolation colorspace set. */
+export type MixColorSpace = (typeof MIX_COLOR_SPACES)[number]
 
-/** The four polar spaces that carry a hue component. */
-type CylindricalSpace = "hsl" | "hwb" | "lch" | "oklch"
+/** The polar spaces that carry a hue component. */
+type CylindricalSpace = (typeof CYLINDRICAL_SPACES)[number]
 
 /** Hue-interpolation methods (precede the literal `hue` keyword). */
-export type HueMethod = "shorter" | "longer" | "increasing" | "decreasing"
+export type HueMethod = (typeof HUE_METHODS)[number]
 
-/** The eight relative-color function names. */
-export type RelativeFn =
-  | "rgb"
-  | "hsl"
-  | "hwb"
-  | "lab"
-  | "lch"
-  | "oklab"
-  | "oklch"
-  | "color"
+/** The relative-color function names. */
+export type RelativeFn = (typeof RELATIVE_FNS)[number]
 
 // =====================================================================
 // 2. PER-TOKEN PREDICATE ALIASES

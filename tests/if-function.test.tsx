@@ -8,6 +8,7 @@ import {
   IfFunctionPanel,
   IfPreview,
 } from "@/components/ui/if-function/if-function"
+import { parseIf } from "@/components/ui/if-function/if-function.helpers"
 import { cssIf } from "@/components/ui/if-function/if-function.types"
 
 test("cssIf returns its argument unchanged at runtime", () => {
@@ -98,6 +99,22 @@ describe("IfFunctionPanel", () => {
     expect(onChange).toHaveBeenCalledWith(
       "if(media(width >= 800px): red; media(width >= 600px): red)",
     )
+  })
+
+  test("adding a branch when the last is else keeps else last (round-trippable)", () => {
+    const onChange = vi.fn()
+    render(
+      <IfFunctionPanel
+        value="if(media(width >= 600px): red; else: blue)"
+        onChange={onChange}
+      />,
+    )
+    fireEvent.click(screen.getByLabelText(/add a branch/i))
+    const emitted = onChange.mock.calls.at(-1)?.[0] as string
+    // The emitted value must round-trip: `else` has to remain the final branch
+    // or parseIf rejects it and the editor silently loses all branches on
+    // remount.
+    expect(parseIf(emitted)).not.toBeNull()
   })
 
   test("removing a branch drops it from the value", () => {

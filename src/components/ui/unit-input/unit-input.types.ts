@@ -49,33 +49,20 @@ type KeepIf<B extends boolean, S extends string> = B extends true ? S : never
 // 2. STRICT VALIDATORS — exported, generic. Used by deg()/percent()/etc.
 // =====================================================================
 
-export type DegLiteral<S extends string> = S extends `${infer N}deg`
-  ? KeepIf<IsSignedDecimal<Trim<N>>, S>
-  : never
+// Validate that S is `<signed-decimal><U>` and, if so, return S unchanged
+// (else never). All per-unit *Literal aliases are just this with U pinned.
+export type SuffixLiteral<
+  S extends string,
+  U extends string,
+> = S extends `${infer N}${U}` ? KeepIf<IsSignedDecimal<Trim<N>>, S> : never
 
-export type PercentLiteral<S extends string> = S extends `${infer N}%`
-  ? KeepIf<IsSignedDecimal<Trim<N>>, S>
-  : never
-
-export type PxLiteral<S extends string> = S extends `${infer N}px`
-  ? KeepIf<IsSignedDecimal<Trim<N>>, S>
-  : never
-
-export type RemLiteral<S extends string> = S extends `${infer N}rem`
-  ? KeepIf<IsSignedDecimal<Trim<N>>, S>
-  : never
-
-export type EmLiteral<S extends string> = S extends `${infer N}em`
-  ? KeepIf<IsSignedDecimal<Trim<N>>, S>
-  : never
-
-export type VwLiteral<S extends string> = S extends `${infer N}vw`
-  ? KeepIf<IsSignedDecimal<Trim<N>>, S>
-  : never
-
-export type VhLiteral<S extends string> = S extends `${infer N}vh`
-  ? KeepIf<IsSignedDecimal<Trim<N>>, S>
-  : never
+export type DegLiteral<S extends string> = SuffixLiteral<S, "deg">
+export type PercentLiteral<S extends string> = SuffixLiteral<S, "%">
+export type PxLiteral<S extends string> = SuffixLiteral<S, "px">
+export type RemLiteral<S extends string> = SuffixLiteral<S, "rem">
+export type EmLiteral<S extends string> = SuffixLiteral<S, "em">
+export type VwLiteral<S extends string> = SuffixLiteral<S, "vw">
+export type VhLiteral<S extends string> = SuffixLiteral<S, "vh">
 
 export type UnitLiteral<S extends string> =
   | DegLiteral<S>
@@ -90,13 +77,15 @@ export type UnitLiteral<S extends string> =
 // 3. SUGGESTION STRINGS — non-generic, for IntelliSense + onChange returns.
 // =====================================================================
 
-export type DegString = `${number}deg`
-export type PercentString = `${number}%`
-export type PxString = `${number}px`
-export type RemString = `${number}rem`
-export type EmString = `${number}em`
-export type VwString = `${number}vw`
-export type VhString = `${number}vh`
+export type SuffixString<U extends string> = `${number}${U}`
+
+export type DegString = SuffixString<"deg">
+export type PercentString = SuffixString<"%">
+export type PxString = SuffixString<"px">
+export type RemString = SuffixString<"rem">
+export type EmString = SuffixString<"em">
+export type VwString = SuffixString<"vw">
+export type VhString = SuffixString<"vh">
 
 export interface UnitStringMap {
   deg: DegString
@@ -122,11 +111,18 @@ export type UnitString =
 // 4. STRICT HELPERS — validate at the call site, return the literal back.
 // =====================================================================
 
-export const deg = <S extends string>(value: S & DegLiteral<S>): S => value
-export const percent = <S extends string>(value: S & PercentLiteral<S>): S =>
-  value
-export const px = <S extends string>(value: S & PxLiteral<S>): S => value
-export const rem = <S extends string>(value: S & RemLiteral<S>): S => value
-export const em = <S extends string>(value: S & EmLiteral<S>): S => value
-export const vw = <S extends string>(value: S & VwLiteral<S>): S => value
-export const vh = <S extends string>(value: S & VhLiteral<S>): S => value
+// Build a strict tag helper for one unit suffix: it accepts S only when S is a
+// valid `<number><U>` literal and returns S unchanged, so callers keep the
+// narrow type. Each per-unit helper below is one application of this factory.
+const makeUnit =
+  <U extends string>() =>
+  <S extends string>(value: S & SuffixLiteral<S, U>): S =>
+    value
+
+export const deg = makeUnit<"deg">()
+export const percent = makeUnit<"%">()
+export const px = makeUnit<"px">()
+export const rem = makeUnit<"rem">()
+export const em = makeUnit<"em">()
+export const vw = makeUnit<"vw">()
+export const vh = makeUnit<"vh">()

@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react"
+import { useState } from "react"
 import { describe, expect, test, vi } from "vitest"
 import {
   FamilyEditor,
@@ -102,6 +103,27 @@ describe("FamilyEditor", () => {
     })
     expect(onChange).toHaveBeenCalledWith(["Arial", "monospace"])
   })
+
+  test("removing a row keeps element identity of the surviving rows", () => {
+    // Stable per-row keys: removing a row ABOVE the focused one must not drop
+    // focus. Index keys remount the survivor under a shifted index and lose it.
+    function Harness() {
+      const [value, setValue] = useState(["Arial", "Georgia", "Verdana"])
+      return <FamilyEditor value={value} onChange={setValue} />
+    }
+    render(<Harness />)
+    const verdana = screen.getByLabelText("Font family 3") as HTMLInputElement
+    verdana.focus()
+    expect(document.activeElement).toBe(verdana)
+
+    fireEvent.click(screen.getByLabelText("Remove family 1"))
+
+    // "Verdana" is now row 2; with a stable key it is the SAME element, so it
+    // retains focus and its value.
+    const survivor = screen.getByLabelText("Font family 2") as HTMLInputElement
+    expect(survivor.value).toBe("Verdana")
+    expect(document.activeElement).toBe(survivor)
+  })
 })
 
 describe("FontPreview", () => {
@@ -175,6 +197,28 @@ describe("FontEditorPanel — field controls", () => {
     expect(
       (screen.getByLabelText("Font size unit") as HTMLSelectElement).value,
     ).toBe("keyword")
+  })
+
+  test("a bare unit (no number) marks the unit select opaque, not a real unit", () => {
+    render(<FontEditorPanel value="16px serif" onChange={() => {}} />)
+    // Mid-edit the size field can hold a lone unit. The split must require at
+    // least one digit, so a bare "px" is opaque (placeholder), not a number.
+    fireEvent.change(screen.getByLabelText("Font size"), {
+      target: { value: "px" },
+    })
+    expect(
+      (screen.getByLabelText("Font size unit") as HTMLSelectElement).value,
+    ).toBe("")
+  })
+
+  test("an empty size field marks the unit select opaque, not px", () => {
+    render(<FontEditorPanel value="16px serif" onChange={() => {}} />)
+    fireEvent.change(screen.getByLabelText("Font size"), {
+      target: { value: "" },
+    })
+    expect(
+      (screen.getByLabelText("Font size unit") as HTMLSelectElement).value,
+    ).toBe("")
   })
 
   test("switching weight to number reveals the numeric input and seeds 400", () => {

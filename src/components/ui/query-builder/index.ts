@@ -18,7 +18,6 @@ export {
   QueryBuilderPanel,
   QueryPreview,
 } from "./query-builder"
-export type { ParseResult } from "./query-builder.helpers"
 export {
   defaultFeatureTest,
   defaultQuery,

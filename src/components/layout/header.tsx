@@ -20,7 +20,7 @@ function GitHubLink() {
     <a
       href="https://github.com/TurtIeSocks/ridiculous"
       aria-label="GitHub"
-      className="inline-flex items-center justify-center size-10 rounded-full border border-transparent text-muted-foreground transition hover:border-white/15 hover:bg-white/5 hover:text-foreground"
+      className="inline-flex size-10 items-center justify-center rounded-full border border-transparent text-muted-foreground transition hover:border-white/15 hover:bg-white/5 hover:text-foreground"
     >
       <GitHubGlyph className="size-5" />
     </a>
@@ -47,11 +47,11 @@ export function HeroHeader() {
   return (
     <header className="relative">
       <div className="container mx-auto max-w-6xl px-6 pt-24 pb-16">
-        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-mono text-muted-foreground backdrop-blur-sm">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 font-mono text-muted-foreground text-xs backdrop-blur-sm">
           <span className="inline-block size-1.5 rounded-full bg-violet-glow shadow-[0_0_8px_var(--color-violet-glow)]" />
           v0 · ridiculous
         </div>
-        <h1 className="mt-6 text-6xl md:text-7xl font-extrabold tracking-tight leading-[0.95]">
+        <h1 className="mt-6 font-extrabold text-6xl leading-[0.95] tracking-tight md:text-7xl">
           <span className="text-gradient">ridiculous</span>
         </h1>
         <p className="mt-4 max-w-xl text-lg text-muted-foreground">
@@ -62,7 +62,7 @@ export function HeroHeader() {
           <GitHubLink />
           <a
             href="#install"
-            className="inline-flex items-center gap-2 rounded-full bg-linear-to-br from-violet-glow to-pink-glow px-4 py-2 text-sm font-semibold text-background shadow-[0_4px_24px_oklch(0.5_0.2_300/0.35)] transition hover:brightness-110"
+            className="inline-flex items-center gap-2 rounded-full bg-linear-to-br from-violet-glow to-pink-glow px-4 py-2 font-semibold text-background text-sm shadow-[0_4px_24px_oklch(0.5_0.2_300/0.35)] transition hover:brightness-110"
           >
             Install
           </a>
@@ -77,11 +77,11 @@ export function HeroHeader() {
 
 export function CompactHeader() {
   return (
-    <header className="sticky top-0 z-20 backdrop-blur-md bg-background/70 border-b border-white/10">
-      <div className="container mx-auto max-w-6xl px-6 h-16 flex items-center justify-between gap-3">
+    <header className="sticky top-0 z-20 border-white/10 border-b bg-background/70 backdrop-blur-md">
+      <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between gap-3 px-6">
         <Link
           to="/"
-          className="text-lg font-extrabold tracking-tight text-gradient"
+          className="font-extrabold text-gradient text-lg tracking-tight"
         >
           ridiculous
         </Link>
@@ -91,7 +91,7 @@ export function CompactHeader() {
             <button
               type="button"
               aria-label="Open navigation"
-              className="md:hidden inline-flex size-10 items-center justify-center rounded-md border border-white/10 bg-white/5"
+              className="inline-flex size-10 items-center justify-center rounded-md border border-white/10 bg-white/5 md:hidden"
             >
               <HamburgerIcon />
             </button>

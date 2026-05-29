@@ -50,7 +50,7 @@ export interface IfFunctionPanelProps {
   "aria-label"?: string
 }
 
-export interface IfFunctionProps extends IfFunctionPanelProps {}
+export type IfFunctionProps = IfFunctionPanelProps
 
 // ---------------------------------------------------------------------------
 // IfFunction — popover-wrapped
@@ -126,7 +126,17 @@ export function IfFunctionPanel({
     commit(branches.filter((_, i) => i !== index))
   }
   const add = () => {
-    commit([...branches, defaultBranch("media")])
+    // `else` is only legal as the FINAL branch, so insert a new media branch
+    // *before* a trailing else (keeping else last); otherwise append. Appending
+    // after an else would emit a value parseIf rejects → silent data loss on
+    // remount.
+    const insertAt =
+      branches.length > 0 && branches[branches.length - 1].kind === "else"
+        ? branches.length - 1
+        : branches.length
+    const next = [...branches]
+    next.splice(insertAt, 0, defaultBranch("media"))
+    commit(next)
   }
 
   return (
@@ -350,7 +360,7 @@ export function IfPreview({ value, className }: IfPreviewProps) {
           if() value
         </span>
       </div>
-      <p className="text-muted-foreground/70 text-[10px] leading-relaxed">
+      <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
         The CSS <code className="font-mono">if()</code> function shipped in
         2025; support is still rolling out. Non-supporting browsers ignore the
         declaration and fall back.

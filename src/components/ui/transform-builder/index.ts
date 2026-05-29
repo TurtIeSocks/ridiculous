@@ -17,7 +17,6 @@ export {
 export type {
   ArgKind,
   ArgSpec,
-  ParseResult,
 } from "./transform-builder.helpers"
 export {
   argSpec,

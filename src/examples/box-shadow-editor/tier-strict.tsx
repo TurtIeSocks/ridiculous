@@ -6,6 +6,9 @@ import {
   type BoxShadowString,
   cssBoxShadow,
 } from "@/components/ui/box-shadow-editor"
+import { CodeBlock } from "@/examples/_shared/code-block"
+import { ExampleCard } from "@/examples/_shared/example-card"
+import { ValueReadout } from "@/examples/_shared/value-readout"
 
 // Compile-time per-layer validation. These calls are validated by tsc:
 const valid = cssBoxShadow(
@@ -27,58 +30,59 @@ void _badLeading
 export function TierStrict() {
   const [value, setValue] = useState<BoxShadowString>(valid)
   return (
-    <div className="glass-card flex flex-col rounded-2xl p-6">
-      <div className="flex items-baseline justify-between">
-        <div className="font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
-          <span className="text-gradient">03</span> strict
-        </div>
-        <span className="font-mono text-[10px] text-muted-foreground/60">
-          BoxShadowLiteral&lt;S&gt;
-        </span>
-      </div>
-      <h3 className="mt-3 font-semibold text-lg tracking-tight">
-        Per-layer token typing at compile time
-      </h3>
-      <p className="mt-2 text-muted-foreground text-sm">
-        <code className="text-foreground">cssBoxShadow()</code> splits the list
-        by comma, then each layer by space, and resolves a bad arity, a negative
-        blur, a misplaced <code className="text-foreground">inset</code>, or a
-        non-<code className="text-foreground">ColorLiteral</code> color to{" "}
-        <code className="text-foreground">never</code> — a type error before you
-        run the code.
-      </p>
+    <ExampleCard
+      tierIndex={3}
+      tierLabel="strict"
+      typeBadge={<>BoxShadowLiteral&lt;S&gt;</>}
+      title="Per-layer token typing at compile time"
+      description={
+        <>
+          <code className="text-foreground">cssBoxShadow()</code> splits the
+          list by comma, then each layer by space, and resolves a bad arity, a
+          negative blur, a misplaced{" "}
+          <code className="text-foreground">inset</code>, or a non-
+          <code className="text-foreground">ColorLiteral</code> color to{" "}
+          <code className="text-foreground">never</code> — a type error before
+          you run the code.
+        </>
+      }
+    >
       <div className="mt-5 flex items-center gap-2">
         <BoxShadowEditor value={value} onChange={setValue} />
-        <code className="min-w-0 flex-1 truncate rounded-md border border-white/10 bg-black/40 px-2.5 py-1 font-mono text-xs">
-          {value}
-        </code>
+        <ValueReadout value={value} />
       </div>
-      <pre className="mt-6 overflow-x-auto rounded-lg border border-white/10 bg-black/40 p-4 font-mono text-[11px] leading-relaxed">
-        <span className="text-cyan-glow">cssBoxShadow</span>(
-        <span className="text-emerald-400">
-          &quot;inset 0px 0px 10px 2px #000, 0px 4px 8px #0003&quot;
-        </span>
-        ) <span className="text-muted-foreground/70">{"// ✓"}</span>
-        {"\n"}
-        <span className="text-muted-foreground/70">
-          {"// @ts-expect-error bare keyword color"}
-        </span>
-        {"\n"}
-        <span className="text-cyan-glow">cssBoxShadow</span>(
-        <span className="text-destructive">&quot;0px 4px red&quot;</span>){"\n"}
-        <span className="text-muted-foreground/70">
-          {"// @ts-expect-error negative blur"}
-        </span>
-        {"\n"}
-        <span className="text-cyan-glow">cssBoxShadow</span>(
-        <span className="text-destructive">&quot;0px 4px -8px&quot;</span>)
-      </pre>
+      <CodeBlock
+        className="mt-6"
+        tokens={[
+          { kind: "fn", text: "cssBoxShadow" },
+          { kind: "plain", text: "(" },
+          {
+            kind: "str",
+            text: '"inset 0px 0px 10px 2px #000, 0px 4px 8px #0003"',
+          },
+          { kind: "plain", text: ") " },
+          { kind: "com", text: "// ✓" },
+          { kind: "plain", text: "\n" },
+          { kind: "com", text: "// @ts-expect-error bare keyword color" },
+          { kind: "plain", text: "\n" },
+          { kind: "fn", text: "cssBoxShadow" },
+          { kind: "plain", text: "(" },
+          { kind: "err", text: '"0px 4px red"' },
+          { kind: "plain", text: ")\n" },
+          { kind: "com", text: "// @ts-expect-error negative blur" },
+          { kind: "plain", text: "\n" },
+          { kind: "fn", text: "cssBoxShadow" },
+          { kind: "plain", text: "(" },
+          { kind: "err", text: '"0px 4px -8px"' },
+          { kind: "plain", text: ")" },
+        ]}
+      />
       <p className="mt-3 text-muted-foreground/70 text-xs">
         Note: bare keyword colors (<code className="font-mono">red</code>) and{" "}
         <code className="font-mono">calc()</code> /{" "}
         <code className="font-mono">var()</code> are rejected at the strict tier
         — use the casual or IntelliSense tier; the runtime parser accepts them.
       </p>
-    </div>
+    </ExampleCard>
   )
 }

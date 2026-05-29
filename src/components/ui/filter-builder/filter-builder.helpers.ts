@@ -276,12 +276,3 @@ export function formatFilter(items: FilterItem[]): string {
   if (items.length === 0) return "none"
   return items.map(itemToCss).join(" ")
 }
-
-// ---------------------------------------------------------------------------
-// ParseResult facade
-// ---------------------------------------------------------------------------
-
-export interface ParseResult {
-  items: FilterItem[] | null
-  error: string | null
-}

@@ -4,7 +4,7 @@ import { ApiReference } from "@/examples/ridiculous-type-kit/api-reference"
 import { ExportsOverview } from "@/examples/ridiculous-type-kit/exports-overview"
 import { Recipes } from "@/examples/ridiculous-type-kit/recipes"
 
-export function RidiculousTypeKitPage() {
+export default function RidiculousTypeKitPage() {
   return (
     <>
       <SectionHeader
@@ -13,7 +13,7 @@ export function RidiculousTypeKitPage() {
         description="The shared template-literal machinery every ridiculous component is built on — character and number primitives, CSS dimension validators, and paren-aware parser combinators. Pure types, zero runtime."
       />
 
-      <div className="mt-8 glass-card rounded-2xl p-6 text-muted-foreground text-sm">
+      <div className="glass-card mt-8 rounded-2xl p-6 text-muted-foreground text-sm">
         Installed automatically as a{" "}
         <code className="rounded bg-black/20 px-1.5 py-0.5 font-mono text-foreground text-xs">
           registryDependency

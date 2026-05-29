@@ -137,6 +137,31 @@ describe("PolygonControls — vertices", () => {
     expect(onChange.mock.calls[0][0].vertices.length).toBe(3)
   })
 
+  test("removing a MIDDLE vertex drops exactly that vertex (stable keys)", () => {
+    const onChange = vi.fn()
+    render(
+      <PolygonControls
+        state={{
+          shape: "polygon",
+          vertices: [
+            { x: "0%", y: "0%" },
+            { x: "50%", y: "10%" },
+            { x: "100%", y: "0%" },
+            { x: "50%", y: "100%" },
+          ],
+        }}
+        onChange={onChange}
+      />,
+    )
+    const removes = screen.getAllByRole("button", { name: /remove vertex/i })
+    fireEvent.click(removes[1]) // drop the 2nd vertex
+    expect(onChange.mock.calls[0][0].vertices).toEqual([
+      { x: "0%", y: "0%" },
+      { x: "100%", y: "0%" },
+      { x: "50%", y: "100%" },
+    ])
+  })
+
   test("a 3-vertex polygon does not expose enabled remove buttons", () => {
     const onChange = vi.fn()
     render(<PolygonControls state={polyState()} onChange={onChange} />)
@@ -460,6 +485,36 @@ describe("LengthPctEditor", () => {
       target: { value: "px" },
     })
     expect(onChange).toHaveBeenCalledWith("10px")
+  })
+
+  test("a bare `auto` token renders an opaque text input, not a unit select", () => {
+    const onChange = vi.fn()
+    render(<LengthPctEditor label="lp" value="auto" onChange={onChange} />)
+    // The control is a plain text input preserving the verbatim value …
+    const input = screen.getByLabelText("lp") as HTMLInputElement
+    expect(input.value).toBe("auto")
+    // … with NO unit <select> (which would be an out-of-range controlled
+    // select since `auto` is not in LP_UNITS).
+    expect(screen.queryByLabelText("lp unit")).toBeNull()
+  })
+
+  test("an opaque token survives a round-trip through the parser (inset auto)", () => {
+    const onChange = vi.fn()
+    render(
+      <InsetControls
+        state={{ shape: "inset", top: "auto" }}
+        onChange={onChange}
+      />,
+    )
+    const input = screen.getByLabelText("inset top") as HTMLInputElement
+    // The `auto` keyword is preserved verbatim, not coerced to "0px".
+    expect(input.value).toBe("auto")
+    expect(screen.queryByLabelText("inset top unit")).toBeNull()
+    // Editing keeps it opaque (no "%" suffix coercion).
+    fireEvent.change(input, { target: { value: "fit-content" } })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ top: "fit-content" }),
+    )
   })
 })
 

@@ -2,47 +2,46 @@
 
 import { useState } from "react"
 import { TransformBuilder } from "@/components/ui/transform-builder"
+import { CodeBlock } from "@/examples/_shared/code-block"
+import { ExampleCard } from "@/examples/_shared/example-card"
+import { ValueReadout } from "@/examples/_shared/value-readout"
 
 export function TierCasual() {
   const [value, setValue] = useState<string>(
     "translate(10px, 20%) rotate(15deg)",
   )
   return (
-    <div className="glass-card flex flex-col rounded-2xl p-6">
-      <div className="flex items-baseline justify-between">
-        <div className="font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
-          <span className="text-gradient">01</span> casual
-        </div>
-        <span className="font-mono text-[10px] text-muted-foreground/60">
-          string
-        </span>
-      </div>
-      <h3 className="mt-3 font-semibold text-lg tracking-tight">
-        Pass any string
-      </h3>
-      <p className="mt-2 text-muted-foreground text-sm">
-        <code className="text-foreground">useState&lt;string&gt;</code>. No
-        compile-time validation; the runtime parser handles whatever you type —
-        including <code className="text-foreground">calc()</code> and{" "}
-        <code className="text-foreground">var()</code> arguments.
-      </p>
+    <ExampleCard
+      tierIndex={1}
+      tierLabel="casual"
+      typeBadge="string"
+      title="Pass any string"
+      description={
+        <>
+          <code className="text-foreground">useState&lt;string&gt;</code>. No
+          compile-time validation; the runtime parser handles whatever you type
+          — including <code className="text-foreground">calc()</code> and{" "}
+          <code className="text-foreground">var()</code> arguments.
+        </>
+      }
+    >
       <div className="mt-5 flex items-center gap-2">
         <TransformBuilder value={value} onChange={setValue} />
-        <code className="min-w-0 flex-1 truncate rounded-md border border-white/10 bg-black/40 px-2.5 py-1 font-mono text-xs">
-          {value}
-        </code>
+        <ValueReadout value={value} />
       </div>
-      <pre className="mt-6 overflow-x-auto rounded-lg border border-white/10 bg-black/40 p-4 font-mono text-[11px] leading-relaxed">
-        <span className="text-violet-glow">const</span> [value, setValue] ={" "}
-        <span className="text-cyan-glow">useState</span>
-        {"<"}
-        <span className="text-pink-glow">string</span>
-        {">"}(
-        <span className="text-emerald-400">
-          &quot;translate(10px, 20%) rotate(15deg)&quot;
-        </span>
-        )
-      </pre>
-    </div>
+      <CodeBlock
+        className="mt-6"
+        tokens={[
+          { kind: "kw", text: "const" },
+          { kind: "plain", text: " [value, setValue] = " },
+          { kind: "fn", text: "useState" },
+          { kind: "plain", text: "<" },
+          { kind: "type", text: "string" },
+          { kind: "plain", text: ">(" },
+          { kind: "str", text: '"translate(10px, 20%) rotate(15deg)"' },
+          { kind: "plain", text: ")" },
+        ]}
+      />
+    </ExampleCard>
   )
 }

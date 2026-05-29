@@ -21,6 +21,66 @@ export type HexDigit =
   | "E"
   | "F"
 
+// ASCII letters, both cases. Hoisted from the per-component CSS-ident
+// validators (grid-builder / transition-editor / font-editor), which all
+// re-declared this identical A–Z + a–z union.
+export type Letter =
+  | "a"
+  | "b"
+  | "c"
+  | "d"
+  | "e"
+  | "f"
+  | "g"
+  | "h"
+  | "i"
+  | "j"
+  | "k"
+  | "l"
+  | "m"
+  | "n"
+  | "o"
+  | "p"
+  | "q"
+  | "r"
+  | "s"
+  | "t"
+  | "u"
+  | "v"
+  | "w"
+  | "x"
+  | "y"
+  | "z"
+  | "A"
+  | "B"
+  | "C"
+  | "D"
+  | "E"
+  | "F"
+  | "G"
+  | "H"
+  | "I"
+  | "J"
+  | "K"
+  | "L"
+  | "M"
+  | "N"
+  | "O"
+  | "P"
+  | "Q"
+  | "R"
+  | "S"
+  | "T"
+  | "U"
+  | "V"
+  | "W"
+  | "X"
+  | "Y"
+  | "Z"
+
+// ASCII letter or digit — the alphanumeric char class.
+export type Alpha = Letter | Digit
+
 export type WS = " " | "\n" | "\t"
 
 export type TrimLeft<S extends string> = S extends `${WS}${infer R}`
@@ -115,70 +175,79 @@ export type IsPositiveInt<S extends string> = S extends "0"
     : NonEmptyAllChars<S, Digit>
 
 // --- bounded-number predicates ---------------------------------------
-
-export type IsByte<S extends string> =
-  NonEmptyAllChars<S, Digit> extends true
-    ? NormalizeInt<S> extends `${IntRange<0, 256>}`
-      ? true
-      : false
-    : false
-
-export type IsNumber0To1<S extends string> = S extends `${infer I}.${infer F}`
+//
+// One generic engine for "is `S` a number in a closed integer-capped range".
+// Three char-set parameters pin the exact accepted values so every existing
+// alias keeps byte-identical behavior:
+//   • `IntSet`     — bare-integer forms accepted (the integer branch).
+//   • `DecIntSet`  — integer-parts STRICTLY BELOW the cap (a non-zero
+//                    fraction is allowed for these).
+//   • `MaxLit`     — the cap's integer literal; valid only with an all-zero
+//                    fraction (e.g. `"100"` → `100.0` ok, `100.5` not).
+// Each set may be a bare-literal union (`"0" | "1"`) or an `IntRange<…>`
+// template — `IsNumber0To1` uses the former, the rest use the latter.
+// `IsByte` is the integer-only degenerate: passing `never` for both decimal
+// sets makes the fraction branch always reject, leaving the integer check.
+export type IsNumberInClosedRange<
+  S extends string,
+  IntSet extends string,
+  DecIntSet extends string,
+  MaxLit extends string,
+> = S extends `${infer I}.${infer F}`
   ? And<IsIntPart<I>, NonEmptyAllChars<F, Digit>> extends true
-    ? NormalizeInt<I> extends "0"
+    ? NormalizeInt<I> extends DecIntSet
       ? true
-      : NormalizeInt<I> extends "1"
+      : NormalizeInt<I> extends MaxLit
         ? AllChars<F, "0">
         : false
     : false
   : NonEmptyAllChars<S, Digit> extends true
-    ? NormalizeInt<S> extends "0" | "1"
+    ? NormalizeInt<S> extends IntSet
       ? true
       : false
     : false
 
-export type IsNumber0To100<S extends string> = S extends `${infer I}.${infer F}`
-  ? And<IsIntPart<I>, NonEmptyAllChars<F, Digit>> extends true
-    ? NormalizeInt<I> extends `${IntRange<0, 100>}`
-      ? true
-      : NormalizeInt<I> extends "100"
-        ? AllChars<F, "0">
-        : false
-    : false
-  : NonEmptyAllChars<S, Digit> extends true
-    ? NormalizeInt<S> extends `${IntRange<0, 101>}`
-      ? true
-      : false
-    : false
+export type IsByte<S extends string> = IsNumberInClosedRange<
+  S,
+  `${IntRange<0, 256>}`,
+  never,
+  never
+>
 
-export type IsNumber0To360<S extends string> = S extends `${infer I}.${infer F}`
-  ? And<IsIntPart<I>, NonEmptyAllChars<F, Digit>> extends true
-    ? NormalizeInt<I> extends `${IntRange<0, 360>}`
-      ? true
-      : NormalizeInt<I> extends "360"
-        ? AllChars<F, "0">
-        : false
-    : false
-  : NonEmptyAllChars<S, Digit> extends true
-    ? NormalizeInt<S> extends `${IntRange<0, 361>}`
-      ? true
-      : false
-    : false
+export type IsNumber0To1<S extends string> = IsNumberInClosedRange<
+  S,
+  "0" | "1",
+  "0",
+  "1"
+>
 
-export type IsNumber0To400<S extends string> = S extends `${infer I}.${infer F}`
-  ? And<IsIntPart<I>, NonEmptyAllChars<F, Digit>> extends true
-    ? NormalizeInt<I> extends `${IntRange<0, 400>}`
-      ? true
-      : NormalizeInt<I> extends "400"
-        ? AllChars<F, "0">
-        : false
-    : false
-  : NonEmptyAllChars<S, Digit> extends true
-    ? NormalizeInt<S> extends `${IntRange<0, 401>}`
-      ? true
-      : false
-    : false
+export type IsNumber0To100<S extends string> = IsNumberInClosedRange<
+  S,
+  `${IntRange<0, 101>}`,
+  `${IntRange<0, 100>}`,
+  "100"
+>
 
+export type IsNumber0To360<S extends string> = IsNumberInClosedRange<
+  S,
+  `${IntRange<0, 361>}`,
+  `${IntRange<0, 360>}`,
+  "360"
+>
+
+export type IsNumber0To400<S extends string> = IsNumberInClosedRange<
+  S,
+  `${IntRange<0, 401>}`,
+  `${IntRange<0, 400>}`,
+  "400"
+>
+
+// Trims the numeric part before range-checking, mirroring `IsPercentage`
+// (dimensions.ts), which does `IsNumber<Trim<N>>`. Both now treat `" 50%"`
+// identically (previously this returned false here while IsPercentage
+// returned true — an inconsistency across the public API). The `%` must
+// still be the literal final char (no trailing-whitespace acceptance), so
+// only the inner number is trimmed — exactly as IsPercentage does.
 export type IsPercent0To100<S extends string> = S extends `${infer N}%`
-  ? IsNumber0To100<N>
+  ? IsNumber0To100<Trim<N>>
   : false

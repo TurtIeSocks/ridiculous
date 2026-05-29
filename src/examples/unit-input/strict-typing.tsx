@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { type DegString, deg, UnitInput } from "@/components/ui/unit-input"
+import { ExampleCard } from "@/examples/_shared/example-card"
 
 export function StrictTyping() {
   // DegString = `${number}deg`. The deg() helper validates a literal
@@ -7,17 +8,19 @@ export function StrictTyping() {
   // const bad = deg("45px")
   const [angle, setAngle] = useState<DegString>(deg("90deg"))
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8">
-      <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">
-        <span className="text-gradient">/</span> tier-strict
-      </div>
-      <h3 className="text-xl font-semibold tracking-tight">Strict Typing</h3>
-      <p className="mt-2 text-sm text-muted-foreground max-w-prose">
-        <code className="font-mono">unit="deg"</code> narrows the value/onChange
-        types to <code className="font-mono">DegString</code>. The{" "}
-        <code className="font-mono">deg()</code> call-site helper rejects
-        wrong-suffix literals at compile time.
-      </p>
+    <ExampleCard
+      className="md:p-8"
+      eyebrow="tier-strict"
+      title="Strict Typing"
+      description={
+        <>
+          <code className="font-mono">unit="deg"</code> narrows the
+          value/onChange types to <code className="font-mono">DegString</code>.
+          The <code className="font-mono">deg()</code> call-site helper rejects
+          wrong-suffix literals at compile time.
+        </>
+      }
+    >
       <div className="mt-6 flex items-center gap-6">
         <UnitInput
           unit="deg"
@@ -28,10 +31,10 @@ export function StrictTyping() {
           aria-label="Angle"
           className="w-24"
         />
-        <code className="text-sm font-mono bg-black/40 border border-white/10 px-3 py-1.5 rounded-lg">
+        <code className="rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 font-mono text-sm">
           {angle}
         </code>
       </div>
-    </div>
+    </ExampleCard>
   )
 }

@@ -4,6 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "packageManager": "pnpm@11.1.2",
+  "engines": {
+    "node": ">=20.19",
+    "pnpm": ">=11"
+  },
   "scripts": {
     "nav:build": "node scripts/build-nav.mjs",
     "predev": "pnpm nav:build",
@@ -17,8 +21,6 @@
     "test:watch": "vitest watch",
     "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit -p tsconfig.app.json",
-    "lint": "biome lint .",
-    "format": "biome format --write .",
     "check": "biome check .",
     "check:fix": "biome check --write --unsafe .",
     "ci:check": "biome ci .",

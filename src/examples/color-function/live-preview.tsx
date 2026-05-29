@@ -5,6 +5,7 @@ import {
   ColorFunctionPanel,
   ColorFunctionPreview,
 } from "@/components/ui/color-function"
+import { ExampleCard } from "@/examples/_shared/example-card"
 
 export function LivePreviewExample() {
   const [mix, setMix] = useState<string>(
@@ -18,21 +19,20 @@ export function LivePreviewExample() {
   )
 
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8">
-      <div className="mb-2 font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
-        <span className="text-gradient">/</span> live-preview
-      </div>
-      <h3 className="font-semibold text-xl tracking-tight">
-        Each family, edited live with a result swatch
-      </h3>
-      <p className="mt-2 max-w-prose text-muted-foreground text-sm">
-        Three modes, three panels. Every control composes the typed string; the
-        swatch beneath each renders the produced value as a computed
-        background-color. The{" "}
-        <code className="font-mono text-foreground">light-dark()</code> swatch
-        carries a scheme toggle so the browser resolves it both ways.
-      </p>
-
+    <ExampleCard
+      eyebrow="live-preview"
+      title="Each family, edited live with a result swatch"
+      description={
+        <>
+          Three modes, three panels. Every control composes the typed string;
+          the swatch beneath each renders the produced value as a computed
+          background-color. The{" "}
+          <code className="font-mono text-foreground">light-dark()</code> swatch
+          carries a scheme toggle so the browser resolves it both ways.
+        </>
+      }
+      className="md:p-8"
+    >
       <div className="mt-6 grid gap-8 lg:grid-cols-3">
         <PreviewColumn title="color-mix()" value={mix}>
           <ColorFunctionPanel
@@ -61,7 +61,7 @@ export function LivePreviewExample() {
           />
         </PreviewColumn>
       </div>
-    </div>
+    </ExampleCard>
   )
 }
 

@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { TransitionEditor } from "@/components/ui/transition-editor"
+import { ExampleCard } from "@/examples/_shared/example-card"
+import { ValueReadout } from "@/examples/_shared/value-readout"
 
 export function BasicUsage() {
   const [transition, setTransition] = useState<string>(
@@ -9,29 +11,27 @@ export function BasicUsage() {
   )
   const [animation, setAnimation] = useState<string>("spin 1s linear infinite")
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8">
-      <div className="mb-2 font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
-        <span className="text-gradient">/</span> basic-usage
-      </div>
-      <h3 className="font-semibold text-xl tracking-tight">
-        Two shorthands, one editor
-      </h3>
-      <p className="mt-2 max-w-prose text-muted-foreground text-sm">
-        Controlled <code className="font-mono text-foreground">value</code> +{" "}
-        <code className="font-mono text-foreground">onChange</code>. The{" "}
-        <code className="font-mono text-foreground">mode</code> prop switches
-        between the{" "}
-        <code className="font-mono text-foreground">transition</code> and{" "}
-        <code className="font-mono text-foreground">animation</code> shorthands.
-        Add layers, edit each token with the right control, and the editor emits
-        a valid comma-separated string.
-      </p>
+    <ExampleCard
+      eyebrow="basic-usage"
+      title="Two shorthands, one editor"
+      description={
+        <>
+          Controlled <code className="font-mono text-foreground">value</code> +{" "}
+          <code className="font-mono text-foreground">onChange</code>. The{" "}
+          <code className="font-mono text-foreground">mode</code> prop switches
+          between the{" "}
+          <code className="font-mono text-foreground">transition</code> and{" "}
+          <code className="font-mono text-foreground">animation</code>{" "}
+          shorthands. Add layers, edit each token with the right control, and
+          the editor emits a valid comma-separated string.
+        </>
+      }
+      className="md:p-8"
+    >
       <div className="mt-6 space-y-3">
         <div className="flex flex-wrap items-center gap-3">
           <TransitionEditor value={transition} onChange={setTransition} />
-          <code className="min-w-0 flex-1 truncate rounded-md border border-white/10 bg-black/40 px-2.5 py-1 font-mono text-xs">
-            {transition}
-          </code>
+          <ValueReadout value={transition} />
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <TransitionEditor
@@ -39,11 +39,9 @@ export function BasicUsage() {
             value={animation}
             onChange={setAnimation}
           />
-          <code className="min-w-0 flex-1 truncate rounded-md border border-white/10 bg-black/40 px-2.5 py-1 font-mono text-xs">
-            {animation}
-          </code>
+          <ValueReadout value={animation} />
         </div>
       </div>
-    </div>
+    </ExampleCard>
   )
 }

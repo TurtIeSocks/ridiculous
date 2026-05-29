@@ -17,7 +17,6 @@ export {
 export type {
   ArgKind,
   ArgSpec,
-  ParseResult,
 } from "./filter-builder.helpers"
 export {
   argSpec,

@@ -191,18 +191,18 @@ function computeEasing(state: PlaygroundState): EasingString {
 
 const pillClass = (active: boolean) =>
   cn(
-    "rounded-full px-3 py-1 text-xs font-mono border transition",
+    "rounded-full border px-3 py-1 font-mono text-xs transition",
     active
-      ? "bg-linear-to-br from-violet-glow to-pink-glow text-background border-transparent"
-      : "bg-white/5 border-white/10 hover:bg-white/10",
+      ? "border-transparent bg-linear-to-br from-violet-glow to-pink-glow text-background"
+      : "border-white/10 bg-white/5 hover:bg-white/10",
   )
 
 const compactPillClass = (active: boolean) =>
   cn(
-    "rounded-md px-2 py-0.5 text-[11px] font-mono border transition",
+    "rounded-md border px-2 py-0.5 font-mono text-[11px] transition",
     active
-      ? "bg-linear-to-br from-violet-glow to-pink-glow text-background border-transparent"
-      : "bg-white/5 border-white/10 hover:bg-white/10",
+      ? "border-transparent bg-linear-to-br from-violet-glow to-pink-glow text-background"
+      : "border-white/10 bg-white/5 hover:bg-white/10",
   )
 
 const sectionLabelClass =
@@ -231,7 +231,7 @@ function CopyButton({ text, className }: { text: string; className?: string }) {
         }
       }}
       className={cn(
-        "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-wider border border-white/10 bg-white/5 hover:bg-white/10",
+        "rounded border border-white/10 bg-white/5 px-2 py-1 font-mono text-[10px] uppercase tracking-wider hover:bg-white/10",
         className,
       )}
     >
@@ -270,18 +270,18 @@ export function EasingPlayground() {
     <section
       data-slot="easing-playground"
       className={cn(
-        "glass-card rounded-2xl p-6 md:p-8 border border-white/10",
+        "glass-card rounded-2xl border border-white/10 p-6 md:p-8",
         "bg-[linear-gradient(135deg,oklch(0.18_0.04_290),oklch(0.14_0.03_270))]",
       )}
     >
       <div className="mb-6">
-        <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
+        <div className="font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
           / component · playground
         </div>
-        <h3 className="mt-1 text-xl font-bold tracking-tight">Easing Picker</h3>
+        <h3 className="mt-1 font-bold text-xl tracking-tight">Easing Picker</h3>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[0.7fr_1fr] items-stretch">
+      <div className="grid items-stretch gap-6 lg:grid-cols-[0.7fr_1fr]">
         <div data-slot="easing-playground-left" className="flex flex-col gap-4">
           {/* Basis + Direction on the same row (Direction only when basis=bezier) */}
           <div className="flex flex-wrap items-end gap-4">
@@ -429,7 +429,7 @@ export function EasingPlayground() {
 
         <div
           data-slot="easing-playground-right"
-          className="flex flex-col gap-6 min-w-0"
+          className="flex min-w-0 flex-col gap-6"
         >
           <div
             className="flex-1 rounded-lg border border-white/10 bg-background/40 p-4"
@@ -464,7 +464,7 @@ export function EasingPlayground() {
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
-            <label className="flex items-center gap-2 text-xs font-mono">
+            <label className="flex items-center gap-2 font-mono text-xs">
               <input
                 type="checkbox"
                 aria-label="loop"
@@ -474,7 +474,7 @@ export function EasingPlayground() {
               />
               loop
             </label>
-            <label className="flex items-center gap-2 text-xs font-mono">
+            <label className="flex items-center gap-2 font-mono text-xs">
               <span className="text-muted-foreground">duration</span>
               <input
                 type="range"
@@ -486,13 +486,13 @@ export function EasingPlayground() {
                 onChange={(e) => setDuration(Number(e.target.value))}
                 className="w-32"
               />
-              <span className="tabular-nums w-12 text-right">
+              <span className="w-12 text-right tabular-nums">
                 {state.duration}ms
               </span>
             </label>
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-background/60 p-3 mt-2 space-y-2">
+          <div className="mt-2 space-y-2 rounded-lg border border-white/10 bg-background/60 p-3">
             <div className="flex items-center gap-1">
               {FORMATS.map((f) => (
                 <button
@@ -500,9 +500,9 @@ export function EasingPlayground() {
                   type="button"
                   onClick={() => setFormat(f)}
                   className={cn(
-                    "rounded px-2 py-1 text-[10px] font-mono uppercase tracking-wider border",
+                    "rounded border px-2 py-1 font-mono text-[10px] uppercase tracking-wider",
                     state.format === f
-                      ? "bg-violet-500/20 border-violet-400/40 text-violet-200"
+                      ? "border-violet-400/40 bg-violet-500/20 text-violet-200"
                       : "border-transparent text-muted-foreground hover:bg-white/5",
                   )}
                 >
@@ -520,7 +520,7 @@ export function EasingPlayground() {
             </div>
             <pre
               data-slot="easing-playground-code"
-              className="text-xs font-mono text-foreground/90 whitespace-pre-wrap break-all"
+              className="whitespace-pre-wrap break-all font-mono text-foreground/90 text-xs"
             >
               {formatSnippet(easing, state.format)}
             </pre>

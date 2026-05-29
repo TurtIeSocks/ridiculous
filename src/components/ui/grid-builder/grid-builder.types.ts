@@ -34,6 +34,8 @@ import type {
   IsLength,
   IsPercentage,
   IsPositiveInt,
+  Letter,
+  NonEmptyAllChars,
   Or,
   ParseFunction,
   SplitByComma,
@@ -55,60 +57,6 @@ type IsNever<T> = [T] extends [never] ? true : false
 // fuller <custom-ident> grammar — escapes, non-ASCII — is out of scope;
 // see spec §9.5).
 // =====================================================================
-
-type Letter =
-  | "a"
-  | "b"
-  | "c"
-  | "d"
-  | "e"
-  | "f"
-  | "g"
-  | "h"
-  | "i"
-  | "j"
-  | "k"
-  | "l"
-  | "m"
-  | "n"
-  | "o"
-  | "p"
-  | "q"
-  | "r"
-  | "s"
-  | "t"
-  | "u"
-  | "v"
-  | "w"
-  | "x"
-  | "y"
-  | "z"
-  | "A"
-  | "B"
-  | "C"
-  | "D"
-  | "E"
-  | "F"
-  | "G"
-  | "H"
-  | "I"
-  | "J"
-  | "K"
-  | "L"
-  | "M"
-  | "N"
-  | "O"
-  | "P"
-  | "Q"
-  | "R"
-  | "S"
-  | "T"
-  | "U"
-  | "V"
-  | "W"
-  | "X"
-  | "Y"
-  | "Z"
 
 type IdentChar = Letter | Digit | "-" | "_"
 
@@ -297,8 +245,7 @@ export const cssTracks = <S extends string>(
 // =====================================================================
 
 /** A null cell: a run of one or more dots (`.`, `..`, `...`). */
-type IsDots<S extends string> =
-  AllChars<S, "."> extends true ? (S extends "" ? false : true) : false
+type IsDots<S extends string> = NonEmptyAllChars<S, ".">
 
 /** A single areas cell: a valid ident OR a null-cell dot run. */
 type IsAreaCell<S extends string> = Or<IsIdent<Trim<S>>, IsDots<Trim<S>>>

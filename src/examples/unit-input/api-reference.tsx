@@ -1,9 +1,9 @@
-import type * as React from "react"
+import { ApiRow, ApiSection, Signature } from "@/examples/_shared/api-reference"
 
 export function ApiReference() {
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8 space-y-10">
-      <Section title="Component">
+    <div className="glass-card space-y-10 rounded-2xl p-6 md:p-8">
+      <ApiSection title="Component">
         <Signature>
           {
             "<UnitInput<TUnit extends KnownUnit | (string & {})>\n  value: UnitStringMap[TUnit] | (string & {}) | string\n  onChange: (next: UnitStringMap[TUnit] | string) => void\n  unit: TUnit\n  min?: number\n  max?: number\n  step?: number\n  precision?: number\n  dragSensitivity?: number\n  prefix?: React.ReactNode\n  suffix?: React.ReactNode\n  disabled?: boolean\n  aria-label?: string\n  className?: string\n/>"
@@ -78,9 +78,9 @@ export function ApiReference() {
             },
           ]}
         />
-      </Section>
+      </ApiSection>
 
-      <Section title="Runtime helpers">
+      <ApiSection title="Runtime helpers">
         <ApiRow
           signature="deg<S extends string>(value: S & DegLiteral<S>): S"
           desc="Validate a deg literal at the call site."
@@ -109,9 +109,9 @@ export function ApiReference() {
           signature="vh<S extends string>(value: S & VhLiteral<S>): S"
           desc="Validate a vh literal."
         />
-      </Section>
+      </ApiSection>
 
-      <Section title="Types">
+      <ApiSection title="Types">
         <TypesList
           rows={[
             {
@@ -132,41 +132,7 @@ export function ApiReference() {
             },
           ]}
         />
-      </Section>
-    </div>
-  )
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="space-y-4">
-      <h3 className="text-sm font-mono uppercase tracking-[0.18em] text-muted-foreground">
-        <span className="text-gradient">§</span> {title}
-      </h3>
-      {children}
-    </div>
-  )
-}
-
-function Signature({ children }: { children: string }) {
-  return (
-    <pre className="text-[11px] md:text-xs leading-relaxed font-mono bg-black/40 border border-white/10 p-4 rounded-lg overflow-x-auto whitespace-pre">
-      {children}
-    </pre>
-  )
-}
-
-function ApiRow({ signature, desc }: { signature: string; desc: string }) {
-  return (
-    <div className="space-y-2">
-      <Signature>{signature}</Signature>
-      <p className="text-sm text-muted-foreground">{desc}</p>
+      </ApiSection>
     </div>
   )
 }
@@ -177,8 +143,8 @@ function PropsTable({
   rows: { name: string; type: string; desc: string }[]
 }) {
   return (
-    <div className="rounded-lg border border-white/10 overflow-hidden">
-      <div className="grid grid-cols-[minmax(7rem,auto)_minmax(12rem,auto)_1fr] gap-x-4 px-4 py-2 bg-black/40 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
+    <div className="overflow-hidden rounded-lg border border-white/10">
+      <div className="grid grid-cols-[minmax(7rem,auto)_minmax(12rem,auto)_1fr] gap-x-4 bg-black/40 px-4 py-2 font-mono text-[10px] text-muted-foreground uppercase tracking-[0.15em]">
         <div>Prop</div>
         <div>Type</div>
         <div>Description</div>
@@ -187,10 +153,10 @@ function PropsTable({
         {rows.map((r) => (
           <div
             key={r.name}
-            className="grid grid-cols-[minmax(7rem,auto)_minmax(12rem,auto)_1fr] gap-x-4 px-4 py-3 items-baseline text-sm"
+            className="grid grid-cols-[minmax(7rem,auto)_minmax(12rem,auto)_1fr] items-baseline gap-x-4 px-4 py-3 text-sm"
           >
             <code className="font-mono text-foreground">{r.name}</code>
-            <code className="font-mono text-xs text-cyan-glow break-all">
+            <code className="break-all font-mono text-cyan-glow text-xs">
               {r.type}
             </code>
             <span className="text-muted-foreground text-sm">{r.desc}</span>
@@ -203,11 +169,11 @@ function PropsTable({
 
 function TypesList({ rows }: { rows: { name: string; desc: string }[] }) {
   return (
-    <div className="rounded-lg border border-white/10 divide-y divide-white/5 overflow-hidden">
+    <div className="divide-y divide-white/5 overflow-hidden rounded-lg border border-white/10">
       {rows.map((r) => (
         <div
           key={r.name}
-          className="grid grid-cols-1 sm:grid-cols-[minmax(10rem,auto)_1fr] gap-x-4 gap-y-1 px-4 py-3 text-sm"
+          className="grid grid-cols-1 gap-x-4 gap-y-1 px-4 py-3 text-sm sm:grid-cols-[minmax(10rem,auto)_1fr]"
         >
           <code className="font-mono text-foreground">{r.name}</code>
           <span className="text-muted-foreground">{r.desc}</span>

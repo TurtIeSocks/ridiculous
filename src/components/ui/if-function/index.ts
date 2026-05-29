@@ -14,7 +14,6 @@ export {
   IfFunctionPanel,
   IfPreview,
 } from "./if-function"
-export type { ParseResult } from "./if-function.helpers"
 export {
   branchCount,
   branchToCss,

@@ -29,17 +29,14 @@ function parseNumericResult(
   value: string,
   unit: string,
 ): { value: number; ok: boolean } {
-  // Reject when the value isn't an empty-string AND doesn't end with the
-  // declared unit suffix. parseFloat would otherwise silently accept e.g.
-  // "45px" for unit="deg" (parses leading digits, drops trailing chars).
+  // Reject a wrong suffix: parseFloat("45px") would silently accept it for unit="deg".
   if (value !== "" && unit !== "" && !value.endsWith(unit)) {
     return { value: 0, ok: false }
   }
   const stripped = value.endsWith(unit) ? value.slice(0, -unit.length) : value
   const n = Number.parseFloat(stripped)
   if (Number.isNaN(n)) return { value: 0, ok: false }
-  // Final guard: the stripped portion must be entirely numeric. parseFloat
-  // accepts trailing garbage; we don't.
+  // Reject trailing garbage that parseFloat would otherwise tolerate.
   if (!/^-?\d+(\.\d+)?$/.test(stripped)) return { value: 0, ok: false }
   return { value: n, ok: true }
 }
@@ -56,7 +53,7 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
   unit,
   min,
   max,
-  step: props_step = 1,
+  step = 1,
   precision = 0,
   dragSensitivity = 1,
   prefix,
@@ -99,13 +96,15 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
     direction: 1 | -1,
     modifier: { shift: boolean; alt: boolean },
   ) => {
-    const stepProp = props_step
     const multiplier = modifier.shift ? 10 : modifier.alt ? 0.1 : 1
-    const delta = stepProp * multiplier * direction
-    const base =
-      rawDraft !== null
-        ? Number.parseFloat(rawDraft) || parsedFromValue
-        : parsedFromValue
+    const delta = step * multiplier * direction
+    let base = parsedFromValue
+    if (rawDraft !== null) {
+      // Use the live draft as the step base, but only when it's a real number.
+      // A bare `|| parsedFromValue` would discard a legit "0" (0 is falsy).
+      const p = Number.parseFloat(rawDraft)
+      base = Number.isNaN(p) ? parsedFromValue : p
+    }
     commit(String(base + delta))
   }
 
@@ -148,10 +147,8 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
 
   const rafPendingRef = React.useRef(false)
 
-  // `commit` and the scrub-arithmetic closures over props are rebuilt every
-  // render. Stash the latest scrub-step calculator in a ref so the window-
-  // level listeners can stay registered with an empty dep array — otherwise
-  // we'd thrash the addEventListener/removeEventListener pair on every render.
+  // Hold the latest move-handler in a ref so the window listeners can register
+  // once (empty deps) instead of re-binding on every render.
   const scrubMoveRef = React.useRef<(event: PointerEvent) => void>(() => {})
   scrubMoveRef.current = (event: PointerEvent) => {
     if (!scrubRef.current.active) return
@@ -171,13 +168,12 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
         scrubRef.current.hasCommitted &&
         (prevShift !== newShift || prevAlt !== newAlt)
       ) {
-        // Snap the anchor forward by the already-applied delta under the prior
-        // modifier, then zero deltaPx so the new modifier applies only to motion
-        // from this frame onwards. Prevents the retroactive-multiplier jump.
+        // Fold accumulated delta into the anchor under the old multiplier, then
+        // zero it — so the new modifier never retroactively rescales past motion.
         const prevMul = prevShift ? 10 : prevAlt ? 0.1 : 1
         scrubRef.current.anchor =
           scrubRef.current.anchor +
-          scrubRef.current.deltaPx * props_step * dragSensitivity * prevMul
+          scrubRef.current.deltaPx * step * dragSensitivity * prevMul
         scrubRef.current.deltaPx = 0
       }
       scrubRef.current.appliedShift = newShift
@@ -186,7 +182,7 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
       const multiplier = newShift ? 10 : newAlt ? 0.1 : 1
       const next =
         scrubRef.current.anchor +
-        scrubRef.current.deltaPx * props_step * dragSensitivity * multiplier
+        scrubRef.current.deltaPx * step * dragSensitivity * multiplier
       commit(String(next))
     })
   }
@@ -227,7 +223,7 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
       <span
         data-slot="unit-input-suffix"
         className={cn(
-          "select-none bg-muted/50 px-2 flex items-center text-xs font-mono text-muted-foreground",
+          "flex select-none items-center bg-muted/50 px-2 font-mono text-muted-foreground text-xs",
           disabled ? "cursor-not-allowed" : "cursor-ew-resize",
         )}
         aria-hidden="true"
@@ -245,7 +241,7 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
     <div
       data-slot="unit-input"
       className={cn(
-        "inline-flex items-stretch h-7 rounded-md border border-input bg-background overflow-hidden focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1",
+        "inline-flex h-7 items-stretch overflow-hidden rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-1",
         disabled && "opacity-50",
         className,
       )}
@@ -253,7 +249,7 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
       {prefix ? (
         <div
           data-slot="unit-input-prefix"
-          className="flex items-center px-2 bg-muted/50 border-r border-input"
+          className="flex items-center border-input border-r bg-muted/50 px-2"
         >
           {prefix}
         </div>
@@ -265,7 +261,7 @@ export function UnitInput<TUnit extends KnownUnit | (string & {})>({
         onChange={(e) => setRawDraft(e.target.value)}
         onBlur={(e) => commit(e.target.value)}
         onKeyDown={onKeyDown}
-        className="border-0 rounded-none bg-transparent px-2 font-mono text-xs h-full focus-visible:ring-0 focus-visible:ring-offset-0 shadow-none"
+        className="h-full rounded-none border-0 bg-transparent px-2 font-mono text-xs shadow-none focus-visible:ring-0 focus-visible:ring-offset-0"
       />
       <div className="w-px bg-input" aria-hidden="true" />
       {suffixNode}

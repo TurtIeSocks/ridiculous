@@ -6,6 +6,9 @@ import {
   FontEditor,
   type FontString,
 } from "@/components/ui/font-editor"
+import { CodeBlock } from "@/examples/_shared/code-block"
+import { ExampleCard } from "@/examples/_shared/example-card"
+import { ValueReadout } from "@/examples/_shared/value-readout"
 
 // Compile-time ordered parse. These calls are validated by tsc:
 const valid = cssFont("italic bold 16px/1.5 'Inter', sans-serif")
@@ -25,59 +28,53 @@ void _varFont
 export function TierStrict() {
   const [value, setValue] = useState<FontString>(valid)
   return (
-    <div className="glass-card flex flex-col rounded-2xl p-6">
-      <div className="flex items-baseline justify-between">
-        <div className="font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
-          <span className="text-gradient">03</span> strict
-        </div>
-        <span className="font-mono text-[10px] text-muted-foreground/60">
-          FontLiteral&lt;S&gt;
-        </span>
-      </div>
-      <h3 className="mt-3 font-semibold text-lg tracking-tight">
-        The ordered grammar at compile time
-      </h3>
-      <p className="mt-2 text-muted-foreground text-sm">
-        <code className="text-foreground">cssFont()</code> parses the prefix,
-        size, optional line-height and family in order and resolves a missing
-        size, missing family, or duplicate prefix kind to{" "}
-        <code className="text-foreground">never</code> — a type error before you
-        run the code.
-      </p>
+    <ExampleCard
+      tierIndex={3}
+      tierLabel="strict"
+      typeBadge={<>FontLiteral&lt;S&gt;</>}
+      title="The ordered grammar at compile time"
+      description={
+        <>
+          <code className="text-foreground">cssFont()</code> parses the prefix,
+          size, optional line-height and family in order and resolves a missing
+          size, missing family, or duplicate prefix kind to{" "}
+          <code className="text-foreground">never</code> — a type error before
+          you run the code.
+        </>
+      }
+    >
       <div className="mt-5 flex items-center gap-2">
         <FontEditor value={value} onChange={setValue} />
-        <code className="min-w-0 flex-1 truncate rounded-md border border-white/10 bg-black/40 px-2.5 py-1 font-mono text-xs">
-          {value}
-        </code>
+        <ValueReadout value={value} />
       </div>
-      <pre className="mt-6 overflow-x-auto rounded-lg border border-white/10 bg-black/40 p-4 font-mono text-[11px] leading-relaxed">
-        <span className="text-cyan-glow">cssFont</span>(
-        <span className="text-emerald-400">
-          &quot;italic bold 16px/1.5 serif&quot;
-        </span>
-        ) <span className="text-muted-foreground/70">{"// ✓"}</span>
-        {"\n"}
-        <span className="text-muted-foreground/70">
-          {"// @ts-expect-error no font-family"}
-        </span>
-        {"\n"}
-        <span className="text-cyan-glow">cssFont</span>(
-        <span className="text-destructive">&quot;16px&quot;</span>){"\n"}
-        <span className="text-muted-foreground/70">
-          {"// @ts-expect-error two style tokens"}
-        </span>
-        {"\n"}
-        <span className="text-cyan-glow">cssFont</span>(
-        <span className="text-destructive">
-          &quot;italic oblique 16px serif&quot;
-        </span>
-        )
-      </pre>
+      <CodeBlock
+        className="mt-6"
+        tokens={[
+          { kind: "fn", text: "cssFont" },
+          { kind: "plain", text: "(" },
+          { kind: "str", text: '"italic bold 16px/1.5 serif"' },
+          { kind: "plain", text: ") " },
+          { kind: "com", text: "// ✓" },
+          { kind: "plain", text: "\n" },
+          { kind: "com", text: "// @ts-expect-error no font-family" },
+          { kind: "plain", text: "\n" },
+          { kind: "fn", text: "cssFont" },
+          { kind: "plain", text: "(" },
+          { kind: "err", text: '"16px"' },
+          { kind: "plain", text: ")\n" },
+          { kind: "com", text: "// @ts-expect-error two style tokens" },
+          { kind: "plain", text: "\n" },
+          { kind: "fn", text: "cssFont" },
+          { kind: "plain", text: "(" },
+          { kind: "err", text: '"italic oblique 16px serif"' },
+          { kind: "plain", text: ")" },
+        ]}
+      />
       <p className="mt-3 text-muted-foreground/70 text-xs">
         Note: <code className="font-mono">var()</code> /{" "}
         <code className="font-mono">calc()</code> are undecidable at compile
         time — use the casual or IntelliSense tier for those.
       </p>
-    </div>
+    </ExampleCard>
   )
 }

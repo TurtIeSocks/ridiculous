@@ -5,6 +5,7 @@ import type {
   GradientStop,
   GradientString,
   GradientType,
+  InternalStop,
   InterpolationHueMethod,
   InterpolationSpace,
   LinearGradientString,
@@ -12,9 +13,13 @@ import type {
   RadialGradientString,
 } from "./gradient-editor.types"
 
+let stopIdSeq = 0
+/** Monotonic id for a freshly-born stop — a stable React key across re-sorts. */
+export const nextStopId = (): string => `gs-${stopIdSeq++}`
+
 export interface InternalState {
   type: GradientType
-  stops: GradientStop[]
+  stops: InternalStop[]
   /** Linear only. Degrees, 0 = to top, 90 = to right, 180 = to bottom (CSS default), 270 = to left. */
   angle: number
   /** Radial only. */
@@ -136,7 +141,7 @@ export function parseStop(
   if (splitAt !== -1) {
     const tail = trimmed.slice(splitAt + 1).trim()
     if (tail.endsWith("%")) {
-      const n = parseFloat(tail.slice(0, -1))
+      const n = Number.parseFloat(tail.slice(0, -1))
       if (!Number.isNaN(n)) {
         colorPart = trimmed.slice(0, splitAt).trim()
         positionPart = tail
@@ -147,7 +152,7 @@ export function parseStop(
   if (parseColor(colorPart) == null) return null
   return {
     color: colorPart as ColorString,
-    position: positionPart == null ? null : parseFloat(positionPart),
+    position: positionPart == null ? null : Number.parseFloat(positionPart),
   }
 }
 
@@ -268,7 +273,7 @@ export function parseGradient(value: string): InternalState | null {
       angle = SIDE_TO_ANGLE[prelude]
     } else {
       const m = prelude.match(/^(-?\d+(?:\.\d+)?)deg$/)
-      if (m) angle = parseFloat(m[1])
+      if (m) angle = Number.parseFloat(m[1])
       else return null
     }
     preludeIndex = 1
@@ -302,7 +307,7 @@ export function parseGradient(value: string): InternalState | null {
       i++
       const m = tokens[i++].match(/^(-?\d+(?:\.\d+)?)deg$/)
       if (!m) return null
-      fromAngle = parseFloat(m[1])
+      fromAngle = Number.parseFloat(m[1])
     }
     if (tokens[i] === "at") {
       i++
@@ -327,7 +332,8 @@ export function parseGradient(value: string): InternalState | null {
 
   // Auto-distribute positions when null.
   const count = validStops.length
-  const stops: GradientStop[] = validStops.map((raw, i) => ({
+  const stops: InternalStop[] = validStops.map((raw, i) => ({
+    id: nextStopId(),
     color: raw.color,
     position: raw.position != null ? raw.position : (i / (count - 1)) * 100,
   }))
@@ -347,7 +353,7 @@ export function parseGradient(value: string): InternalState | null {
 function parsePercent(input: string | undefined): number | null {
   if (!input) return null
   if (!input.endsWith("%")) return null
-  const n = parseFloat(input.slice(0, -1))
+  const n = Number.parseFloat(input.slice(0, -1))
   return Number.isNaN(n) ? null : n
 }
 
@@ -377,7 +383,9 @@ export function isGradientString(value: string): boolean {
  * `radial-gradient(in oklch, ellipse at 50% 50%, …)` as invalid syntax;
  * the correct form is `radial-gradient(ellipse at 50% 50% in oklch, …)`.
  */
-export function formatGradient(state: InternalState): string {
+export function formatGradient(
+  state: Omit<InternalState, "stops"> & { stops: GradientStop[] },
+): string {
   const interpToken = formatInterpolation(state.interpolation)
   const stops = state.stops.map(formatStop).join(", ")
   const joinInterp = (positional: string) =>

@@ -138,6 +138,15 @@ export function boxShadowLayerCount(src: string): number {
 // defaultLayer — seed a fresh layer
 // ---------------------------------------------------------------------------
 
+/**
+ * The canonical soft-drop-shadow color. A single source of truth for the
+ * default-layer seed and the preview's auto-generated elevation layer (both
+ * a 25%-opacity black). NOTE: the per-row "+ color" affordance seeds a more
+ * opaque `rgb(0 0 0 / 0.5)` on purpose — that is an explicit, user-visible
+ * color, distinct from this implicit default.
+ */
+export const DEFAULT_SHADOW_COLOR = "rgb(0 0 0 / 0.25)"
+
 /** A sensible default layer — a soft drop shadow. */
 export function defaultLayer(): ShadowLayer {
   return {
@@ -145,7 +154,7 @@ export function defaultLayer(): ShadowLayer {
     offsetX: "0px",
     offsetY: "4px",
     blur: "8px",
-    color: "rgb(0 0 0 / 0.25)",
+    color: DEFAULT_SHADOW_COLOR,
   }
 }
 
@@ -171,13 +180,4 @@ export function layerToCss(layer: ShadowLayer): string {
 export function formatBoxShadow(layers: ShadowLayer[]): string {
   if (layers.length === 0) return "none"
   return layers.map(layerToCss).join(", ")
-}
-
-// ---------------------------------------------------------------------------
-// ParseResult facade
-// ---------------------------------------------------------------------------
-
-export interface ParseResult {
-  layers: ShadowLayer[] | null
-  error: string | null
 }

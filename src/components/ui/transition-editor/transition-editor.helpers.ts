@@ -65,11 +65,34 @@ function splitTokens(layer: string): string[] {
 // ---------------------------------------------------------------------------
 
 // A <time> token (Ns / Nms) OR an opaque math function kept verbatim.
-const TIME_RE = /^-?[\d.]+(s|ms)$/i
 const OPAQUE_FN_RE = /^(calc|var|min|max|clamp|env)\(/i
 
+/** Time unit suffix for a CSS <time>. */
+export type TimeUnit = "ms" | "s"
+
+// The single <time> grammar shared by every call site (classifier, the editing
+// field's number+unit split, and the ms-conversion in the preview). Numeric
+// part is a well-formed signed decimal; the unit is captured separately. The
+// optional numeric part lets the editing field show an in-progress edit.
+const TIME_RE = /^(-?\d*\.?\d*)(ms|s)$/i
+
+/**
+ * Split a CSS `<time>` into its numeric and unit parts, or `null` when the
+ * token is not a `<time>` (e.g. `calc()`, a bare ident, the empty string).
+ * This is the single source of truth for every `<time>` regex in the editor.
+ */
+export function parseTime(
+  value: string,
+): { num: string; unit: TimeUnit } | null {
+  const m = TIME_RE.exec(value)
+  if (m === null) return null
+  return { num: m[1], unit: m[2].toLowerCase() as TimeUnit }
+}
+
 function isTimeish(token: string): boolean {
-  return TIME_RE.test(token) || OPAQUE_FN_RE.test(token)
+  const t = parseTime(token)
+  // A classifiable <time> needs an actual digit (reject a bare unit like `ms`).
+  return (t !== null && /\d/.test(t.num)) || OPAQUE_FN_RE.test(token)
 }
 
 // A bare <number> (no unit) — iteration count.
@@ -310,14 +333,4 @@ export function formatTransition(layers: TransitionLayer[]): string {
 export function formatAnimation(layers: AnimationLayer[]): string {
   if (layers.length === 0) return "none"
   return layers.map(animationLayerToCss).join(", ")
-}
-
-// ---------------------------------------------------------------------------
-// ParseResult facade (mirrors box-shadow-editor)
-// ---------------------------------------------------------------------------
-
-export interface ParseResult {
-  transition: TransitionLayer[] | null
-  animation: AnimationLayer[] | null
-  error: string | null
 }

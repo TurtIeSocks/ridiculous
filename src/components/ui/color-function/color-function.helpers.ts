@@ -61,6 +61,9 @@ export const RELATIVE_FNS = [
   "color",
 ] as const
 
+/** Default mix weight (percent) — the midpoint a fresh ratio seeds to. */
+export const DEFAULT_PCT = 50
+
 /** Channel keywords per relative-color function (destination space). */
 export const CHANNEL_KEYWORDS: Record<
   string,
@@ -311,13 +314,4 @@ export function defaultState(mode: ColorFunctionMode): ColorFunctionState {
     case "light-dark":
       return { kind: "light-dark", light: "#ffffff", dark: "#000000" }
   }
-}
-
-// ---------------------------------------------------------------------------
-// ParseResult facade (matches sibling helpers)
-// ---------------------------------------------------------------------------
-
-export interface ParseResult {
-  state: ColorFunctionState | null
-  error: string | null
 }

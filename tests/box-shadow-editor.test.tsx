@@ -236,6 +236,36 @@ describe("ShadowLengthEditor — opaque values", () => {
     expect(input).toHaveValue("calc(2px + 1px)")
     expect(screen.queryByLabelText("offset-x unit")).not.toBeInTheDocument()
   })
+
+  test("a scientific-notation length splits into number + unit", () => {
+    const onChange = vi.fn()
+    render(
+      <ShadowLengthEditor label="blur" value="1e3px" onChange={onChange} />,
+    )
+    // the exponent value is recognized as a number, so a unit select is shown
+    expect(screen.getByLabelText("blur unit")).toBeInTheDocument()
+    // re-picking the same unit preserves the numeric part (no data loss)
+    fireEvent.change(screen.getByLabelText("blur unit"), {
+      target: { value: "px" },
+    })
+    expect(onChange).toHaveBeenCalledWith("1e3px")
+  })
+
+  test("a digitless value (lone sign) is opaque and never emits a bare unit", () => {
+    const onChange = vi.fn()
+    render(
+      <ShadowLengthEditor label="offset-x" value="-" onChange={onChange} />,
+    )
+    // no unit select for a digitless token — it is shown raw
+    expect(screen.queryByLabelText("offset-x unit")).not.toBeInTheDocument()
+    expect(screen.getByLabelText("offset-x")).toHaveValue("-")
+  })
+
+  test("a bare unit string is opaque (not split into an empty number)", () => {
+    render(<ShadowLengthEditor label="blur" value="px" onChange={() => {}} />)
+    expect(screen.queryByLabelText("blur unit")).not.toBeInTheDocument()
+    expect(screen.getByLabelText("blur")).toHaveValue("px")
+  })
 })
 
 describe("AddLayerButton", () => {
@@ -269,7 +299,7 @@ describe("BoxShadowPreview", () => {
     const onChange = vi.fn()
     render(<BoxShadowPreview value="0px 4px 8px #000" onChange={onChange} />)
     stubRect(screen.getByTestId("box-shadow-stage"))
-    const light = screen.getByRole("slider", { name: /light source/i })
+    const light = screen.getByRole("application", { name: /light source/i })
     // press at the top-left corner, then drag to the bottom-right corner.
     fireEvent.pointerDown(light, { clientX: 0, clientY: 0, pointerId: 1 })
     fireEvent.pointerMove(window, { clientX: 200, clientY: 200, pointerId: 1 })
@@ -283,7 +313,7 @@ describe("BoxShadowPreview", () => {
   test("arrow keys nudge the light and re-cast offsets", () => {
     const onChange = vi.fn()
     render(<BoxShadowPreview value="0px 0px 8px #000" onChange={onChange} />)
-    const light = screen.getByRole("slider", { name: /light source/i })
+    const light = screen.getByRole("application", { name: /light source/i })
     fireEvent.keyDown(light, { key: "ArrowRight" })
     expect(onChange).toHaveBeenCalled()
     const last = onChange.mock.calls[onChange.mock.calls.length - 1][0]
@@ -294,7 +324,7 @@ describe("BoxShadowPreview", () => {
   test("every arrow direction nudges; a non-arrow key is a no-op", () => {
     const onChange = vi.fn()
     render(<BoxShadowPreview value="0px 0px 8px #000" onChange={onChange} />)
-    const light = screen.getByRole("slider", { name: /light source/i })
+    const light = screen.getByRole("application", { name: /light source/i })
     for (const key of ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]) {
       fireEvent.keyDown(light, { key })
     }
@@ -317,7 +347,7 @@ describe("BoxShadowPreview", () => {
       />,
     )
     stubRect(screen.getByTestId("box-shadow-stage"))
-    const light = screen.getByRole("slider", { name: /light source/i })
+    const light = screen.getByRole("application", { name: /light source/i })
     fireEvent.pointerDown(light, { clientX: 0, clientY: 0, pointerId: 1 })
     fireEvent.pointerMove(window, { clientX: 200, clientY: 200, pointerId: 1 })
     const last = onChange.mock.calls[onChange.mock.calls.length - 1][0]
@@ -351,15 +381,30 @@ describe("BoxShadowPreview", () => {
   test("renders no controls when onChange is omitted", () => {
     render(<BoxShadowPreview value="0px 4px 8px #000" />)
     expect(
-      screen.queryByRole("slider", { name: /light source/i }),
+      screen.queryByRole("application", { name: /light source/i }),
     ).not.toBeInTheDocument()
     expect(screen.queryByLabelText(/elevation/i)).not.toBeInTheDocument()
+  })
+
+  test("the light source is a 2-D control that names both axes", () => {
+    render(<BoxShadowPreview value="0px 4px 8px #000" onChange={() => {}} />)
+    const light = screen.getByRole("application", { name: /light source/i })
+    // a 2-D control: the accessible name names BOTH the x and y dimensions
+    // (a single-axis aria-valuenow would be misleading, so it is omitted)
+    const name = light.getAttribute("aria-label") ?? ""
+    expect(name).toMatch(/x\b/i)
+    expect(name).toMatch(/y\b/i)
+    expect(light).not.toHaveAttribute("aria-valuenow")
+    // it carries a role description naming the widget pattern, and — being a
+    // <button> — is natively keyboard-focusable
+    expect(light).toHaveAttribute("aria-roledescription", "2D light position")
+    expect(light.tagName).toBe("BUTTON")
   })
 
   test("value='none' still shows a draggable light (default position)", () => {
     const onChange = vi.fn()
     render(<BoxShadowPreview value="none" onChange={onChange} />)
-    const light = screen.getByRole("slider", { name: /light source/i })
+    const light = screen.getByRole("application", { name: /light source/i })
     expect(light).toBeInTheDocument()
     // dragging from none produces a single freshly-cast layer
     stubRect(screen.getByTestId("box-shadow-stage"))
@@ -393,7 +438,7 @@ describe("BoxShadowPreview", () => {
     render(
       <BoxShadowPreview value="-12px -12px 8px #000" onChange={() => {}} />,
     )
-    const light = screen.getByRole("slider", { name: /light source/i })
+    const light = screen.getByRole("application", { name: /light source/i })
     // light vector inverts the negative offset → past center (>50%)
     expect(light.style.left).not.toBe("30%")
   })
@@ -420,7 +465,7 @@ describe("BoxShadowEditorPanel — resync + preview write-back", () => {
       <BoxShadowEditorPanel value="0px 4px 8px #000" onChange={onChange} />,
     )
     stubRect(screen.getByTestId("box-shadow-stage"))
-    const light = screen.getByRole("slider", { name: /light source/i })
+    const light = screen.getByRole("application", { name: /light source/i })
     fireEvent.pointerDown(light, { clientX: 0, clientY: 0, pointerId: 1 })
     fireEvent.pointerMove(window, { clientX: 200, clientY: 200, pointerId: 1 })
     expect(onChange).toHaveBeenCalled()

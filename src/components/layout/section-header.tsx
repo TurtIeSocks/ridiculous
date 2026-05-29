@@ -17,10 +17,10 @@ export function SectionHeader({
 }: SectionHeaderProps) {
   return (
     <div className={cn(className)} id={id}>
-      <div className="text-xs font-mono uppercase tracking-[0.18em] text-muted-foreground">
+      <div className="font-mono text-muted-foreground text-xs uppercase tracking-[0.18em]">
         <span className="text-gradient">/</span> {eyebrow}
       </div>
-      <h2 className="mt-3 text-3xl md:text-4xl font-bold tracking-tight">
+      <h2 className="mt-3 font-bold text-3xl tracking-tight md:text-4xl">
         {title}
       </h2>
       {description ? (

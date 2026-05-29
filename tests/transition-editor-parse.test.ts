@@ -4,6 +4,7 @@ import {
   defaultTransitionLayer,
   layerCount,
   parseAnimation,
+  parseTime,
   parseTransition,
 } from "@/components/ui/transition-editor/transition-editor.helpers"
 import type {
@@ -104,6 +105,23 @@ describe("parseTransition", () => {
     expect(parseTransition("opacity 200ms @x")).toBeNull()
   })
 
+  test("accepts a negative <time> and a leading-dot <time>", () => {
+    expect(mustParseT("opacity -200ms")).toEqual([
+      { property: "opacity", duration: "-200ms" },
+    ])
+    expect(mustParseT("opacity .5s")).toEqual([
+      { property: "opacity", duration: ".5s" },
+    ])
+  })
+
+  test("rejects a malformed multi-dot <time> (unified parseTime grammar)", () => {
+    // The single `parseTime` helper requires a well-formed signed decimal
+    // (`-?\d*\.?\d*`), so a multi-dot token like `1.2.3ms` is not a <time>;
+    // it then fails ident validation and the whole layer is rejected. (The
+    // prior classifier used a looser `[\d.]+` that accepted this.)
+    expect(parseTransition("opacity 1.2.3ms")).toBeNull()
+  })
+
   test("a list with any invalid layer is null", () => {
     expect(parseTransition("opacity 200ms, color 200ms 100ms 50ms")).toBeNull()
   })
@@ -166,6 +184,28 @@ describe("parseAnimation", () => {
     expect(parseAnimation("spin 1s 2 3")).toBeNull()
     expect(parseAnimation("spin alternate reverse")).toBeNull()
     expect(parseAnimation("spin 1s up")).toBeNull()
+  })
+})
+
+// ===========================================================================
+// parseTime — the single <time> splitter shared by every call site
+// ===========================================================================
+
+describe("parseTime", () => {
+  test("splits a <time> into numeric + lowercased unit", () => {
+    expect(parseTime("200ms")).toEqual({ num: "200", unit: "ms" })
+    expect(parseTime("0.3s")).toEqual({ num: "0.3", unit: "s" })
+    expect(parseTime("0.3S")).toEqual({ num: "0.3", unit: "s" })
+    expect(parseTime("-1.5s")).toEqual({ num: "-1.5", unit: "s" })
+    expect(parseTime(".5s")).toEqual({ num: ".5", unit: "s" })
+  })
+
+  test("returns null for non-<time> tokens", () => {
+    expect(parseTime("")).toBeNull()
+    expect(parseTime("calc(1s)")).toBeNull()
+    expect(parseTime("ease")).toBeNull()
+    expect(parseTime("1.2.3ms")).toBeNull()
+    expect(parseTime("200")).toBeNull() // no unit
   })
 })
 

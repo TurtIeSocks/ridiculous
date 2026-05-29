@@ -115,18 +115,19 @@ export function CalcEditorPanel<TFn extends CalcFn | undefined = undefined>({
   className,
   "aria-label": ariaLabel = "CSS math value editor",
 }: CalcEditorPanelProps<TFn>) {
-  const initialFn = detectFn(value) ?? fnProp ?? "calc"
+  const initialFn = fnProp ?? detectFn(value) ?? "calc"
   const [activeFn, setActiveFn] = useState<CalcFn>(initialFn)
   const [expr, setExpr] = useState<string>(value)
   const lastEmittedRef = useRef<string | null>(null)
 
-  // Resync from external value (skip our own emits).
+  // Resync from external value (skip our own emits). A locked `fnProp` pins the
+  // active function, so only auto-switch the tab when there is no lock.
   useEffect(() => {
     if (value === lastEmittedRef.current) return
     setExpr(value)
     const detected = detectFn(value)
-    if (detected) setActiveFn(detected)
-  }, [value])
+    if (!fnProp && detected) setActiveFn(detected)
+  }, [value, fnProp])
 
   const result = evaluateCalc(expr)
   const valid = result.error === null && result.dimension !== null
@@ -154,7 +155,7 @@ export function CalcEditorPanel<TFn extends CalcFn | undefined = undefined>({
   return (
     <fieldset
       className={cn(
-        "w-[460px] space-y-3 border-0 bg-background p-3 m-0",
+        "m-0 w-[460px] space-y-3 border-0 bg-background p-3",
         className,
       )}
       aria-label={ariaLabel}
@@ -262,7 +263,7 @@ export function ExpressionField({
           )}
           aria-invalid={error ? true : undefined}
         />
-        <div className="-translate-y-1/2 absolute top-1/2 right-2">
+        <div className="absolute top-1/2 right-2 -translate-y-1/2">
           <DimensionBadge dimension={dimension ?? null} />
         </div>
       </div>
