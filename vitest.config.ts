@@ -29,6 +29,7 @@ export default defineConfig({
         "src/components/ui/transition-editor/**",
         "src/components/ui/font-editor/**",
         "src/components/ui/color-function/**",
+        "src/components/ui/if-function/**",
       ],
       thresholds: {
         statements: 90,

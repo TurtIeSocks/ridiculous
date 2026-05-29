@@ -489,10 +489,45 @@
       ]
     },
     {
+      "name": "if-function",
+      "type": "registry:ui",
+      "title": "if() Conditional Value",
+      "description": "Ridiculously typed editor for the CSS if() conditional value function (shipped 2025). IfFunctionLiteral<S> validates the if() wrapper (via the kit's ParseFunction), splits the body on TOP-LEVEL semicolons (a local paren-aware splitter — the kit ships none), splits each branch on its FIRST top-level colon (so a colon inside style(--x: 1) is not a split point), checks the condition kind (media()/supports()/style()/else), enforces else-as-last-branch, and requires a non-empty value. Condition bodies are validated leniently (non-empty + balanced parens); the runtime parser does fuller structural work. if(foo(x): 1) resolves to never (unknown kind); if(else: a; media(x): b) resolves to never (else not last). Ships the cssIf call-site helper, parseIf/formatIf/branchToCss/defaultBranch/branchCount helpers, BranchesOf/BranchCountOf/ConditionKindsOf utility types, IfBranch/IfFunctionState internal state, a popover + inline panel, a branch-builder UI, and an if() preview with a cutting-edge browser-support note.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "button",
+        "popover",
+        "input"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/if-function/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/if-function/index.ts"
+        },
+        {
+          "path": "src/components/ui/if-function/if-function.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/if-function/if-function.tsx"
+        },
+        {
+          "path": "src/components/ui/if-function/if-function.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/if-function/if-function.types.ts"
+        },
+        {
+          "path": "src/components/ui/if-function/if-function.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/if-function/if-function.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, and color-function in one command.",
+      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, and if-function in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -507,7 +542,8 @@
         "https://turtiesocks.github.io/ridiculous/r/box-shadow-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/transition-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/font-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/color-function.json"
+        "https://turtiesocks.github.io/ridiculous/r/color-function.json",
+        "https://turtiesocks.github.io/ridiculous/r/if-function.json"
       ],
       "dependencies": [],
       "files": []

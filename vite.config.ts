@@ -63,6 +63,7 @@ export default defineConfig({
           __dirname,
           "pages/color-function/index.html",
         ),
+        "if-function": path.resolve(__dirname, "pages/if-function/index.html"),
       },
     },
   },
