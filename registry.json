@@ -37,7 +37,7 @@
       "name": "color-picker",
       "type": "registry:ui",
       "title": "Color Picker",
-      "description": "Ridiculously typed color picker with oklch L×C pad, hue/alpha strips, and 6-mode round-trip (oklch, oklab, hex, rgb, hsl, hwb).",
+      "description": "Ridiculously typed color picker with oklch L\u00d7C pad, hue/alpha strips, and 6-mode round-trip (oklch, oklab, hex, rgb, hsl, hwb).",
       "registryDependencies": ["button", "popover"],
       "dependencies": [],
       "files": [
@@ -127,7 +127,7 @@
       "name": "easing-picker",
       "type": "registry:ui",
       "title": "Easing Picker",
-      "description": "Ridiculously typed CSS easing function picker — bezier canvas, spring/bounce/wiggle physics baked to linear(), polynomial preset gallery, 6-property animation preview, 3-format output (CSS/Tailwind v3/v4).",
+      "description": "Ridiculously typed CSS easing function picker \u2014 bezier canvas, spring/bounce/wiggle physics baked to linear(), polynomial preset gallery, 6-property animation preview, 3-format output (CSS/Tailwind v3/v4).",
       "registryDependencies": ["button", "popover"],
       "dependencies": [],
       "files": [
@@ -152,7 +152,7 @@
       "name": "calc-editor",
       "type": "registry:ui",
       "title": "Calc Editor",
-      "description": "Ridiculously typed CSS math editor — calc/clamp/min/max with compile-time DIMENSIONAL ANALYSIS (length±length ✓, length±angle ✗, length×length ✗, ÷ by non-number ✗), a full runtime parser/evaluator, and a fluid-type clamp() playground.",
+      "description": "Ridiculously typed CSS math editor \u2014 calc/clamp/min/max with compile-time DIMENSIONAL ANALYSIS (length\u00b1length \u2713, length\u00b1angle \u2717, length\u00d7length \u2717, \u00f7 by non-number \u2717), a full runtime parser/evaluator, and a fluid-type clamp() playground.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "button",
@@ -187,7 +187,7 @@
       "name": "transform-builder",
       "type": "registry:ui",
       "title": "Transform Builder",
-      "description": "Ridiculously typed CSS transform editor — a space-separated function list with compile-time FUNCTION-NAME DISPATCH (per-function arity + per-argument dimension typing: rotate wants an angle, translateX a length-%), a tolerant runtime parser, and a live 3D-preview card driven by the typed string.",
+      "description": "Ridiculously typed CSS transform editor \u2014 a space-separated function list with compile-time FUNCTION-NAME DISPATCH (per-function arity + per-argument dimension typing: rotate wants an angle, translateX a length-%), a tolerant runtime parser, and a live 3D-preview card driven by the typed string.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "button",
@@ -224,7 +224,7 @@
       "name": "filter-builder",
       "type": "registry:ui",
       "title": "Filter Builder",
-      "description": "Ridiculously typed CSS filter / backdrop-filter editor — a space-separated function list with compile-time FUNCTION-LIST DISPATCH (per-function arity + per-argument dimension typing: blur wants a length, hue-rotate an angle, the amount functions a non-negative number or percentage), a drop-shadow whose optional trailing color is validated against the color-picker ColorLiteral, a tolerant runtime parser, and a live image/card preview with a filter ↔ backdrop-filter toggle.",
+      "description": "Ridiculously typed CSS filter / backdrop-filter editor \u2014 a space-separated function list with compile-time FUNCTION-LIST DISPATCH (per-function arity + per-argument dimension typing: blur wants a length, hue-rotate an angle, the amount functions a non-negative number or percentage), a drop-shadow whose optional trailing color is validated against the color-picker ColorLiteral, a tolerant runtime parser, and a live image/card preview with a filter \u2194 backdrop-filter toggle.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "color-picker",
@@ -259,10 +259,47 @@
       ]
     },
     {
+      "name": "grid-builder",
+      "type": "registry:ui",
+      "title": "Grid Builder",
+      "description": "Ridiculously typed CSS grid-template editor \u2014 track lists (grid-template-columns / grid-template-rows) and grid-template-areas across three modes. TrackListLiteral fully validates the track grammar (length/percentage/flex/keywords, minmax with an inflexible-min guard, fit-content, depth-capped repeat with a recursive track list + auto-fill/auto-fit, and [named-line] idents); GridAreasLiteral validates quoting + equal column counts + cell idents at the type level, with the contiguous-rectangle invariant enforced at runtime. Ships a live display:grid preview and a clickable areas painter.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "unit-input",
+        "button",
+        "popover",
+        "input",
+        "label"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/grid-builder/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/grid-builder/index.ts"
+        },
+        {
+          "path": "src/components/ui/grid-builder/grid-builder.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/grid-builder/grid-builder.tsx"
+        },
+        {
+          "path": "src/components/ui/grid-builder/grid-builder.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/grid-builder/grid-builder.types.ts"
+        },
+        {
+          "path": "src/components/ui/grid-builder/grid-builder.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/grid-builder/grid-builder.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, and filter-builder in one command.",
+      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, and grid-builder in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -271,7 +308,8 @@
         "https://turtiesocks.github.io/ridiculous/r/easing-picker.json",
         "https://turtiesocks.github.io/ridiculous/r/calc-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/transform-builder.json",
-        "https://turtiesocks.github.io/ridiculous/r/filter-builder.json"
+        "https://turtiesocks.github.io/ridiculous/r/filter-builder.json",
+        "https://turtiesocks.github.io/ridiculous/r/grid-builder.json"
       ],
       "dependencies": [],
       "files": []

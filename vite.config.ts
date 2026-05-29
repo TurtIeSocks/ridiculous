@@ -42,6 +42,10 @@ export default defineConfig({
           __dirname,
           "pages/filter-builder/index.html",
         ),
+        "grid-builder": path.resolve(
+          __dirname,
+          "pages/grid-builder/index.html",
+        ),
       },
     },
   },
