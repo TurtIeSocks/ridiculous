@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/transition-editor/api-reference"
 import { BasicUsage } from "@/examples/transition-editor/basic-usage"
@@ -10,7 +9,7 @@ import { TierStrict } from "@/examples/transition-editor/tier-strict"
 
 export function TransitionEditorPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="Transition + Animation Editor"
@@ -52,6 +51,6 @@ export function TransitionEditorPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/transition-editor.json" />
       </div>
-    </Layout>
+    </>
   )
 }

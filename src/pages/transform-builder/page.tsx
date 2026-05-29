@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/transform-builder/api-reference"
 import { BasicUsage } from "@/examples/transform-builder/basic-usage"
@@ -10,7 +9,7 @@ import { TierStrict } from "@/examples/transform-builder/tier-strict"
 
 export function TransformBuilderPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="Transform Builder"
@@ -52,6 +51,6 @@ export function TransformBuilderPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/transform-builder.json" />
       </div>
-    </Layout>
+    </>
   )
 }

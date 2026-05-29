@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/if-function/api-reference"
 import { BasicUsage } from "@/examples/if-function/basic-usage"
@@ -10,7 +9,7 @@ import { TierStrict } from "@/examples/if-function/tier-strict"
 
 export function IfFunctionPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="if() Conditional Value"
@@ -52,6 +51,6 @@ export function IfFunctionPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/if-function.json" />
       </div>
-    </Layout>
+    </>
   )
 }

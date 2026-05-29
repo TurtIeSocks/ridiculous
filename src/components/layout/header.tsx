@@ -1,6 +1,5 @@
+import { Link } from "react-router-dom"
 import { MobileSidebarSheet } from "./sidebar"
-
-const BASE = import.meta.env.BASE_URL
 
 function GitHubGlyph({ className = "size-4" }: { className?: string }) {
   return (
@@ -80,12 +79,12 @@ export function CompactHeader() {
   return (
     <header className="sticky top-0 z-20 backdrop-blur-md bg-background/70 border-b border-white/10">
       <div className="container mx-auto max-w-6xl px-6 h-16 flex items-center justify-between gap-3">
-        <a
-          href={BASE}
+        <Link
+          to="/"
           className="text-lg font-extrabold tracking-tight text-gradient"
         >
           ridiculous
-        </a>
+        </Link>
         <div className="flex items-center gap-3">
           <GitHubLink />
           <MobileSidebarSheet>

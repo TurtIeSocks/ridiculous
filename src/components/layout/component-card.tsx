@@ -1,4 +1,4 @@
-const BASE = import.meta.env.BASE_URL
+import { Link } from "react-router-dom"
 
 interface ComponentCardProps {
   name: string
@@ -12,8 +12,8 @@ export function ComponentCard({
   description,
 }: ComponentCardProps) {
   return (
-    <a
-      href={`${BASE}${name}/`}
+    <Link
+      to={`/${name}`}
       className="group glass-card rounded-2xl p-6 transition hover:border-white/20"
     >
       <div className="flex items-start justify-between gap-3">
@@ -26,6 +26,6 @@ export function ComponentCard({
         </span>
       </div>
       <p className="mt-3 text-sm text-muted-foreground">{description}</p>
-    </a>
+    </Link>
   )
 }

@@ -1,6 +1,5 @@
 import { ComponentCard } from "@/components/layout/component-card"
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { TierCasual } from "@/examples/color-picker/tier-casual"
 import { TierIntellisense } from "@/examples/color-picker/tier-intellisense"
@@ -12,7 +11,7 @@ const REGISTRY_TEMPLATE =
 
 export function IndexPage() {
   return (
-    <Layout variant="hero">
+    <>
       <section id="install" className="scroll-mt-24">
         <SectionHeader eyebrow="install" title="Installation" />
         <p className="mt-4 max-w-2xl text-muted-foreground">
@@ -71,6 +70,6 @@ export function IndexPage() {
         <TierIntellisense />
         <TierStrict />
       </div>
-    </Layout>
+    </>
   )
 }
