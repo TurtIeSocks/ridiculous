@@ -59,6 +59,10 @@ export default defineConfig({
           "pages/transition-editor/index.html",
         ),
         "font-editor": path.resolve(__dirname, "pages/font-editor/index.html"),
+        "color-function": path.resolve(
+          __dirname,
+          "pages/color-function/index.html",
+        ),
       },
     },
   },

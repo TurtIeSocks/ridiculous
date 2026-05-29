@@ -28,6 +28,7 @@ export default defineConfig({
         "src/components/ui/box-shadow-editor/**",
         "src/components/ui/transition-editor/**",
         "src/components/ui/font-editor/**",
+        "src/components/ui/color-function/**",
       ],
       thresholds: {
         statements: 90,

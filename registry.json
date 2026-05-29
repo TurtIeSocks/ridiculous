@@ -450,10 +450,49 @@
       ]
     },
     {
+      "name": "color-function",
+      "type": "registry:ui",
+      "title": "Color Function",
+      "description": "Ridiculously typed editor for the modern CSS color functions, dispatching on the leading function name into three independent compile-time grammars. ColorMixLiteral fully validates color-mix(in <space> [<method> hue]?, <color> <pct>?, <color> <pct>?) — the 14-member interpolation colorspace set, with a hue-interpolation method allowed only on the four cylindrical spaces (hsl/hwb/lch/oklch), and exactly two colors with optional percentage weights. LightDarkLiteral validates light-dark(<color>, <color>). RelativeColorLiteral validates <fn>(from <color> <c1> <c2> <c3> [/ <alpha>]?) for rgb/hsl/hwb/lab/lch/oklab/oklch/color with PER-SPACE channel-keyword strictness (oklch -> l c h, rgb -> r g b) — so oklch(from #f00 r g b) resolves to never. var() is accepted wherever a <color> is expected; calc() channel bodies and channel magnitudes are weak-validated, and a bare color like rgb(255 0 0) resolves to never (color-picker's domain). Reuses color-picker's ColorLiteral and ColorPicker UI. Ships the cssColorFn call-site helper, parseColorFunction/formatColorFunction, and a result-swatch preview with a light-dark color-scheme toggle.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "color-picker",
+        "button",
+        "popover",
+        "input",
+        "label",
+        "select",
+        "slider"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/color-function/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/color-function/index.ts"
+        },
+        {
+          "path": "src/components/ui/color-function/color-function.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-function/color-function.tsx"
+        },
+        {
+          "path": "src/components/ui/color-function/color-function.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/color-function/color-function.types.ts"
+        },
+        {
+          "path": "src/components/ui/color-function/color-function.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/color-function/color-function.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, and font-editor in one command.",
+      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, and color-function in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -467,7 +506,8 @@
         "https://turtiesocks.github.io/ridiculous/r/clip-path-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/box-shadow-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/transition-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/font-editor.json"
+        "https://turtiesocks.github.io/ridiculous/r/font-editor.json",
+        "https://turtiesocks.github.io/ridiculous/r/color-function.json"
       ],
       "dependencies": [],
       "files": []
