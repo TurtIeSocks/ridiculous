@@ -4,6 +4,36 @@
   "homepage": "https://turtiesocks.github.io/ridiculous",
   "items": [
     {
+      "name": "ridiculous-type-kit",
+      "type": "registry:lib",
+      "title": "Ridiculous Type Kit",
+      "description": "Shared template-literal type machinery: char/number primitives, CSS dimension validators (IsLength/IsAngle/IsTime/...), DimensionOf, and paren-aware parser combinators powering every ridiculous component.",
+      "dependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "src/lib/ridiculous-type-kit/index.ts",
+          "type": "registry:lib",
+          "target": "lib/ridiculous-type-kit/index.ts"
+        },
+        {
+          "path": "src/lib/ridiculous-type-kit/primitives.ts",
+          "type": "registry:lib",
+          "target": "lib/ridiculous-type-kit/primitives.ts"
+        },
+        {
+          "path": "src/lib/ridiculous-type-kit/dimensions.ts",
+          "type": "registry:lib",
+          "target": "lib/ridiculous-type-kit/dimensions.ts"
+        },
+        {
+          "path": "src/lib/ridiculous-type-kit/combinators.ts",
+          "type": "registry:lib",
+          "target": "lib/ridiculous-type-kit/combinators.ts"
+        }
+      ]
+    },
+    {
       "name": "color-picker",
       "type": "registry:ui",
       "title": "Color Picker",
@@ -124,6 +154,7 @@
       "title": "All ridiculous components",
       "description": "Bundle — installs color-picker, gradient-editor, unit-input, and easing-picker in one command.",
       "registryDependencies": [
+        "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
         "https://turtiesocks.github.io/ridiculous/r/unit-input.json",
         "https://turtiesocks.github.io/ridiculous/r/gradient-editor.json",
