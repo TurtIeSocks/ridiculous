@@ -26,7 +26,7 @@ export function FilterBuilderPage() {
         title="Three usage tiers"
         description="From useState-and-go to per-function dimension-typed dispatch."
       />
-      <div className="mt-12 grid gap-6 md:grid-cols-3">
+      <div className="mt-12 space-y-6">
         <TierCasual />
         <TierIntellisense />
         <TierStrict />
