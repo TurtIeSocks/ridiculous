@@ -33,6 +33,7 @@ export default defineConfig({
           __dirname,
           "pages/easing-picker/index.html",
         ),
+        "calc-editor": path.resolve(__dirname, "pages/calc-editor/index.html"),
       },
     },
   },
