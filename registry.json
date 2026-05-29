@@ -334,10 +334,49 @@
       ]
     },
     {
+      "name": "box-shadow-editor",
+      "type": "registry:ui",
+      "title": "Box Shadow Editor",
+      "description": "Ridiculously typed CSS box-shadow editor — a comma-separated list of shadow layers with compile-time PER-LAYER TOKEN VALIDATION. The list splits by comma into layers, each layer by space into tokens; BoxShadowLiteral validates per layer 2-4 lengths (offset-x, offset-y required; blur non-negative; spread optional), at most one inset keyword (leading or trailing), and at most one trailing color checked against the color-picker ColorLiteral. Bare keyword colors and a leading color resolve to never at the strict tier (the runtime parser is tolerant). Ships a tolerant runtime parser and a live preview with a draggable light source that re-casts every layer's offsets plus an elevation scrubber.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "color-picker",
+        "unit-input",
+        "button",
+        "popover",
+        "input",
+        "label",
+        "slider"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/box-shadow-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/box-shadow-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/box-shadow-editor/box-shadow-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/box-shadow-editor/box-shadow-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/box-shadow-editor/box-shadow-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/box-shadow-editor/box-shadow-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/box-shadow-editor/box-shadow-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/box-shadow-editor/box-shadow-editor.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, and clip-path-editor in one command.",
+      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, and box-shadow-editor in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -348,7 +387,8 @@
         "https://turtiesocks.github.io/ridiculous/r/transform-builder.json",
         "https://turtiesocks.github.io/ridiculous/r/filter-builder.json",
         "https://turtiesocks.github.io/ridiculous/r/grid-builder.json",
-        "https://turtiesocks.github.io/ridiculous/r/clip-path-editor.json"
+        "https://turtiesocks.github.io/ridiculous/r/clip-path-editor.json",
+        "https://turtiesocks.github.io/ridiculous/r/box-shadow-editor.json"
       ],
       "dependencies": [],
       "files": []

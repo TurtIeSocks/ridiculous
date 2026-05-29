@@ -25,6 +25,7 @@ export default defineConfig({
         "src/components/ui/filter-builder/**",
         "src/components/ui/grid-builder/**",
         "src/components/ui/clip-path-editor/**",
+        "src/components/ui/box-shadow-editor/**",
       ],
       thresholds: {
         statements: 90,

@@ -50,6 +50,10 @@ export default defineConfig({
           __dirname,
           "pages/clip-path-editor/index.html",
         ),
+        "box-shadow-editor": path.resolve(
+          __dirname,
+          "pages/box-shadow-editor/index.html",
+        ),
       },
     },
   },
