@@ -46,6 +46,10 @@ export default defineConfig({
           __dirname,
           "pages/grid-builder/index.html",
         ),
+        "clip-path-editor": path.resolve(
+          __dirname,
+          "pages/clip-path-editor/index.html",
+        ),
       },
     },
   },
