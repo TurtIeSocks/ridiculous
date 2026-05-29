@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ColorPicker } from "@/components/ui/color-picker"
 import {
@@ -16,16 +16,17 @@ import {
   GRADIENT_TYPES,
   INTERPOLATION_SPACES,
   type InternalState,
+  nextStopId,
   POLAR_SPACES,
   parseGradient,
   toDeg,
   toPct,
 } from "./gradient-editor.helpers"
 import type {
-  GradientStop,
   GradientString,
   GradientStringMap,
   GradientType,
+  InternalStop,
   InterpolationHueMethod,
   InterpolationSpace,
   PolarSpace,
@@ -58,7 +59,7 @@ export function GradientEditor<TType extends GradientType | undefined>({
   className,
   "aria-label": ariaLabel = "Edit gradient",
 }: GradientEditorProps<TType>) {
-  const parsed = parseGradient(value)
+  const parsed = useMemo(() => parseGradient(value), [value])
   if (!parsed) {
     return (
       <span
@@ -184,7 +185,7 @@ function GradientEditorBody({
               // Inherit the last stop's color (fallback to black if somehow empty).
               const newColor =
                 internal.stops[internal.stops.length - 1]?.color ?? "#000000"
-              const newStop = { color: newColor, position }
+              const newStop = { id: nextStopId(), color: newColor, position }
               const stops = [...internal.stops, newStop].sort(
                 (a, b) => a.position - b.position,
               )
@@ -625,9 +626,9 @@ function StopDetailRow({
   onChange,
   onDelete,
 }: {
-  stop: GradientStop
+  stop: InternalStop
   canDelete: boolean
-  onChange: (next: GradientStop) => void
+  onChange: (next: InternalStop) => void
   onDelete: () => void
 }) {
   return (
@@ -773,8 +774,7 @@ function GradientPreview({
       >
         {state.stops.map((stop, i) => (
           <button
-            // biome-ignore lint/suspicious/noArrayIndexKey: stops have no stable id; index is the canonical identity here
-            key={i}
+            key={stop.id}
             type="button"
             aria-label={`Stop ${i + 1} at ${Math.round(stop.position)}%`}
             onClick={() => onSelectStop(i)}

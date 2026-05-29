@@ -5,6 +5,7 @@ import type {
   GradientStop,
   GradientString,
   GradientType,
+  InternalStop,
   InterpolationHueMethod,
   InterpolationSpace,
   LinearGradientString,
@@ -12,9 +13,13 @@ import type {
   RadialGradientString,
 } from "./gradient-editor.types"
 
+let stopIdSeq = 0
+/** Monotonic id for a freshly-born stop — a stable React key across re-sorts. */
+export const nextStopId = (): string => `gs-${stopIdSeq++}`
+
 export interface InternalState {
   type: GradientType
-  stops: GradientStop[]
+  stops: InternalStop[]
   /** Linear only. Degrees, 0 = to top, 90 = to right, 180 = to bottom (CSS default), 270 = to left. */
   angle: number
   /** Radial only. */
@@ -327,7 +332,8 @@ export function parseGradient(value: string): InternalState | null {
 
   // Auto-distribute positions when null.
   const count = validStops.length
-  const stops: GradientStop[] = validStops.map((raw, i) => ({
+  const stops: InternalStop[] = validStops.map((raw, i) => ({
+    id: nextStopId(),
     color: raw.color,
     position: raw.position != null ? raw.position : (i / (count - 1)) * 100,
   }))
@@ -377,7 +383,9 @@ export function isGradientString(value: string): boolean {
  * `radial-gradient(in oklch, ellipse at 50% 50%, …)` as invalid syntax;
  * the correct form is `radial-gradient(ellipse at 50% 50% in oklch, …)`.
  */
-export function formatGradient(state: InternalState): string {
+export function formatGradient(
+  state: Omit<InternalState, "stops"> & { stops: GradientStop[] },
+): string {
   const interpToken = formatInterpolation(state.interpolation)
   const stops = state.stops.map(formatStop).join(", ")
   const joinInterp = (positional: string) =>

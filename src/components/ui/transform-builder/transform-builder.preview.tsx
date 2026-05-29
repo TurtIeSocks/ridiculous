@@ -55,7 +55,9 @@ function applyScrub(
   }
   return items.map((it, i) => {
     if (i !== idx) return it
-    const args = itemArgs(it)
+    // Copy first: itemArgs can return the live array (valuesShape returns
+    // `item.values` by reference), so mutating in place would corrupt state.
+    const args = [...itemArgs(it)]
     args[0] = slot0
     return itemFromArgs(scrub.fn, args)
   })

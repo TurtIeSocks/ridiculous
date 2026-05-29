@@ -107,7 +107,9 @@ export function TimeField({
       <select
         aria-label={`${label} unit`}
         value={unitPart}
-        onChange={(e) => onChange(`${numPart || "0"}${e.target.value}`)}
+        onChange={(e) =>
+          onChange(value === "" ? "" : `${numPart || "0"}${e.target.value}`)
+        }
         className="h-8 rounded-r-md rounded-l-none border border-input bg-background px-1 font-mono text-xs"
       >
         {TIME_UNITS.map((u) => (

@@ -83,3 +83,13 @@ export interface GradientStop {
   /** Position 0..100. */
   position: number
 }
+
+/**
+ * A stop in live editor state, carrying a stable `id` for React keys. The id is
+ * assigned when a stop is born (parsed from a string or added) and travels with
+ * it through re-sorts, so list reconciliation tracks each stop by identity
+ * rather than array index.
+ */
+export interface InternalStop extends GradientStop {
+  id: string
+}
