@@ -38,6 +38,10 @@ export default defineConfig({
           __dirname,
           "pages/transform-builder/index.html",
         ),
+        "filter-builder": path.resolve(
+          __dirname,
+          "pages/filter-builder/index.html",
+        ),
       },
     },
   },

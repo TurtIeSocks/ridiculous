@@ -221,10 +221,48 @@
       ]
     },
     {
+      "name": "filter-builder",
+      "type": "registry:ui",
+      "title": "Filter Builder",
+      "description": "Ridiculously typed CSS filter / backdrop-filter editor — a space-separated function list with compile-time FUNCTION-LIST DISPATCH (per-function arity + per-argument dimension typing: blur wants a length, hue-rotate an angle, the amount functions a non-negative number or percentage), a drop-shadow whose optional trailing color is validated against the color-picker ColorLiteral, a tolerant runtime parser, and a live image/card preview with a filter ↔ backdrop-filter toggle.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "color-picker",
+        "button",
+        "popover",
+        "input",
+        "label",
+        "slider"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/filter-builder/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/filter-builder/index.ts"
+        },
+        {
+          "path": "src/components/ui/filter-builder/filter-builder.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/filter-builder/filter-builder.tsx"
+        },
+        {
+          "path": "src/components/ui/filter-builder/filter-builder.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/filter-builder/filter-builder.types.ts"
+        },
+        {
+          "path": "src/components/ui/filter-builder/filter-builder.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/filter-builder/filter-builder.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, and transform-builder in one command.",
+      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, and filter-builder in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -232,7 +270,8 @@
         "https://turtiesocks.github.io/ridiculous/r/gradient-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/easing-picker.json",
         "https://turtiesocks.github.io/ridiculous/r/calc-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/transform-builder.json"
+        "https://turtiesocks.github.io/ridiculous/r/transform-builder.json",
+        "https://turtiesocks.github.io/ridiculous/r/filter-builder.json"
       ],
       "dependencies": [],
       "files": []

@@ -22,6 +22,7 @@ export default defineConfig({
         "src/components/ui/unit-input/**",
         "src/components/ui/calc-editor/**",
         "src/components/ui/transform-builder/**",
+        "src/components/ui/filter-builder/**",
       ],
       thresholds: {
         statements: 90,
