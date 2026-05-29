@@ -11,4 +11,4 @@
 //   export const cssThing = <S extends string>(v: S & CssThingLiteral<S>): S => v
 // =====================================================================
 
-export type {}
+export type * from "./primitives"
