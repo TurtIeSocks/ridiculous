@@ -573,7 +573,170 @@ export function evaluateCalc(src: string): EvaluateResult {
 }
 
 // ---------------------------------------------------------------------------
-// computeCalc + formatCalc land in Task 3.
+// computeCalc — numeric evaluation where units are resolvable
 // ---------------------------------------------------------------------------
+
+export interface ComputeContext {
+  /** Viewport width in px — resolves vw/vmin/etc. Required. */
+  viewport: number
+  /** Viewport height in px — resolves vh. Defaults to `viewport`. */
+  viewportHeight?: number
+  /** Root font size in px — resolves rem. Defaults to 16. */
+  rootFontSize?: number
+  /** Element font size in px — resolves em. Defaults to `rootFontSize`. */
+  fontSize?: number
+  /** The basis a percentage resolves against. If omitted, `%` blocks compute. */
+  basis?: number
+}
+
+// Resolve a single value literal to px (or its raw number for unitless),
+// or null when it cannot be resolved in this context.
+function resolveLiteral(value: string, ctx: ComputeContext): number | null {
+  const v = value.trim()
+  const root = ctx.rootFontSize ?? 16
+  const fontSize = ctx.fontSize ?? root
+  const vw = ctx.viewport / 100
+  const vh = (ctx.viewportHeight ?? ctx.viewport) / 100
+
+  if (v.endsWith("%")) {
+    const num = Number(v.slice(0, -1))
+    if (!Number.isFinite(num)) return null
+    return ctx.basis === undefined ? null : (num / 100) * ctx.basis
+  }
+
+  const m = v.match(/^([+-]?(?:\d+\.?\d*|\.\d+)(?:[eE][+-]?\d+)?)([a-zA-Z]*)$/)
+  if (!m) {
+    const lower = v.toLowerCase()
+    if (lower === "pi") return Math.PI
+    if (lower === "e") return Math.E
+    if (lower === "infinity") return Number.POSITIVE_INFINITY
+    if (lower === "-infinity") return Number.NEGATIVE_INFINITY
+    if (lower === "nan") return Number.NaN
+    return null
+  }
+  const num = Number(m[1])
+  if (!Number.isFinite(num) && m[2] !== "") return null
+  const unit = m[2].toLowerCase()
+
+  switch (unit) {
+    case "":
+      return num
+    case "px":
+      return num
+    case "rem":
+    case "rlh":
+      return num * root
+    case "em":
+    case "lh":
+      return num * fontSize
+    case "vw":
+    case "vi":
+      return num * vw
+    case "vh":
+    case "vb":
+      return num * vh
+    case "vmin":
+      return num * Math.min(vw, vh)
+    case "vmax":
+      return num * Math.max(vw, vh)
+    case "cm":
+      return num * 96 * (1 / 2.54)
+    case "mm":
+      return num * 96 * (1 / 25.4)
+    case "in":
+      return num * 96
+    case "pt":
+      return num * (96 / 72)
+    case "pc":
+      return num * 16
+    case "q":
+      return num * 96 * (1 / 25.4) * 0.25
+    default:
+      // Unit we don't numerically resolve (deg/s/etc.) — treat as a raw number
+      // for value purposes; dimensional validity is checked separately.
+      return num
+  }
+}
+
+/**
+ * Numerically evaluate an expression to a px value (or unitless number),
+ * resolving units against `ctx`. Returns `null` when a `var()` or an
+ * unresolvable `%` blocks the computation.
+ */
+export function computeCalc(
+  node: CalcNode,
+  ctx: ComputeContext,
+): number | null {
+  switch (node.kind) {
+    case "literal":
+      return resolveLiteral(node.value, ctx)
+    case "var":
+      return null // opaque — cannot compute
+    case "group":
+      return computeCalc(node.inner, ctx)
+    case "binary": {
+      const a = computeCalc(node.left, ctx)
+      if (a === null) return null
+      const b = computeCalc(node.right, ctx)
+      if (b === null) return null
+      switch (node.op) {
+        case "+":
+          return a + b
+        case "-":
+          return a - b
+        case "*":
+          return a * b
+        case "/":
+          return b === 0 ? null : a / b
+      }
+      return null
+    }
+    case "fn": {
+      const vals: number[] = []
+      for (const arg of node.args) {
+        const v = computeCalc(arg, ctx)
+        if (v === null) return null
+        vals.push(v)
+      }
+      switch (node.name) {
+        case "calc":
+          return vals[0]
+        case "min":
+          return Math.min(...vals)
+        case "max":
+          return Math.max(...vals)
+        case "clamp": {
+          const [lo, pref, hi] = vals
+          return Math.min(Math.max(pref, lo), hi)
+        }
+      }
+      return null
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// formatCalc — canonical serialization
+// ---------------------------------------------------------------------------
+
+function formatNode(node: CalcNode): string {
+  switch (node.kind) {
+    case "literal":
+      return node.value
+    case "var":
+      return node.raw
+    case "group":
+      return `(${formatNode(node.inner)})`
+    case "binary":
+      return `${formatNode(node.left)} ${node.op} ${formatNode(node.right)}`
+    case "fn":
+      return `${node.name}(${node.args.map(formatNode).join(", ")})`
+  }
+}
+
+/** Re-serialize a parsed expression with canonical spacing. */
+export function formatCalc(node: CalcNode): CalcString {
+  return formatNode(node) as CalcString
+}
 
 export type { CalcString }
