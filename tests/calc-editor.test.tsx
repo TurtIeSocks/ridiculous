@@ -129,6 +129,82 @@ describe("FluidTypePlayground", () => {
   })
 })
 
+describe("CalcEditorPanel integration", () => {
+  test("switching the function tab re-wraps the expression and emits", () => {
+    const onChange = vi.fn()
+    render(<CalcEditorPanel value="calc(2rem)" onChange={onChange} />)
+    fireEvent.click(screen.getByRole("tab", { name: /^clamp$/i }))
+    // wrapping seeds a clamp() and emits a valid one
+    expect(onChange).toHaveBeenCalledWith(expect.stringMatching(/^clamp\(/))
+    expect(
+      (screen.getByLabelText(/expression/i) as HTMLInputElement).value,
+    ).toMatch(/^clamp\(/)
+  })
+
+  test("switching among min/max re-wraps the inner value", () => {
+    const onChange = vi.fn()
+    render(<CalcEditorPanel value="calc(1px + 2px)" onChange={onChange} />)
+    fireEvent.click(screen.getByRole("tab", { name: /^min$/i }))
+    expect(onChange).toHaveBeenCalledWith(expect.stringMatching(/^min\(/))
+    fireEvent.click(screen.getByRole("tab", { name: /^max$/i }))
+    expect(onChange).toHaveBeenCalledWith(expect.stringMatching(/^max\(/))
+  })
+
+  test("inserting a token from the palette appends and re-emits", () => {
+    const onChange = vi.fn()
+    render(<CalcEditorPanel value="calc(10px)" onChange={() => {}} />)
+    // open with a value that becomes valid after inserting
+    fireEvent.change(screen.getByLabelText(/expression/i), {
+      target: { value: "calc(10px + 2px" },
+    })
+    onChange.mockClear()
+    // now type the close paren via the palette
+    fireEvent.click(screen.getByRole("button", { name: "( )" }))
+    // the field text grew
+    expect(
+      (screen.getByLabelText(/expression/i) as HTMLInputElement).value,
+    ).toContain("()")
+  })
+
+  test("shows a computed px readout for a length expression", () => {
+    render(
+      <CalcEditorPanel
+        value="calc(10px + 1rem)"
+        onChange={() => {}}
+        referenceViewport={1000}
+      />,
+    )
+    // 10 + 16 = 26px @ 1000px
+    expect(screen.getByText(/26px @ 1000px/)).toBeInTheDocument()
+  })
+})
+
+describe("TokenPalette function tokens", () => {
+  test("inserts var() and clamp() stubs", () => {
+    const onInsert = vi.fn()
+    render(<TokenPalette onInsert={onInsert} />)
+    fireEvent.click(screen.getByRole("button", { name: "var()" }))
+    expect(onInsert).toHaveBeenCalledWith("var(--)")
+    fireEvent.click(screen.getByRole("button", { name: "clamp()" }))
+    expect(onInsert).toHaveBeenCalledWith("clamp(, , )")
+  })
+})
+
+describe("FluidTypePlayground visual", () => {
+  test("renders a tracking bar for a length expression", () => {
+    const { container } = render(
+      <FluidTypePlayground expression="calc(1rem + 2vw)" />,
+    )
+    const bar = container.querySelector("[aria-hidden='true'].bg-primary")
+    expect(bar).not.toBeNull()
+  })
+
+  test("shows an em-dash when the expression cannot be computed", () => {
+    render(<FluidTypePlayground expression="calc(10px + var(--x))" />)
+    expect(screen.getByText("—")).toBeInTheDocument()
+  })
+})
+
 describe("CalcEditor (popover)", () => {
   test("renders a trigger button", () => {
     render(<CalcEditor value="calc(10px + 2rem)" onChange={() => {}} />)
