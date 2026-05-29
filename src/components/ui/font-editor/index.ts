@@ -12,7 +12,6 @@ export {
   FontPreview,
   PropertyField,
 } from "./font-editor"
-export type { ParseResult } from "./font-editor.helpers"
 export {
   ABSOLUTE_SIZES,
   classifyFamilyToken,

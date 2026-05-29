@@ -1,59 +1,65 @@
+"use client"
+
 import { useState } from "react"
 import {
   ColorPicker,
   type ColorString,
   color,
 } from "@/components/ui/color-picker"
-import { CopyButton } from "./copy-button"
+import { CodeBlock } from "@/examples/_shared/code-block"
+import { CopyButton } from "@/examples/_shared/copy-button"
+import { ExampleCard } from "@/examples/_shared/example-card"
+import { ValueReadout } from "@/examples/_shared/value-readout"
 
 export function TierStrict() {
   const [c, setC] = useState<ColorString>(color("oklch(0.7 0.18 240)"))
   return (
-    <div className="glass-card rounded-2xl p-6 flex flex-col">
-      <div className="flex items-baseline justify-between">
-        <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
-          <span className="text-gradient">03</span> strict
-        </div>
-        <span className="text-[10px] font-mono text-muted-foreground/60">
-          ColorLiteral&lt;S&gt;
-        </span>
-      </div>
-      <h3 className="mt-3 text-lg font-semibold tracking-tight">
-        Validate at compile time
-      </h3>
-      <p className="mt-2 text-sm text-muted-foreground">
-        <code className="text-foreground">color()</code> range-checks the
-        literal. Out-of-range tokens type-error.
-      </p>
+    <ExampleCard
+      tierIndex={3}
+      tierLabel="strict"
+      typeBadge={<>ColorLiteral&lt;S&gt;</>}
+      title="Validate at compile time"
+      description={
+        <>
+          <code className="text-foreground">color()</code> range-checks the
+          literal. Out-of-range tokens type-error.
+        </>
+      }
+    >
       <div className="mt-5 flex items-center gap-2">
         <ColorPicker value={c} onChange={setC} />
-        <code className="text-xs font-mono bg-black/40 border border-white/10 px-2.5 py-1 rounded-md truncate min-w-0 flex-1">
-          {c}
-        </code>
-        <CopyButton value={c} />
+        <ValueReadout value={c} />
+        <CopyButton value={c} label="Copy color" />
       </div>
-      <pre className="mt-6 text-[11px] leading-relaxed font-mono bg-black/40 border border-white/10 p-4 rounded-lg overflow-x-auto">
-        <span className="text-violet-glow">const</span> valid ={" "}
-        <span className="text-cyan-glow">color</span>(
-        <span className="text-emerald-400">&quot;#ff0000&quot;</span>){" "}
-        <span className="text-muted-foreground/70">{"// ✓"}</span>
-        {"\n"}
-        <span className="text-muted-foreground/70">
-          {"// @ts-expect-error 256 > 255"}
-        </span>
-        {"\n"}
-        <span className="text-violet-glow">const</span> bad ={" "}
-        <span className="text-cyan-glow">color</span>(
-        <span className="text-destructive">&quot;rgb(256 0 0)&quot;</span>)
-        {"\n"}
-        <span className="text-muted-foreground/70">
-          {"// @ts-expect-error wrong hex length"}
-        </span>
-        {"\n"}
-        <span className="text-violet-glow">const</span> short ={" "}
-        <span className="text-cyan-glow">color</span>(
-        <span className="text-destructive">&quot;#ff&quot;</span>)
-      </pre>
-    </div>
+      <CodeBlock
+        className="mt-6"
+        tokens={[
+          { kind: "kw", text: "const" },
+          { kind: "plain", text: " valid = " },
+          { kind: "fn", text: "color" },
+          { kind: "plain", text: "(" },
+          { kind: "str", text: '"#ff0000"' },
+          { kind: "plain", text: ") " },
+          { kind: "com", text: "// ✓" },
+          { kind: "plain", text: "\n" },
+          { kind: "com", text: "// @ts-expect-error 256 > 255" },
+          { kind: "plain", text: "\n" },
+          { kind: "kw", text: "const" },
+          { kind: "plain", text: " bad = " },
+          { kind: "fn", text: "color" },
+          { kind: "plain", text: "(" },
+          { kind: "err", text: '"rgb(256 0 0)"' },
+          { kind: "plain", text: ")\n" },
+          { kind: "com", text: "// @ts-expect-error wrong hex length" },
+          { kind: "plain", text: "\n" },
+          { kind: "kw", text: "const" },
+          { kind: "plain", text: " short = " },
+          { kind: "fn", text: "color" },
+          { kind: "plain", text: "(" },
+          { kind: "err", text: '"#ff"' },
+          { kind: "plain", text: ")" },
+        ]}
+      />
+    </ExampleCard>
   )
 }

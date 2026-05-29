@@ -38,6 +38,7 @@ import type {
   Digit,
   IsNumber,
   IsTime,
+  Letter,
   SplitByComma,
   SplitBySpace,
   Trim,
@@ -56,60 +57,6 @@ type IsEasing<S extends string> =
 // digit. Full <custom-ident> grammar (escapes, CSS-wide-keyword exclusion) is
 // deferred to the runtime parser; the type budget does not warrant it for the
 // single catch-all slot.
-type Letter =
-  | "a"
-  | "b"
-  | "c"
-  | "d"
-  | "e"
-  | "f"
-  | "g"
-  | "h"
-  | "i"
-  | "j"
-  | "k"
-  | "l"
-  | "m"
-  | "n"
-  | "o"
-  | "p"
-  | "q"
-  | "r"
-  | "s"
-  | "t"
-  | "u"
-  | "v"
-  | "w"
-  | "x"
-  | "y"
-  | "z"
-  | "A"
-  | "B"
-  | "C"
-  | "D"
-  | "E"
-  | "F"
-  | "G"
-  | "H"
-  | "I"
-  | "J"
-  | "K"
-  | "L"
-  | "M"
-  | "N"
-  | "O"
-  | "P"
-  | "Q"
-  | "R"
-  | "S"
-  | "T"
-  | "U"
-  | "V"
-  | "W"
-  | "X"
-  | "Y"
-  | "Z"
-
 type IdentChar = Letter | Digit | "-" | "_"
 
 type IsIdent<S extends string> = S extends ""

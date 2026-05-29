@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { describe, expect, test, vi } from "vitest"
 import {
   AddFunctionMenu,
+  ArgEditor,
   TransformBuilder,
   TransformBuilderPanel,
   TransformFunctionRow,
@@ -329,6 +330,75 @@ describe("TransformFunctionRow — every argument shape", () => {
   })
 })
 
+describe("ArgEditor — number/unit split", () => {
+  // Regression: the old `^(-?\d*\.?\d*)([a-z%]*)$` split rejected scientific
+  // notation, so "1e3px" fell back to an opaque raw input and lost its unit
+  // dropdown. It must now split into number + unit like any other dimension.
+  test("scientific notation keeps the dual number+unit control", () => {
+    render(
+      <ArgEditor
+        fn="translateX"
+        label="translateX x"
+        kind="length-percentage"
+        value="1e3px"
+        onChange={() => {}}
+      />,
+    )
+    expect(screen.getByLabelText("translateX x")).toHaveValue("1e3px")
+    // a unit select is present (the value was NOT treated as opaque)…
+    const unit = screen.getByLabelText("translateX x unit") as HTMLSelectElement
+    expect(unit.value).toBe("px")
+  })
+
+  test("changing the unit preserves the exponent in the number part", () => {
+    const onChange = vi.fn()
+    render(
+      <ArgEditor
+        fn="translateX"
+        label="translateX x"
+        kind="length-percentage"
+        value="1e3px"
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("translateX x unit"), {
+      target: { value: "rem" },
+    })
+    expect(onChange).toHaveBeenCalledWith("1e3rem")
+  })
+
+  // The old regex matched empty / lone-sign / bare-unit and would emit
+  // "-px" / "0px" via the unit select. These must stay opaque (raw input,
+  // no unit dropdown) so a half-typed value is never silently rewritten.
+  test("a bare unit is opaque (no unit select)", () => {
+    render(
+      <ArgEditor
+        fn="translateX"
+        label="translateX x"
+        kind="length-percentage"
+        value="px"
+        onChange={() => {}}
+      />,
+    )
+    expect(screen.getByLabelText("translateX x")).toHaveValue("px")
+    expect(screen.queryByLabelText("translateX x unit")).not.toBeInTheDocument()
+  })
+
+  test("a lone minus sign is opaque (no unit select)", () => {
+    render(
+      <ArgEditor
+        fn="translateX"
+        label="translateX x"
+        kind="length-percentage"
+        value="-"
+        onChange={() => {}}
+      />,
+    )
+    expect(screen.getByLabelText("translateX x")).toHaveValue("-")
+    expect(screen.queryByLabelText("translateX x unit")).not.toBeInTheDocument()
+  })
+})
+
 describe("TransformPreview3D — scrub merge", () => {
   test("a scrubber replaces the matching function in an existing list", () => {
     const onChange = vi.fn()
@@ -347,5 +417,17 @@ describe("TransformPreview3D — scrub merge", () => {
   test("renders without scrubbers when onChange is omitted", () => {
     render(<TransformPreview3D value="none" />)
     expect(screen.queryByLabelText("rotate")).not.toBeInTheDocument()
+  })
+
+  // Regression: the single-scalar `scale` scrubber must only retune the x
+  // factor of an existing two-arg `scale(x, y)` — it must NOT drop the y arg.
+  // (Previously `applyScrub` rebuilt the item from one arg, silently losing y.)
+  test("the scale scrubber preserves an existing y factor", () => {
+    const onChange = vi.fn()
+    render(<TransformPreview3D value="scale(1.2, 0.8)" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("scale"), {
+      target: { value: "1.7" },
+    })
+    expect(onChange).toHaveBeenCalledWith("scale(1.7, 0.8)")
   })
 })

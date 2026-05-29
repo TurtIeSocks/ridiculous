@@ -11,11 +11,6 @@ import type {
 } from "@/components/ui/color-picker/color-picker.types"
 import { color } from "@/components/ui/color-picker/color-picker.types"
 
-// Type-only smoke test: ensure the file imports cleanly.
-test("color-picker.types module imports", () => {
-  expectTypeOf<string>().toBeString()
-})
-
 test("HexLiteral accepts valid hex", () => {
   expectTypeOf<HexLiteral<"#ff0000">>().toEqualTypeOf<"#ff0000">()
   expectTypeOf<HexLiteral<"#fff">>().toEqualTypeOf<"#fff">()

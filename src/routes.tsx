@@ -1,11 +1,17 @@
 import type { RouteRecord } from "vite-react-ssg"
 import { AppShell } from "@/components/layout/app-shell"
+import { NAV } from "@/generated/nav"
 
 /**
  * Route table consumed by vite-react-ssg. The parent route renders the
  * persistent <AppShell/> (Layout + <Outlet/>); each child contributes only
- * its page content via `lazy` for per-route code-splitting. The "*" child is
- * the prerendered 404.
+ * its page content via `lazy` for per-route code-splitting.
+ *
+ * The component child routes are derived from the generated NAV manifest:
+ * every page lives at `@/pages/<name>/page` and default-exports its component,
+ * so path + import path + export are all the slug. The index ("/") and
+ * catch-all 404 ("*") routes are hand-written because they aren't NAV entries;
+ * the "*" child is the prerendered 404 (see vite.config.ts ssgOptions).
  */
 export const routes: RouteRecord[] = [
   {
@@ -15,123 +21,25 @@ export const routes: RouteRecord[] = [
     children: [
       {
         index: true,
-        lazy: async () => ({
-          Component: (await import("@/pages/index/page")).IndexPage,
-        }),
+        lazy: () =>
+          import("@/pages/index/page").then((m) => ({ Component: m.default })),
       },
-      {
-        path: "ridiculous-type-kit",
-        lazy: async () => ({
-          Component: (await import("@/pages/ridiculous-type-kit/page"))
-            .RidiculousTypeKitPage,
-        }),
-      },
-      {
-        path: "color-picker",
-        lazy: async () => ({
-          Component: (await import("@/pages/color-picker/page"))
-            .ColorPickerPage,
-        }),
-      },
-      {
-        path: "unit-input",
-        lazy: async () => ({
-          Component: (await import("@/pages/unit-input/page")).UnitInputPage,
-        }),
-      },
-      {
-        path: "gradient-editor",
-        lazy: async () => ({
-          Component: (await import("@/pages/gradient-editor/page"))
-            .GradientEditorPage,
-        }),
-      },
-      {
-        path: "easing-picker",
-        lazy: async () => ({
-          Component: (await import("@/pages/easing-picker/page"))
-            .EasingPickerPage,
-        }),
-      },
-      {
-        path: "calc-editor",
-        lazy: async () => ({
-          Component: (await import("@/pages/calc-editor/page")).CalcEditorPage,
-        }),
-      },
-      {
-        path: "transform-builder",
-        lazy: async () => ({
-          Component: (await import("@/pages/transform-builder/page"))
-            .TransformBuilderPage,
-        }),
-      },
-      {
-        path: "filter-builder",
-        lazy: async () => ({
-          Component: (await import("@/pages/filter-builder/page"))
-            .FilterBuilderPage,
-        }),
-      },
-      {
-        path: "grid-builder",
-        lazy: async () => ({
-          Component: (await import("@/pages/grid-builder/page"))
-            .GridBuilderPage,
-        }),
-      },
-      {
-        path: "clip-path-editor",
-        lazy: async () => ({
-          Component: (await import("@/pages/clip-path-editor/page"))
-            .ClipPathEditorPage,
-        }),
-      },
-      {
-        path: "box-shadow-editor",
-        lazy: async () => ({
-          Component: (await import("@/pages/box-shadow-editor/page"))
-            .BoxShadowEditorPage,
-        }),
-      },
-      {
-        path: "transition-editor",
-        lazy: async () => ({
-          Component: (await import("@/pages/transition-editor/page"))
-            .TransitionEditorPage,
-        }),
-      },
-      {
-        path: "font-editor",
-        lazy: async () => ({
-          Component: (await import("@/pages/font-editor/page")).FontEditorPage,
-        }),
-      },
-      {
-        path: "color-function",
-        lazy: async () => ({
-          Component: (await import("@/pages/color-function/page"))
-            .ColorFunctionPage,
-        }),
-      },
-      {
-        path: "if-function",
-        lazy: async () => ({
-          Component: (await import("@/pages/if-function/page")).IfFunctionPage,
-        }),
-      },
-      {
-        path: "query-builder",
-        lazy: async () => ({
-          Component: (await import("@/pages/query-builder/page"))
-            .QueryBuilderPage,
-        }),
-      },
+      ...NAV.map(({ name }) => ({
+        path: name,
+        // Relative path + explicit extension so Vite's dynamic-import-vars
+        // plugin can statically enumerate the page modules (the "@/" alias and
+        // an extensionless specifier are both rejected here).
+        lazy: () =>
+          import(`./pages/${name}/page.tsx`).then((m) => ({
+            Component: m.default,
+          })),
+      })),
       {
         path: "*",
-        lazy: async () => ({
-          Component: (await import("@/pages/not-found/page")).NotFoundPage,
-        }),
+        lazy: () =>
+          import("@/pages/not-found/page").then((m) => ({
+            Component: m.default,
+          })),
       },
     ],
   },

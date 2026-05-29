@@ -9,7 +9,7 @@ import { NAV } from "@/generated/nav"
 const REGISTRY_TEMPLATE =
   "https://turtiesocks.github.io/ridiculous/r/{name}.json"
 
-export function IndexPage() {
+export default function IndexPage() {
   return (
     <>
       <section id="install" className="scroll-mt-24">

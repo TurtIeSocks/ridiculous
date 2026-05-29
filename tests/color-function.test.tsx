@@ -5,7 +5,6 @@ import {
   ColorFunctionPanel,
   ColorFunctionPreview,
   ColorMixEditor,
-  LightDarkEditor,
   RelativeColorEditor,
 } from "@/components/ui/color-function/color-function"
 import { cssColorFn } from "@/components/ui/color-function/color-function.types"
@@ -273,11 +272,6 @@ describe("ColorMixEditor / RelativeColorEditor / LightDarkEditor (sub-components
       target: { value: "hsl" },
     })
     expect(onChange).toHaveBeenCalled()
-  })
-
-  test("RelativeColorEditor and LightDarkEditor are exported", () => {
-    expect(typeof RelativeColorEditor).toBe("function")
-    expect(typeof LightDarkEditor).toBe("function")
   })
 })
 

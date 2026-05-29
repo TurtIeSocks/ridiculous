@@ -1,4 +1,9 @@
-import type { ColorLiteral, ColorMode, ColorString } from "./color-picker.types"
+import type {
+  ColorLiteral,
+  ColorMode,
+  ColorString,
+  Oklch,
+} from "./color-picker.types"
 
 // ---------------------------------------------------------------------------
 // Parsing / formatting
@@ -93,12 +98,7 @@ export function parseHsl(
 const OKLCH_RE =
   /^oklch\(\s*([\d.]+%?)\s+([\d.]+%?)\s+([\d.]+(?:deg)?)\s*(?:\/\s*([\d.]+%?)\s*)?\)$/i
 
-export function parseOklch(value: string): {
-  l: number
-  c: number
-  h: number
-  a: number
-} | null {
+export function parseOklch(value: string): Oklch | null {
   const match = value.match(OKLCH_RE)
   if (!match) return null
   const l = match[1].endsWith("%")
@@ -118,26 +118,13 @@ export function parseOklch(value: string): {
 // to integer percent (byte-quantized inputs make fractional alpha meaningless).
 // Hex encodes alpha as a byte-aligned digit pair.
 
-export function formatOklch({
-  l,
-  c,
-  h,
-  a,
-}: {
-  l: number
-  c: number
-  h: number
-  a: number
-}): string {
+export function formatOklch({ l, c, h, a }: Oklch): string {
   const base = `oklch(${trimNumber(l)} ${trimNumber(c)} ${trimNumber(h)}`
   if (a >= 1) return `${base})`
   return `${base} / ${trimNumber(a * 100)}%)`
 }
 
-export function formatHex(
-  oklch: { l: number; c: number; h: number; a: number },
-  includeAlpha: boolean,
-): string {
+export function formatHex(oklch: Oklch, includeAlpha: boolean): string {
   const [r, g, b] = oklchToSrgb(oklch.l, oklch.c, oklch.h)
   const channel = (n: number) =>
     Math.round(clamp01(n) * 255)
@@ -148,12 +135,7 @@ export function formatHex(
   return `${base}${channel(oklch.a)}`
 }
 
-export function formatRgb(oklch: {
-  l: number
-  c: number
-  h: number
-  a: number
-}): string {
+export function formatRgb(oklch: Oklch): string {
   const [r, g, b] = oklchToSrgb(oklch.l, oklch.c, oklch.h)
   const channel = (n: number) => Math.round(clamp01(n) * 255)
   const base = `rgb(${channel(r)} ${channel(g)} ${channel(b)}`
@@ -161,12 +143,7 @@ export function formatRgb(oklch: {
   return `${base} / ${Math.round(oklch.a * 100)}%)`
 }
 
-export function formatHsl(oklch: {
-  l: number
-  c: number
-  h: number
-  a: number
-}): string {
+export function formatHsl(oklch: Oklch): string {
   const [r, g, b] = oklchToSrgb(oklch.l, oklch.c, oklch.h)
   const hsl = srgbToHsl(clamp01(r), clamp01(g), clamp01(b))
   const h = Math.round(hsl.h)
@@ -203,12 +180,7 @@ export function parseOklab(value: string): {
   return { l, a, b, alpha }
 }
 
-export function formatOklab(oklch: {
-  l: number
-  c: number
-  h: number
-  a: number
-}): string {
+export function formatOklab(oklch: Oklch): string {
   const { a, b } = oklchToOklab(oklch.l, oklch.c, oklch.h)
   const base = `oklab(${trimNumber(oklch.l)} ${trimNumber(a)} ${trimNumber(b)}`
   if (oklch.a >= 1) return `${base})`
@@ -234,12 +206,7 @@ export function parseHwb(value: string): {
   return { h, w, b, a }
 }
 
-export function formatHwb(oklch: {
-  l: number
-  c: number
-  h: number
-  a: number
-}): string {
+export function formatHwb(oklch: Oklch): string {
   const [r, g, b] = oklchToSrgb(oklch.l, oklch.c, oklch.h)
   const hwb = srgbToHwb(clamp01(r), clamp01(g), clamp01(b))
   const h = Math.round(hwb.h)
@@ -339,7 +306,7 @@ export function srgbToOklch(
   g: number,
   b: number,
   alpha: number,
-): { l: number; c: number; h: number; a: number } {
+): Oklch {
   const rLin = srgbToLinear(r)
   const gLin = srgbToLinear(g)
   const bLin = srgbToLinear(b)
@@ -418,7 +385,7 @@ export function srgbToHwb(
 // ---------------------------------------------------------------------------
 
 export interface ParseResult {
-  oklch: { l: number; c: number; h: number; a: number }
+  oklch: Oklch
   mode: ColorMode
 }
 
@@ -486,10 +453,7 @@ export function isColorString(value: string): boolean {
   return parseColor(value) !== null
 }
 
-export function formatColor(
-  oklch: { l: number; c: number; h: number; a: number },
-  mode: ColorMode,
-): string {
+export function formatColor(oklch: Oklch, mode: ColorMode): string {
   switch (mode) {
     case "oklch":
       return formatOklch(oklch)

@@ -20,56 +20,82 @@ import type {
 
 // ---------------------------------------------------------------------------
 // Paren-aware low-level scanners (runtime mirrors of the type splitters)
+//
+// All five scanners below walk `src` left→right tracking ()/[] nesting depth
+// and act only at depth 0. `scanDepth0` is the single shared primitive: it
+// applies the bracket depth adjustment for each char, then calls `visit(char,
+// index, depth)` with the post-adjustment depth (so a closing `)` is reported
+// at depth 0, matching the original loops). `visit` returns a control signal —
+// `undefined` to advance one char, `{ skip }` to jump ahead (variable-width
+// token consumption, `skip` must be >= 1), or `{ stop }` to end the walk early.
 // ---------------------------------------------------------------------------
 
-/** Split `src` on the whole word ` ${word} ` only at bracket depth 0. */
-function splitTopLevelWord(src: string, word: string): string[] {
-  const out: string[] = []
+interface ScanStep {
+  stop?: true
+  skip?: number
+}
+
+function scanDepth0(
+  src: string,
+  visit: (char: string, index: number, depth: number) => ScanStep | undefined,
+): void {
   let depth = 0
-  let cur = ""
   let i = 0
-  const token = ` ${word} `
   while (i < src.length) {
     const ch = src[i]
     if (ch === "(" || ch === "[") depth++
     else if (ch === ")" || ch === "]") depth--
+    const step = visit(ch, i, depth)
+    if (step?.stop) return
+    i += step?.skip ?? 1
+  }
+}
+
+/** Split `src` on the whole word ` ${word} ` only at bracket depth 0. */
+function splitTopLevelWord(src: string, word: string): string[] {
+  const out: string[] = []
+  const token = ` ${word} `
+  let cur = ""
+  scanDepth0(src, (ch, i, depth) => {
     if (depth === 0 && src.startsWith(token, i)) {
       out.push(cur)
       cur = ""
-      i += token.length
-      continue
+      return { skip: token.length }
     }
     cur += ch
-    i++
-  }
+    return undefined
+  })
   out.push(cur)
   return out.map((s) => s.trim()).filter((s) => s.length > 0)
 }
 
 /** Does the whole word ` ${word} ` occur at bracket depth 0? */
 function hasTopLevelWord(src: string, word: string): boolean {
-  let depth = 0
   const token = ` ${word} `
-  for (let i = 0; i < src.length; i++) {
-    const ch = src[i]
-    if (ch === "(" || ch === "[") depth++
-    else if (ch === ")" || ch === "]") depth--
-    if (depth === 0 && src.startsWith(token, i)) return true
-  }
-  return false
+  let found = false
+  scanDepth0(src, (_ch, i, depth) => {
+    if (depth === 0 && src.startsWith(token, i)) {
+      found = true
+      return { stop: true }
+    }
+    return undefined
+  })
+  return found
 }
 
 /** True iff every `(`/`[` is matched and depth never goes negative. */
 function isBalanced(src: string): boolean {
-  let depth = 0
-  for (const ch of src) {
-    if (ch === "(" || ch === "[") depth++
-    else if (ch === ")" || ch === "]") {
-      depth--
-      if (depth < 0) return false
+  let ok = true
+  let last = 0
+  scanDepth0(src, (_ch, _i, depth) => {
+    last = depth
+    if (depth < 0) {
+      ok = false
+      return { stop: true }
     }
-  }
-  return depth === 0
+    return undefined
+  })
+  return ok && last === 0
 }
 
 const OPS: readonly FeatureOperator[] = ["<=", ">=", "<", ">", "="]
@@ -78,29 +104,31 @@ const OPS: readonly FeatureOperator[] = ["<=", ">=", "<", ">", "="]
 function firstOp(
   src: string,
 ): { index: number; op: FeatureOperator; len: number } | null {
-  let depth = 0
-  for (let i = 0; i < src.length; i++) {
-    const ch = src[i]
-    if (ch === "(" || ch === "[") depth++
-    else if (ch === ")" || ch === "]") depth--
-    if (depth !== 0) continue
+  let hit: { index: number; op: FeatureOperator; len: number } | null = null
+  scanDepth0(src, (_ch, i, depth) => {
+    if (depth !== 0) return undefined
     for (const op of OPS) {
-      if (src.startsWith(op, i)) return { index: i, op, len: op.length }
+      if (src.startsWith(op, i)) {
+        hit = { index: i, op, len: op.length }
+        return { stop: true }
+      }
     }
-  }
-  return null
+    return undefined
+  })
+  return hit
 }
 
 /** Index of the first `:` at depth 0, or -1. */
 function firstTopLevelColon(src: string): number {
-  let depth = 0
-  for (let i = 0; i < src.length; i++) {
-    const ch = src[i]
-    if (ch === "(" || ch === "[") depth++
-    else if (ch === ")" || ch === "]") depth--
-    else if (ch === ":" && depth === 0) return i
-  }
-  return -1
+  let at = -1
+  scanDepth0(src, (ch, i, depth) => {
+    if (ch === ":" && depth === 0) {
+      at = i
+      return { stop: true }
+    }
+    return undefined
+  })
+  return at
 }
 
 // ---------------------------------------------------------------------------
@@ -272,6 +300,54 @@ export function enumOptionsFor(feature: string): readonly string[] | null {
 }
 
 // ---------------------------------------------------------------------------
+// row-editor pure transforms (UI-facing, no React)
+// ---------------------------------------------------------------------------
+
+/**
+ * Extract the trailing CSS unit of a length value (defaults to `px`) so length
+ * values flow through the unit-aware `UnitInput`.
+ */
+export function unitOf(value: string): string {
+  const m = value.trim().match(/[a-z%]+$/i)
+  return m ? m[0] : "px"
+}
+
+/**
+ * Re-shape a feature test when its shape selector changes, keeping the feature.
+ * `range3` is a numeric range (`v op f op v`) so it only carries the current
+ * value when the feature is length-kind; for a discrete feature (enum/ratio/…)
+ * duplicating the keyword would emit an invalid `kw <= f <= kw`, so reset both
+ * bounds to a numeric default instead.
+ */
+export function reshape(
+  test: FeatureTest,
+  shape: FeatureTest["kind"],
+  mode: QueryMode,
+): FeatureTest {
+  const feature = test.feature
+  const value = "value" in test ? test.value : "0"
+  switch (shape) {
+    case "boolean":
+      return { kind: "boolean", feature }
+    case "plain":
+      return { kind: "plain", feature, value }
+    case "range2":
+      return { kind: "range2", feature, op: ">=", value }
+    case "range3": {
+      const bound = featureKind(feature, mode) === "length" ? value : "0px"
+      return {
+        kind: "range3",
+        feature,
+        op: "<=",
+        value: bound,
+        op2: "<=",
+        value2: bound,
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 // parseFeatureTest — classify one (unwrapped) feature test
 // ---------------------------------------------------------------------------
 
@@ -409,6 +485,68 @@ function nodeTests(node: QueryNode): FeatureTest[] {
   return []
 }
 
+// ---------------------------------------------------------------------------
+// stripLead — peel the optional leading media-type+modifier or container name
+// ---------------------------------------------------------------------------
+
+/**
+ * The leading-token analysis shared by `parseQuery` and `parseQueryState`.
+ *  - `invalid`: a media type was present but not followed by `and <cond>`.
+ *  - `bare`:    a (modified) media type with no condition at all.
+ *  - `rest`:    the remaining condition source, with any modifier / type /
+ *               container name peeled off (and surfaced for the state path).
+ */
+type LeadResult =
+  | { status: "invalid" }
+  | { status: "bare"; modifier?: MediaModifier; mediaType?: MediaType }
+  | {
+      status: "rest"
+      modifier?: MediaModifier
+      mediaType?: MediaType
+      containerName?: string
+      rest: string
+    }
+
+function stripLead(trimmed: string, mode: QueryMode): LeadResult {
+  if (mode === "media") {
+    const tokens = trimmed.split(/\s+/)
+    let modifier: MediaModifier | undefined
+    let mediaType: MediaType | undefined
+    let consumed = 0
+    if (MODIFIERS.has(tokens[0]) && MEDIA_TYPES.has(tokens[1] ?? "")) {
+      modifier = tokens[0] as MediaModifier
+      mediaType = tokens[1] as MediaType
+      consumed = 2
+    } else if (MEDIA_TYPES.has(tokens[0])) {
+      mediaType = tokens[0] as MediaType
+      consumed = 1
+    }
+    if (consumed === 0) return { status: "rest", rest: trimmed }
+    const after = tokens.slice(consumed)
+    if (after.length === 0) return { status: "bare", modifier, mediaType }
+    if (after[0] !== "and") return { status: "invalid" }
+    return {
+      status: "rest",
+      modifier,
+      mediaType,
+      rest: after.slice(1).join(" "),
+    }
+  }
+
+  // container: optional leading name ident (head not `(` and not `not`)
+  if (!trimmed.startsWith("(") && !trimmed.startsWith("not ")) {
+    const space = trimmed.indexOf(" ")
+    if (space !== -1) {
+      return {
+        status: "rest",
+        containerName: trimmed.slice(0, space).trim(),
+        rest: trimmed.slice(space + 1).trim(),
+      }
+    }
+  }
+  return { status: "rest", rest: trimmed }
+}
+
 /**
  * Parse a media / container query string into a QueryNode, or an error.
  * Strips the optional leading media-type + modifier (media) or container name
@@ -422,41 +560,19 @@ export function parseQuery(
   if (trimmed === "") return { node: null, error: "empty query" }
   if (!isBalanced(trimmed)) return { node: null, error: "unbalanced parens" }
 
-  let rest = trimmed
-
-  if (mode === "media") {
-    // optional modifier + media type, possibly followed by `and <cond>`
-    const tokens = rest.split(/\s+/)
-    let consumed = 0
-    if (MODIFIERS.has(tokens[0]) && MEDIA_TYPES.has(tokens[1] ?? "")) {
-      consumed = 2
-    } else if (MEDIA_TYPES.has(tokens[0])) {
-      consumed = 1
-    }
-    if (consumed > 0) {
-      const after = tokens.slice(consumed)
-      if (after.length === 0) {
-        // a bare (modified) media type — no condition
-        return {
-          node: { type: "group", joiner: "and", not: false, tests: [] },
-          error: null,
-        }
-      }
-      // expect `and <condition>`
-      if (after[0] !== "and") {
-        return { node: null, error: "expected `and` after media type" }
-      }
-      rest = after.slice(1).join(" ")
-    }
-  } else {
-    // container: optional leading name ident (head not `(` and not `not`)
-    if (!rest.startsWith("(") && !rest.startsWith("not ")) {
-      const space = rest.indexOf(" ")
-      if (space !== -1) rest = rest.slice(space + 1).trim()
+  const lead = stripLead(trimmed, mode)
+  if (lead.status === "invalid") {
+    return { node: null, error: "expected `and` after media type" }
+  }
+  if (lead.status === "bare") {
+    // a bare (modified) media type — no condition
+    return {
+      node: { type: "group", joiner: "and", not: false, tests: [] },
+      error: null,
     }
   }
 
-  const node = parseCondition(rest, mode)
+  const node = parseCondition(lead.rest, mode)
   if (node === null) return { node: null, error: "could not parse condition" }
   return { node, error: null }
 }
@@ -480,57 +596,25 @@ export function parseQueryState(
   if (trimmed === "") return null
   if (!isBalanced(trimmed)) return null
 
-  let modifier: MediaModifier | undefined
-  let mediaType: MediaType | undefined
-  let containerName: string | undefined
-  let rest = trimmed
-  let leadNot = false
+  const lead = stripLead(trimmed, mode)
+  if (lead.status === "invalid") return null
 
-  if (mode === "media") {
-    const tokens = rest.split(/\s+/)
-    let consumed = 0
-    if (MODIFIERS.has(tokens[0]) && MEDIA_TYPES.has(tokens[1] ?? "")) {
-      modifier = tokens[0] as MediaModifier
-      mediaType = tokens[1] as MediaType
-      consumed = 2
-    } else if (MEDIA_TYPES.has(tokens[0])) {
-      mediaType = tokens[0] as MediaType
-      consumed = 1
-    }
-    if (consumed > 0) {
-      const after = tokens.slice(consumed)
-      if (after.length === 0) {
-        return {
-          mode,
-          modifier,
-          mediaType,
-          joiner: "and",
-          not: false,
-          tests: [],
-        }
-      }
-      if (after[0] !== "and") return null
-      rest = after.slice(1).join(" ")
-    }
-  } else if (!rest.startsWith("(") && !rest.startsWith("not ")) {
-    const space = rest.indexOf(" ")
-    if (space !== -1) {
-      containerName = rest.slice(0, space).trim()
-      rest = rest.slice(space + 1).trim()
-    }
+  const { modifier, mediaType } = lead
+  if (lead.status === "bare") {
+    return { mode, modifier, mediaType, joiner: "and", not: false, tests: [] }
   }
+  const { containerName } = lead
 
-  const node = parseCondition(rest, mode)
+  const node = parseCondition(lead.rest, mode)
   if (node === null || node.type === "raw") return null
   if (node.type === "test") {
-    leadNot = node.not
     return {
       mode,
       modifier,
       mediaType,
       containerName,
       joiner: "and",
-      not: leadNot,
+      not: node.not,
       tests: [node.test],
     }
   }
@@ -652,13 +736,4 @@ export function matchesNow(query: string, mode: QueryMode): boolean | null {
   } catch {
     return null
   }
-}
-
-// ---------------------------------------------------------------------------
-// ParseResult facade (mirrors if-function / box-shadow editors)
-// ---------------------------------------------------------------------------
-
-export interface ParseResult {
-  node: QueryNode | null
-  error: string | null
 }

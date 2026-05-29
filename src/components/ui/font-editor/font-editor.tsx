@@ -29,6 +29,9 @@ const SIZE_UNITS = ["px", "rem", "em", "%", "vw", "vh", "pt"] as const
 
 const SAMPLE_TEXT_DEFAULT = "The quick brown fox jumps over the lazy dog"
 
+// Monotonic source of stable per-row ids for the family list (see FamilyEditor).
+let nextFamilyId = 0
+
 // ---------------------------------------------------------------------------
 // Shared props
 // ---------------------------------------------------------------------------
@@ -59,9 +62,18 @@ interface Shorthand {
 
 function asShorthand(parts: FontParts): Shorthand {
   if (parts.kind === "shorthand") return parts
-  // converting from a system keyword → seed a shorthand
-  return defaultParts() as Shorthand
+  // Converting from a system keyword → seed a shorthand. `defaultParts()` is
+  // typed as the wider `FontParts`, so narrow on the discriminant instead of
+  // casting; the fallback keeps a real shorthand without an unchecked `as`.
+  const seed = defaultParts()
+  if (seed.kind === "shorthand") return seed
+  return { kind: "shorthand", size: "16px", family: ["sans-serif"] }
 }
+
+// A number for the dual control: mandatory mantissa (≥1 digit, so a lone `-`
+// or a bare unit never matches) with an optional exponent, then an optional
+// unit. Empty / sign-only / unit-only inputs fall through to the opaque path.
+const SIZE_NUM_UNIT_RE = /^([+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)([a-z%]*)$/i
 
 /** Split a size like "16px" into number + unit for the dual control. */
 function splitSize(size: string): {
@@ -72,7 +84,7 @@ function splitSize(size: string): {
   if ((ABSOLUTE_SIZES as readonly string[]).includes(size)) {
     return { num: size, unit: "", opaque: true }
   }
-  const m = size.match(/^(-?\d*\.?\d*)([a-z%]*)$/i)
+  const m = size.match(SIZE_NUM_UNIT_RE)
   if (!m) return { num: size, unit: "", opaque: true }
   return { num: m[1], unit: m[2], opaque: false }
 }
@@ -448,7 +460,7 @@ function SizeControl({
             onChange(`${num || "16"}${u}`)
           }
         }}
-        className="h-8 rounded-l-none rounded-r-md border border-input bg-background px-1 font-mono text-xs"
+        className="h-8 rounded-r-md rounded-l-none border border-input bg-background px-1 font-mono text-xs"
       >
         {SIZE_UNITS.map((u) => (
           <option key={u} value={u}>
@@ -497,25 +509,44 @@ export function FamilyEditor({
   onChange,
   className,
 }: FamilyEditorProps) {
+  // One stable id per row, created when the row is created. Keying on this id
+  // (instead of the array index) keeps a surviving row's DOM element identity
+  // across add/remove, so focus/IME state on a row above a removal is not lost.
+  const idsRef = useRef<number[]>([])
+  // Reconcile id count with the current value length: handler-driven mutations
+  // keep them in lockstep below, so this only fires for external replacements
+  // (resync / fallback). Existing ids are preserved by position; new slots get
+  // fresh ids.
+  if (idsRef.current.length !== value.length) {
+    const next = idsRef.current.slice(0, value.length)
+    while (next.length < value.length) next.push(nextFamilyId++)
+    idsRef.current = next
+  }
+  const ids = idsRef.current
+
   const setAt = (index: number, next: string) => {
     onChange(value.map((f, i) => (i === index ? next : f)))
   }
   const removeAt = (index: number) => {
     const next = value.filter((_, i) => i !== index)
-    onChange(next.length === 0 ? ["sans-serif"] : next)
+    if (next.length === 0) {
+      // fall back to a single default family — one fresh row, one fresh id
+      idsRef.current = [nextFamilyId++]
+      onChange(["sans-serif"])
+      return
+    }
+    idsRef.current = ids.filter((_, i) => i !== index)
+    onChange(next)
   }
   const add = (family: string) => {
+    idsRef.current = [...ids, nextFamilyId++]
     onChange([...value, family])
   }
 
   return (
     <div className={cn("space-y-1.5", className)}>
       {value.map((family, i) => (
-        <div
-          // biome-ignore lint/suspicious/noArrayIndexKey: family rows are positional, reordered only by add/remove
-          key={`family-${i}`}
-          className="flex items-center gap-1"
-        >
+        <div key={ids[i]} className="flex items-center gap-1">
           <Input
             aria-label={`Font family ${i + 1}`}
             value={family}

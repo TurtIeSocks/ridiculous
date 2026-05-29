@@ -14,7 +14,6 @@ export {
   LightDarkEditor,
   RelativeColorEditor,
 } from "./color-function"
-export type { ParseResult } from "./color-function.helpers"
 export {
   CHANNEL_KEYWORDS,
   CYLINDRICAL_SPACES,

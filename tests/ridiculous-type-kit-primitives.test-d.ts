@@ -62,6 +62,9 @@ test("bounded number validators", () => {
   expectTypeOf<IsNumber0To360<"360">>().toEqualTypeOf<true>()
   expectTypeOf<IsPercent0To100<"50%">>().toEqualTypeOf<true>()
   expectTypeOf<IsPercent0To100<"150%">>().toEqualTypeOf<false>()
+  // Whitespace policy matches IsPercentage (dimensions): the inner number is
+  // trimmed, so a leading-space percent is accepted by both.
+  expectTypeOf<IsPercent0To100<" 50%">>().toEqualTypeOf<true>()
 })
 
 test("number shape predicates", () => {

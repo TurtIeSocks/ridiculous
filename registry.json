@@ -37,7 +37,7 @@
       "name": "color-picker",
       "type": "registry:ui",
       "title": "Color Picker",
-      "description": "Ridiculously typed color picker with oklch L\u00d7C pad, hue/alpha strips, and 6-mode round-trip (oklch, oklab, hex, rgb, hsl, hwb).",
+      "description": "Ridiculously typed color picker with oklch L×C pad, hue/alpha strips, and 6-mode round-trip (oklch, oklab, hex, rgb, hsl, hwb).",
       "registryDependencies": ["button", "popover"],
       "dependencies": [],
       "files": [
@@ -60,6 +60,36 @@
           "path": "src/components/ui/color-picker/color-picker.types.ts",
           "type": "registry:ui",
           "target": "components/ui/color-picker/color-picker.types.ts"
+        },
+        {
+          "path": "src/components/ui/color-picker/alpha-strip.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/alpha-strip.tsx"
+        },
+        {
+          "path": "src/components/ui/color-picker/color-picker.constants.ts",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/color-picker.constants.ts"
+        },
+        {
+          "path": "src/components/ui/color-picker/hue-strip.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/hue-strip.tsx"
+        },
+        {
+          "path": "src/components/ui/color-picker/lc-pad.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/lc-pad.tsx"
+        },
+        {
+          "path": "src/components/ui/color-picker/mode-button-group.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/mode-button-group.tsx"
+        },
+        {
+          "path": "src/components/ui/color-picker/preset-palette.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/preset-palette.tsx"
         }
       ]
     },
@@ -127,7 +157,7 @@
       "name": "easing-picker",
       "type": "registry:ui",
       "title": "Easing Picker",
-      "description": "Ridiculously typed CSS easing function picker \u2014 bezier canvas, spring/bounce/wiggle physics baked to linear(), polynomial preset gallery, 6-property animation preview, 3-format output (CSS/Tailwind v3/v4).",
+      "description": "Ridiculously typed CSS easing function picker — bezier canvas, spring/bounce/wiggle physics baked to linear(), polynomial preset gallery, 6-property animation preview, 3-format output (CSS/Tailwind v3/v4).",
       "registryDependencies": ["button", "popover"],
       "dependencies": [],
       "files": [
@@ -145,6 +175,76 @@
           "path": "src/components/ui/easing-picker/easing-picker.types.ts",
           "type": "registry:ui",
           "target": "components/ui/easing-picker/easing-picker.types.ts"
+        },
+        {
+          "path": "src/components/ui/easing-picker/easing-picker.constants.ts",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/easing-picker.constants.ts"
+        },
+        {
+          "path": "src/components/ui/easing-picker/easing-picker.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/easing-picker.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/easing-picker/easing-picker.presets.ts",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/easing-picker.presets.ts"
+        },
+        {
+          "path": "src/components/ui/easing-picker/controls/basis-tabs.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/controls/basis-tabs.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/controls/bezier-canvas.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/controls/bezier-canvas.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/controls/bezier-inputs.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/controls/bezier-inputs.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/controls/physics-controls.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/controls/physics-controls.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/controls/preset-gallery.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/controls/preset-gallery.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/controls/slider-group.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/controls/slider-group.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/controls/steps-controls.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/controls/steps-controls.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/panel/basis-controls.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/panel/basis-controls.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/panel/preview-section.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/panel/preview-section.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/preview/easing-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/preview/easing-preview.tsx"
+        },
+        {
+          "path": "src/components/ui/easing-picker/preview/output-panel.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/easing-picker/preview/output-panel.tsx"
         }
       ]
     },
@@ -152,7 +252,7 @@
       "name": "calc-editor",
       "type": "registry:ui",
       "title": "Calc Editor",
-      "description": "Ridiculously typed CSS math editor \u2014 calc/clamp/min/max with compile-time DIMENSIONAL ANALYSIS (length\u00b1length \u2713, length\u00b1angle \u2717, length\u00d7length \u2717, \u00f7 by non-number \u2717), a full runtime parser/evaluator, and a fluid-type clamp() playground.",
+      "description": "Ridiculously typed CSS math editor — calc/clamp/min/max with compile-time DIMENSIONAL ANALYSIS (length±length ✓, length±angle ✗, length×length ✗, ÷ by non-number ✗), a full runtime parser/evaluator, and a fluid-type clamp() playground.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "button",
@@ -187,7 +287,7 @@
       "name": "transform-builder",
       "type": "registry:ui",
       "title": "Transform Builder",
-      "description": "Ridiculously typed CSS transform editor \u2014 a space-separated function list with compile-time FUNCTION-NAME DISPATCH (per-function arity + per-argument dimension typing: rotate wants an angle, translateX a length-%), a tolerant runtime parser, and a live 3D-preview card driven by the typed string.",
+      "description": "Ridiculously typed CSS transform editor — a space-separated function list with compile-time FUNCTION-NAME DISPATCH (per-function arity + per-argument dimension typing: rotate wants an angle, translateX a length-%), a tolerant runtime parser, and a live 3D-preview card driven by the typed string.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "button",
@@ -217,6 +317,21 @@
           "path": "src/components/ui/transform-builder/transform-builder.helpers.ts",
           "type": "registry:ui",
           "target": "components/ui/transform-builder/transform-builder.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/transform-builder/transform-builder.arg-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/transform-builder/transform-builder.arg-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/transform-builder/transform-builder.constants.ts",
+          "type": "registry:ui",
+          "target": "components/ui/transform-builder/transform-builder.constants.ts"
+        },
+        {
+          "path": "src/components/ui/transform-builder/transform-builder.preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/transform-builder/transform-builder.preview.tsx"
         }
       ]
     },
@@ -224,7 +339,7 @@
       "name": "filter-builder",
       "type": "registry:ui",
       "title": "Filter Builder",
-      "description": "Ridiculously typed CSS filter / backdrop-filter editor \u2014 a space-separated function list with compile-time FUNCTION-LIST DISPATCH (per-function arity + per-argument dimension typing: blur wants a length, hue-rotate an angle, the amount functions a non-negative number or percentage), a drop-shadow whose optional trailing color is validated against the color-picker ColorLiteral, a tolerant runtime parser, and a live image/card preview with a filter \u2194 backdrop-filter toggle.",
+      "description": "Ridiculously typed CSS filter / backdrop-filter editor — a space-separated function list with compile-time FUNCTION-LIST DISPATCH (per-function arity + per-argument dimension typing: blur wants a length, hue-rotate an angle, the amount functions a non-negative number or percentage), a drop-shadow whose optional trailing color is validated against the color-picker ColorLiteral, a tolerant runtime parser, and a live image/card preview with a filter ↔ backdrop-filter toggle.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "color-picker",
@@ -255,6 +370,21 @@
           "path": "src/components/ui/filter-builder/filter-builder.helpers.ts",
           "type": "registry:ui",
           "target": "components/ui/filter-builder/filter-builder.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/filter-builder/filter-builder.constants.ts",
+          "type": "registry:ui",
+          "target": "components/ui/filter-builder/filter-builder.constants.ts"
+        },
+        {
+          "path": "src/components/ui/filter-builder/filter-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/filter-builder/filter-preview.tsx"
+        },
+        {
+          "path": "src/components/ui/filter-builder/filter-row.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/filter-builder/filter-row.tsx"
         }
       ]
     },
@@ -262,7 +392,7 @@
       "name": "grid-builder",
       "type": "registry:ui",
       "title": "Grid Builder",
-      "description": "Ridiculously typed CSS grid-template editor \u2014 track lists (grid-template-columns / grid-template-rows) and grid-template-areas across three modes. TrackListLiteral fully validates the track grammar (length/percentage/flex/keywords, minmax with an inflexible-min guard, fit-content, depth-capped repeat with a recursive track list + auto-fill/auto-fit, and [named-line] idents); GridAreasLiteral validates quoting + equal column counts + cell idents at the type level, with the contiguous-rectangle invariant enforced at runtime. Ships a live display:grid preview and a clickable areas painter.",
+      "description": "Ridiculously typed CSS grid-template editor — track lists (grid-template-columns / grid-template-rows) and grid-template-areas across three modes. TrackListLiteral fully validates the track grammar (length/percentage/flex/keywords, minmax with an inflexible-min guard, fit-content, depth-capped repeat with a recursive track list + auto-fill/auto-fit, and [named-line] idents); GridAreasLiteral validates quoting + equal column counts + cell idents at the type level, with the contiguous-rectangle invariant enforced at runtime. Ships a live display:grid preview and a clickable areas painter.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "unit-input",
@@ -292,6 +422,26 @@
           "path": "src/components/ui/grid-builder/grid-builder.helpers.ts",
           "type": "registry:ui",
           "target": "components/ui/grid-builder/grid-builder.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/grid-builder/areas-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/grid-builder/areas-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/grid-builder/grid-builder.constants.ts",
+          "type": "registry:ui",
+          "target": "components/ui/grid-builder/grid-builder.constants.ts"
+        },
+        {
+          "path": "src/components/ui/grid-builder/grid-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/grid-builder/grid-preview.tsx"
+        },
+        {
+          "path": "src/components/ui/grid-builder/track-list-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/grid-builder/track-list-editor.tsx"
         }
       ]
     },
@@ -299,7 +449,7 @@
       "name": "clip-path-editor",
       "type": "registry:ui",
       "title": "Clip Path Editor",
-      "description": "Ridiculously typed CSS clip-path / shape-outside editor \u2014 a single <basic-shape> (inset / circle / ellipse / polygon) with an optional geometry-box keyword, validated by compile-time BASIC-SHAPE DISPATCH. ClipPathLiteral routes the value through ParseFunction to a per-shape validator: inset checks 1-4 length-percentages (+ a weak round tail), circle a radius (length-% or keyword) + at-position, ellipse exactly two radii, polygon a variadic vertex list (each vertex two length-percentages, validated to a 32-vertex depth cap then weak-validated). At most one leading/trailing geometry box. Ships a tolerant runtime parser and a live preview with draggable polygon vertices writing percentage coordinates.",
+      "description": "Ridiculously typed CSS clip-path / shape-outside editor — a single <basic-shape> (inset / circle / ellipse / polygon) with an optional geometry-box keyword, validated by compile-time BASIC-SHAPE DISPATCH. ClipPathLiteral routes the value through ParseFunction to a per-shape validator: inset checks 1-4 length-percentages (+ a weak round tail), circle a radius (length-% or keyword) + at-position, ellipse exactly two radii, polygon a variadic vertex list (each vertex two length-percentages, validated to a 32-vertex depth cap then weak-validated). At most one leading/trailing geometry box. Ships a tolerant runtime parser and a live preview with draggable polygon vertices writing percentage coordinates.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "unit-input",
@@ -330,6 +480,86 @@
           "path": "src/components/ui/clip-path-editor/clip-path-editor.helpers.ts",
           "type": "registry:ui",
           "target": "components/ui/clip-path-editor/clip-path-editor.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/clip-path-editor.constants.ts",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/clip-path-editor.constants.ts"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/clip-path-editor.hooks.ts",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/clip-path-editor.hooks.ts"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/controls/circle.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/controls/circle.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/controls/ellipse.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/controls/ellipse.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/controls/inset.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/controls/inset.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/controls/length-pct.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/controls/length-pct.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/controls/polygon.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/controls/polygon.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/controls/position.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/controls/position.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/controls/radius.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/controls/radius.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/controls/shape-controls.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/controls/shape-controls.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/preview/circle-scrubs.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/preview/circle-scrubs.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/preview/clip-path-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/preview/clip-path-preview.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/primitives/geometry-box-select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/primitives/geometry-box-select.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/primitives/labeled-field.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/primitives/labeled-field.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/primitives/live-string.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/primitives/live-string.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/primitives/shape-select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/primitives/shape-select.tsx"
         }
       ]
     },
@@ -369,6 +599,21 @@
           "path": "src/components/ui/box-shadow-editor/box-shadow-editor.helpers.ts",
           "type": "registry:ui",
           "target": "components/ui/box-shadow-editor/box-shadow-editor.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/box-shadow-editor/box-shadow-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/box-shadow-editor/box-shadow-preview.tsx"
+        },
+        {
+          "path": "src/components/ui/box-shadow-editor/shadow-layer-row.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/box-shadow-editor/shadow-layer-row.tsx"
+        },
+        {
+          "path": "src/components/ui/box-shadow-editor/shadow-length-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/box-shadow-editor/shadow-length-editor.tsx"
         }
       ]
     },
@@ -376,7 +621,7 @@
       "name": "transition-editor",
       "type": "registry:ui",
       "title": "Transition + Animation Editor",
-      "description": "Ridiculously typed CSS transition + animation editor \u2014 a mode prop edits either comma-separated layer list with compile-time PER-LAYER TOKEN-KIND CLASSIFICATION. The list splits by comma into layers, each layer by space into tokens; every token is classified by KIND with a per-kind cardinality cap (order-independent within a layer). TransitionLiteral validates per layer \u22642 <time> (duration, delay), \u22641 <easing-function> (via easing-picker's EasingLiteral), \u22641 <property> (all|none|<custom-ident>), \u22641 allow-discrete. AnimationLiteral validates \u22642 <time>, \u22641 easing, \u22641 iteration-count (<number>|infinite), \u22641 direction, \u22641 fill-mode, \u22641 play-state, \u22641 <keyframes-name>. Excess cardinality, an unknown token, or a bad easing resolve to never; calc()/var() and weak <custom-ident> are deferred to the tolerant runtime parser. Ships cssTransition/cssAnimation helpers, the parser, and a live preview that actually transitions/animates with a play/replay button, embedded EasingPicker, and a duration scrubber.",
+      "description": "Ridiculously typed CSS transition + animation editor — a mode prop edits either comma-separated layer list with compile-time PER-LAYER TOKEN-KIND CLASSIFICATION. The list splits by comma into layers, each layer by space into tokens; every token is classified by KIND with a per-kind cardinality cap (order-independent within a layer). TransitionLiteral validates per layer ≤2 <time> (duration, delay), ≤1 <easing-function> (via easing-picker's EasingLiteral), ≤1 <property> (all|none|<custom-ident>), ≤1 allow-discrete. AnimationLiteral validates ≤2 <time>, ≤1 easing, ≤1 iteration-count (<number>|infinite), ≤1 direction, ≤1 fill-mode, ≤1 play-state, ≤1 <keyframes-name>. Excess cardinality, an unknown token, or a bad easing resolve to never; calc()/var() and weak <custom-ident> are deferred to the tolerant runtime parser. Ships cssTransition/cssAnimation helpers, the parser, and a live preview that actually transitions/animates with a play/replay button, embedded EasingPicker, and a duration scrubber.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "easing-picker",
@@ -408,6 +653,21 @@
           "path": "src/components/ui/transition-editor/transition-editor.helpers.ts",
           "type": "registry:ui",
           "target": "components/ui/transition-editor/transition-editor.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/transition-editor/controls.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/transition-editor/controls.tsx"
+        },
+        {
+          "path": "src/components/ui/transition-editor/fields.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/transition-editor/fields.tsx"
+        },
+        {
+          "path": "src/components/ui/transition-editor/preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/transition-editor/preview.tsx"
         }
       ]
     },
@@ -485,6 +745,36 @@
           "path": "src/components/ui/color-function/color-function.helpers.ts",
           "type": "registry:ui",
           "target": "components/ui/color-function/color-function.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/color-function/color-function-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-function/color-function-preview.tsx"
+        },
+        {
+          "path": "src/components/ui/color-function/color-mix-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-function/color-mix-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/color-function/family-select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-function/family-select.tsx"
+        },
+        {
+          "path": "src/components/ui/color-function/light-dark-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-function/light-dark-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/color-function/live-string.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-function/live-string.tsx"
+        },
+        {
+          "path": "src/components/ui/color-function/relative-color-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/color-function/relative-color-editor.tsx"
         }
       ]
     },
@@ -527,7 +817,7 @@
       "name": "query-builder",
       "type": "registry:ui",
       "title": "Media / Container Query Builder",
-      "description": "Ridiculously typed editor for CSS media queries AND container queries (mode prop: media | container). MediaQueryLiteral<S> / ContainerQueryLiteral<S> validate the query skeleton \u2014 balanced parens, the optional leading only/not + media-type or container name, the boolean combination of parenthesized feature tests enforcing the CSS no-mixing-and-and-or-at-one-level rule \u2014 and each feature test's VALUE dimension against a known feature table: length features want a <length>, resolution features a <resolution>, aspect-ratio a <ratio> (16/9), enum features one of their keywords (orientation, pointer, prefers-color-scheme, \u2026). (width: 16/9) resolves to never; (min-resolution: 600px) to never; (a) and (b) or (c) to never (mixes and/or). Container mode restricts the feature set to the size subset (width, height, inline-size, block-size, aspect-ratio) + orientation. Unknown/exotic features, calc() values, and deep nesting past a depth cap of 4 are deferred to the runtime parser (lenient by design). Ships cssMediaQuery/cssContainerQuery call-site helpers, parseQuery/parseQueryState/formatQuery/queryToString/featureKind/featuresFor/enumOptionsFor/matchesNow helpers, FeaturesOf/FeatureCountOf utility types, FeatureTest/QueryNode/QueryState internal state, a popover + inline panel, a condition-builder UI, and a live matchMedia 'matches now?' indicator (media mode).",
+      "description": "Ridiculously typed editor for CSS media queries AND container queries (mode prop: media | container). MediaQueryLiteral<S> / ContainerQueryLiteral<S> validate the query skeleton — balanced parens, the optional leading only/not + media-type or container name, the boolean combination of parenthesized feature tests enforcing the CSS no-mixing-and-and-or-at-one-level rule — and each feature test's VALUE dimension against a known feature table: length features want a <length>, resolution features a <resolution>, aspect-ratio a <ratio> (16/9), enum features one of their keywords (orientation, pointer, prefers-color-scheme, …). (width: 16/9) resolves to never; (min-resolution: 600px) to never; (a) and (b) or (c) to never (mixes and/or). Container mode restricts the feature set to the size subset (width, height, inline-size, block-size, aspect-ratio) + orientation. Unknown/exotic features, calc() values, and deep nesting past a depth cap of 4 are deferred to the runtime parser (lenient by design). Ships cssMediaQuery/cssContainerQuery call-site helpers, parseQuery/parseQueryState/formatQuery/queryToString/featureKind/featuresFor/enumOptionsFor/matchesNow helpers, FeaturesOf/FeatureCountOf utility types, FeatureTest/QueryNode/QueryState internal state, a popover + inline panel, a condition-builder UI, and a live matchMedia 'matches now?' indicator (media mode).",
       "registryDependencies": [
         "ridiculous-type-kit",
         "unit-input",
@@ -558,6 +848,26 @@
           "path": "src/components/ui/query-builder/query-builder.helpers.ts",
           "type": "registry:ui",
           "target": "components/ui/query-builder/query-builder.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/query-builder/feature-test-row.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/query-builder/feature-test-row.tsx"
+        },
+        {
+          "path": "src/components/ui/query-builder/mini-select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/query-builder/mini-select.tsx"
+        },
+        {
+          "path": "src/components/ui/query-builder/query-builder-fields.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/query-builder/query-builder-fields.tsx"
+        },
+        {
+          "path": "src/components/ui/query-builder/query-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/query-builder/query-preview.tsx"
         }
       ]
     },
@@ -565,7 +875,7 @@
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, and query-builder in one command.",
+      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, and query-builder in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",

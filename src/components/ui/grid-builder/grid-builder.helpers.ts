@@ -271,12 +271,3 @@ export function gridAreaFor(matrix: string[][], name: string): string | null {
   if (maxR === -1) return null
   return `${minR + 1} / ${minC + 1} / ${maxR + 2} / ${maxC + 2}`
 }
-
-// ---------------------------------------------------------------------------
-// ParseResult facade
-// ---------------------------------------------------------------------------
-
-export interface ParseResult {
-  tokens: TrackToken[] | null
-  error: string | null
-}

@@ -1,9 +1,15 @@
-import type * as React from "react"
+import {
+  ApiRow,
+  ApiSection,
+  PropsTable,
+  Signature,
+  TypesList,
+} from "@/examples/_shared/api-reference"
 
 export function ApiReference() {
   return (
     <div className="glass-card space-y-10 rounded-2xl p-6 md:p-8">
-      <Section title="BoxShadowEditor / BoxShadowEditorPanel">
+      <ApiSection title="BoxShadowEditor / BoxShadowEditorPanel">
         <Signature>
           {
             "<BoxShadowEditor\n  value: BoxShadowString | (string & {})\n  onChange: (next: BoxShadowString) => void\n  className?: string\n  aria-label?: string\n/>"
@@ -28,9 +34,9 @@ export function ApiReference() {
             },
           ]}
         />
-      </Section>
+      </ApiSection>
 
-      <Section title="Sub-components">
+      <ApiSection title="Sub-components">
         <ApiRow
           signature="<ShadowLayerRow layer onChange onRemove index? />"
           desc="One editable layer — an inset toggle, offset-x / offset-y / blur / spread length editors, a per-layer color control (a ColorPicker with an add / remove affordance), and a remove button."
@@ -47,9 +53,9 @@ export function ApiReference() {
           signature="<BoxShadowPreview value onChange? />"
           desc="The showcase: a card carrying the stacked shadow, a draggable light source that re-casts every layer's offsets away from it, and a UnitInput elevation scrubber that scales blur across the stack."
         />
-      </Section>
+      </ApiSection>
 
-      <Section title="Runtime helpers">
+      <ApiSection title="Runtime helpers">
         <ApiRow
           signature="cssBoxShadow<S extends string>(value: S & BoxShadowLiteral<S>): S"
           desc="Call-site validator. Mirrors cssFilter() / cssTransform() / color() / easing()."
@@ -74,9 +80,9 @@ export function ApiReference() {
           signature="defaultLayer(): ShadowLayer"
           desc="Seed a fresh layer — a soft drop shadow (0px 4px 8px rgb(0 0 0 / 0.25))."
         />
-      </Section>
+      </ApiSection>
 
-      <Section title="Types">
+      <ApiSection title="Types">
         <TypesList
           rows={[
             {
@@ -109,9 +115,9 @@ export function ApiReference() {
             },
           ]}
         />
-      </Section>
+      </ApiSection>
 
-      <Section title="Strict-tier scope">
+      <ApiSection title="Strict-tier scope">
         <ul className="list-disc space-y-2 pl-5 text-muted-foreground text-sm">
           <li>
             Full <strong>per-layer token validation</strong>:{" "}
@@ -161,96 +167,7 @@ export function ApiReference() {
             weak-validated past the cap); the runtime parser validates fully.
           </li>
         </ul>
-      </Section>
+      </ApiSection>
     </div>
-  )
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="space-y-4">
-      <h3 className="font-mono text-muted-foreground text-sm uppercase tracking-[0.18em]">
-        <span className="text-gradient">§</span> {title}
-      </h3>
-      {children}
-    </div>
-  )
-}
-
-function Signature({ children }: { children: string }) {
-  return (
-    <pre className="overflow-x-auto whitespace-pre rounded-lg border border-white/10 bg-black/40 p-4 font-mono text-[11px] leading-relaxed md:text-xs">
-      {children}
-    </pre>
-  )
-}
-
-function ApiRow({ signature, desc }: { signature: string; desc: string }) {
-  return (
-    <div className="space-y-2">
-      <Signature>{signature}</Signature>
-      <p className="text-muted-foreground text-sm">{desc}</p>
-    </div>
-  )
-}
-
-function PropsTable({
-  rows,
-}: {
-  rows: ReadonlyArray<{ name: string; type: string; desc: string }>
-}) {
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-left text-sm">
-        <thead>
-          <tr className="border-white/10 border-b text-muted-foreground text-xs uppercase tracking-wider">
-            <th className="py-2 pr-4 font-medium">Prop</th>
-            <th className="py-2 pr-4 font-medium">Type</th>
-            <th className="py-2 font-medium">Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.name} className="border-white/5 border-b align-top">
-              <td className="py-2 pr-4 font-mono text-foreground text-xs">
-                {row.name}
-              </td>
-              <td className="py-2 pr-4 font-mono text-muted-foreground text-xs">
-                {row.type}
-              </td>
-              <td className="py-2 text-muted-foreground">{row.desc}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  )
-}
-
-function TypesList({
-  rows,
-}: {
-  rows: ReadonlyArray<{ name: string; desc: string }>
-}) {
-  return (
-    <dl className="space-y-2 text-sm">
-      {rows.map((row) => (
-        <div
-          key={row.name}
-          className="flex flex-col gap-0.5 md:flex-row md:gap-3"
-        >
-          <dt className="min-w-[180px] font-mono text-foreground text-xs">
-            {row.name}
-          </dt>
-          <dd className="text-muted-foreground">{row.desc}</dd>
-        </div>
-      ))}
-    </dl>
   )
 }

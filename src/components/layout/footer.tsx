@@ -1,7 +1,7 @@
 export function Footer() {
   return (
-    <footer className="relative border-t border-white/10 mt-20">
-      <div className="container mx-auto max-w-6xl px-6 py-8 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+    <footer className="relative mt-20 border-white/10 border-t">
+      <div className="container mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-6 py-8 text-muted-foreground text-xs">
         <span>MIT License · 2026</span>
         <a
           href="https://github.com/TurtIeSocks/ridiculous"

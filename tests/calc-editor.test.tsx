@@ -65,6 +65,21 @@ describe("CalcEditorPanel", () => {
       screen.queryByRole("tab", { name: /^min$/i }),
     ).not.toBeInTheDocument()
   })
+
+  test("locked fn wins over the flavor detected from value", () => {
+    render(
+      <CalcEditorPanel
+        fn="clamp"
+        value="calc(10px + 2rem)"
+        onChange={() => {}}
+      />,
+    )
+    // the locked clamp tab must stay selected even though `value` is a calc(...)
+    expect(screen.getByRole("tab", { name: /^clamp$/i })).toHaveAttribute(
+      "aria-selected",
+      "true",
+    )
+  })
 })
 
 describe("ExpressionField", () => {
@@ -152,15 +167,15 @@ describe("CalcEditorPanel integration", () => {
 
   test("inserting a token from the palette appends and re-emits", () => {
     const onChange = vi.fn()
-    render(<CalcEditorPanel value="calc(10px)" onChange={() => {}} />)
-    // open with a value that becomes valid after inserting
+    render(<CalcEditorPanel value="calc(10px)" onChange={onChange} />)
+    // Type a valid expression: this commit re-emits, proving the spy is wired.
     fireEvent.change(screen.getByLabelText(/expression/i), {
-      target: { value: "calc(10px + 2px" },
+      target: { value: "calc(10px + 2px)" },
     })
+    expect(onChange).toHaveBeenCalledWith("calc(10px + 2px)")
     onChange.mockClear()
-    // now type the close paren via the palette
+    // Now append a token from the palette: the field text grows.
     fireEvent.click(screen.getByRole("button", { name: "( )" }))
-    // the field text grew
     expect(
       (screen.getByLabelText(/expression/i) as HTMLInputElement).value,
     ).toContain("()")

@@ -32,6 +32,7 @@ import type {
   IsLength,
   IsNumber,
   IsPercentage,
+  Letter,
   Or,
   SplitByComma,
   SplitBySpace,
@@ -94,63 +95,8 @@ type AbsoluteSizeKeyword =
 //    Each operates on an already-trimmed token.
 // =====================================================================
 
-/** Letters allowed in a bare (unquoted) custom-ident family token. */
-type IdentLetter =
-  | "a"
-  | "b"
-  | "c"
-  | "d"
-  | "e"
-  | "f"
-  | "g"
-  | "h"
-  | "i"
-  | "j"
-  | "k"
-  | "l"
-  | "m"
-  | "n"
-  | "o"
-  | "p"
-  | "q"
-  | "r"
-  | "s"
-  | "t"
-  | "u"
-  | "v"
-  | "w"
-  | "x"
-  | "y"
-  | "z"
-  | "A"
-  | "B"
-  | "C"
-  | "D"
-  | "E"
-  | "F"
-  | "G"
-  | "H"
-  | "I"
-  | "J"
-  | "K"
-  | "L"
-  | "M"
-  | "N"
-  | "O"
-  | "P"
-  | "Q"
-  | "R"
-  | "S"
-  | "T"
-  | "U"
-  | "V"
-  | "W"
-  | "X"
-  | "Y"
-  | "Z"
-
 /** Characters allowed anywhere in a bare family ident (incl. inner spaces). */
-type IdentChar = IdentLetter | Digit | "-" | "_" | " "
+type IdentChar = Letter | Digit | "-" | "_" | " "
 
 type AllIdentChars<S extends string> = S extends ""
   ? true
@@ -197,7 +143,7 @@ export type IsFamilyToken<T extends string> = T extends FontGenericFamily
     : T extends `'${string}'`
       ? true
       : T extends `${infer First}${string}`
-        ? First extends IdentLetter | "_" | "-"
+        ? First extends Letter | "_" | "-"
           ? AllIdentChars<T>
           : false
         : false

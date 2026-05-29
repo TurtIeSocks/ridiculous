@@ -1,10 +1,14 @@
+"use client"
+
 import { useState } from "react"
 import {
   GradientEditor,
   type GradientStringMap,
   type GradientType,
 } from "@/components/ui/gradient-editor"
-import { CopyButton } from "../color-picker/copy-button"
+import { CopyButton } from "@/examples/_shared/copy-button"
+import { ExampleCard } from "@/examples/_shared/example-card"
+import { ValueReadout } from "@/examples/_shared/value-readout"
 
 const TYPES: readonly GradientType[] = ["linear", "radial", "conic"] as const
 
@@ -19,7 +23,7 @@ function TypeCard<T extends GradientType>({ type }: { type: T }) {
   )
   return (
     <div className="glass-card rounded-xl p-4">
-      <div className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground">
+      <div className="font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
         <span className="text-gradient">→</span> {type}
       </div>
       <div className="mt-3 flex items-center gap-2">
@@ -28,10 +32,8 @@ function TypeCard<T extends GradientType>({ type }: { type: T }) {
           type={type}
           onChange={(next) => setGrad(next as GradientStringMap[T])}
         />
-        <code className="text-xs font-mono bg-black/40 border border-white/10 px-2.5 py-1 rounded-md truncate min-w-0 flex-1">
-          {grad}
-        </code>
-        <CopyButton value={grad} />
+        <ValueReadout value={grad} />
+        <CopyButton value={grad} label="Copy color" />
       </div>
     </div>
   )
@@ -39,21 +41,23 @@ function TypeCard<T extends GradientType>({ type }: { type: T }) {
 
 export function TypeLocked() {
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8">
-      <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">
-        <span className="text-gradient">/</span> type-locked
-      </div>
-      <h3 className="text-xl font-semibold tracking-tight">Type-Locked</h3>
-      <p className="mt-2 text-sm text-muted-foreground max-w-prose">
-        Setting <code className="text-foreground">type</code> hides the switcher
-        and locks <code className="text-foreground">onChange</code> to that
-        gradient flavor.
-      </p>
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <ExampleCard
+      className="md:p-8"
+      eyebrow="type-locked"
+      title="Type-Locked"
+      description={
+        <>
+          Setting <code className="text-foreground">type</code> hides the
+          switcher and locks <code className="text-foreground">onChange</code>{" "}
+          to that gradient flavor.
+        </>
+      }
+    >
+      <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         {TYPES.map((t) => (
           <TypeCard key={t} type={t} />
         ))}
       </div>
-    </div>
+    </ExampleCard>
   )
 }

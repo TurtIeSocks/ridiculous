@@ -10,6 +10,8 @@ import {
   QueryBuilderPanel,
   QueryPreview,
 } from "@/components/ui/query-builder/query-builder"
+import { formatFeatureTest } from "@/components/ui/query-builder/query-builder.helpers"
+import type { FeatureTest } from "@/components/ui/query-builder/query-builder.types"
 import { cssMediaQuery } from "@/components/ui/query-builder/query-builder.types"
 
 // jsdom has no matchMedia — mock it for every test.
@@ -370,6 +372,36 @@ describe("FeatureTestRow shape + feature changes", () => {
     })
     expect(onChange).toHaveBeenCalledWith(
       expect.objectContaining({ kind: "range3", feature: "width" }),
+    )
+  })
+
+  test("reshaping a discrete feature to range3 does not duplicate the keyword", () => {
+    // BUG: reshape() carried one string into BOTH value and value2, so a
+    // discrete feature like `orientation: portrait` became the invalid
+    // `portrait <= orientation <= portrait`. range3 is a numeric range shape;
+    // a non-length feature must reset to numeric bounds, never the keyword.
+    const onChange = vi.fn()
+    render(
+      <FeatureTestRow
+        mode="media"
+        test={{ kind: "plain", feature: "orientation", value: "portrait" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("shape"), {
+      target: { value: "range3" },
+    })
+    const emitted = onChange.mock.calls.at(-1)?.[0] as FeatureTest
+    expect(emitted.kind).toBe("range3")
+    if (emitted.kind === "range3") {
+      // neither bound carries the discrete keyword
+      expect(emitted.value).not.toBe("portrait")
+      expect(emitted.value2).not.toBe("portrait")
+    }
+    // the serialized form is a numeric range, not `portrait <= orientation <= portrait`
+    expect(formatFeatureTest(emitted)).not.toBe(
+      "portrait <= orientation <= portrait",
     )
   })
 

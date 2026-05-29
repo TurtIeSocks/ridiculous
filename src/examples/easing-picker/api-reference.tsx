@@ -1,15 +1,21 @@
-import type * as React from "react"
+import {
+  ApiRow,
+  ApiSection,
+  PropsTable,
+  Signature,
+  TypesList,
+} from "@/examples/_shared/api-reference"
 
 export function ApiReference() {
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8 space-y-10">
-      <Section title="EasingPicker">
+    <div className="glass-card space-y-10 rounded-2xl p-6 md:p-8">
+      <ApiSection title="EasingPicker">
         <Signature>
           {
             "<EasingPicker\n  value: EasingString | (string & {})\n  onChange: (next: EasingString | string) => void\n  basis?: EasingBasis\n  output?: 'css' | 'tailwind-v3' | 'tailwind-v4'\n  className?: string\n  aria-label?: string\n/>"
           }
         </Signature>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Popover-wrapped composed wizard.
         </p>
         <PropsTable
@@ -46,20 +52,20 @@ export function ApiReference() {
             },
           ]}
         />
-      </Section>
+      </ApiSection>
 
-      <Section title="EasingPanel">
+      <ApiSection title="EasingPanel">
         <Signature>
           {"<EasingPanel /* same props as EasingPicker */ />"}
         </Signature>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           Renders the wizard inline without a popover wrapper. Same prop surface
           as <code className="font-mono">EasingPicker</code>.
         </p>
-      </Section>
+      </ApiSection>
 
-      <Section title="Sub-components">
-        <p className="text-sm text-muted-foreground">
+      <ApiSection title="Sub-components">
+        <p className="text-muted-foreground text-sm">
           All controlled-only — <code className="font-mono">value</code> +{" "}
           <code className="font-mono">onChange</code> required.
         </p>
@@ -95,9 +101,9 @@ export function ApiReference() {
             },
           ]}
         />
-      </Section>
+      </ApiSection>
 
-      <Section title="Runtime helpers">
+      <ApiSection title="Runtime helpers">
         <ApiRow
           signature="easing<S extends string>(value: S & EasingLiteral<S>): S"
           desc="Call-site validator. Mirrors color() and gradient()."
@@ -126,9 +132,9 @@ export function ApiReference() {
           signature="bakeLinear(samples): string"
           desc="Sample array → linear(...) string with collinear-prune pass."
         />
-      </Section>
+      </ApiSection>
 
-      <Section title="Types">
+      <ApiSection title="Types">
         <TypesList
           rows={[
             {
@@ -157,10 +163,10 @@ export function ApiReference() {
             },
           ]}
         />
-      </Section>
+      </ApiSection>
 
-      <Section title="Limitations">
-        <ul className="text-sm text-muted-foreground space-y-2 list-disc pl-5">
+      <ApiSection title="Limitations">
+        <ul className="list-disc space-y-2 pl-5 text-muted-foreground text-sm">
           <li>
             Round-trip from <code className="font-mono">linear()</code> back to
             physics params is lossy — the baked output erases the source{" "}
@@ -177,87 +183,7 @@ export function ApiReference() {
             runtime parser is authoritative.
           </li>
         </ul>
-      </Section>
-    </div>
-  )
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string
-  children: React.ReactNode
-}) {
-  return (
-    <div className="space-y-4">
-      <h3 className="text-sm font-mono uppercase tracking-[0.18em] text-muted-foreground">
-        <span className="text-gradient">§</span> {title}
-      </h3>
-      {children}
-    </div>
-  )
-}
-
-function Signature({ children }: { children: string }) {
-  return (
-    <pre className="text-[11px] md:text-xs leading-relaxed font-mono bg-black/40 border border-white/10 p-4 rounded-lg overflow-x-auto whitespace-pre">
-      {children}
-    </pre>
-  )
-}
-
-function ApiRow({ signature, desc }: { signature: string; desc: string }) {
-  return (
-    <div className="space-y-2">
-      <Signature>{signature}</Signature>
-      <p className="text-sm text-muted-foreground">{desc}</p>
-    </div>
-  )
-}
-
-function PropsTable({
-  rows,
-}: {
-  rows: { name: string; type: string; desc: string }[]
-}) {
-  return (
-    <div className="rounded-lg border border-white/10 overflow-hidden">
-      <div className="grid grid-cols-[minmax(7rem,auto)_minmax(12rem,auto)_1fr] gap-x-4 px-4 py-2 bg-black/40 text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
-        <div>Prop</div>
-        <div>Type</div>
-        <div>Description</div>
-      </div>
-      <div className="divide-y divide-white/5">
-        {rows.map((r) => (
-          <div
-            key={r.name}
-            className="grid grid-cols-[minmax(7rem,auto)_minmax(12rem,auto)_1fr] gap-x-4 px-4 py-3 items-baseline text-sm"
-          >
-            <code className="font-mono text-foreground">{r.name}</code>
-            <code className="font-mono text-xs text-cyan-glow break-all">
-              {r.type}
-            </code>
-            <span className="text-muted-foreground text-sm">{r.desc}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function TypesList({ rows }: { rows: { name: string; desc: string }[] }) {
-  return (
-    <div className="rounded-lg border border-white/10 divide-y divide-white/5 overflow-hidden">
-      {rows.map((r) => (
-        <div
-          key={r.name}
-          className="grid grid-cols-1 sm:grid-cols-[minmax(10rem,auto)_1fr] gap-x-4 gap-y-1 px-4 py-3 text-sm"
-        >
-          <code className="font-mono text-foreground">{r.name}</code>
-          <span className="text-muted-foreground">{r.desc}</span>
-        </div>
-      ))}
+      </ApiSection>
     </div>
   )
 }

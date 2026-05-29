@@ -6,6 +6,7 @@ import {
   type ClipPathString,
   parseClipPath,
 } from "@/components/ui/clip-path-editor"
+import { ExampleCard } from "@/examples/_shared/example-card"
 
 const PRESETS: ReadonlyArray<{ label: string; value: ClipPathString }> = [
   { label: "triangle", value: "polygon(50% 0%, 0% 100%, 100% 100%)" },
@@ -59,21 +60,20 @@ export function PolygonPlayground() {
   }
 
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8">
-      <div className="mb-2 font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
-        <span className="text-gradient">/</span> polygon-playground
-      </div>
-      <h3 className="font-semibold text-xl tracking-tight">
-        Drag the vertices
-      </h3>
-      <p className="mt-2 max-w-prose text-muted-foreground text-sm">
-        The handles convert pointer position to{" "}
-        <strong>percentage vertices</strong> and write the{" "}
-        <code className="font-mono text-foreground">polygon()</code> string live
-        — the namesake demo. The same value drives both the masked image and the
-        editor panel below.
-      </p>
-
+    <ExampleCard
+      className="md:p-8"
+      eyebrow="polygon-playground"
+      title="Drag the vertices"
+      description={
+        <>
+          The handles convert pointer position to{" "}
+          <strong>percentage vertices</strong> and write the{" "}
+          <code className="font-mono text-foreground">polygon()</code> string
+          live — the namesake demo. The same value drives both the masked image
+          and the editor panel below.
+        </>
+      }
+    >
       <div className="mt-6 flex flex-wrap gap-2">
         {PRESETS.map((p) => (
           <button
@@ -139,7 +139,7 @@ export function PolygonPlayground() {
               onPointerUp={() => {
                 dragRef.current = null
               }}
-              className="-translate-x-1/2 -translate-y-1/2 absolute h-4 w-4 cursor-grab rounded-full border-2 border-white bg-fuchsia-500 shadow-lg transition-transform hover:scale-125 focus:outline-none focus:ring-2 focus:ring-white active:cursor-grabbing"
+              className="absolute h-4 w-4 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-full border-2 border-white bg-fuchsia-500 shadow-lg transition-transform hover:scale-125 focus:outline-none focus:ring-2 focus:ring-white active:cursor-grabbing"
               style={{
                 left: `${Number.parseFloat(v.x)}%`,
                 top: `${Number.parseFloat(v.y)}%`,
@@ -163,6 +163,6 @@ export function PolygonPlayground() {
       >
         {value}
       </code>
-    </div>
+    </ExampleCard>
   )
 }

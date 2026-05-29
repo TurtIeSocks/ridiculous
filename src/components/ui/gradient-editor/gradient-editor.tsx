@@ -164,14 +164,24 @@ function GradientEditorBody({
             selectedIndex={selectedStopIndex}
             onSelectStop={setSelectedStopIndex}
             onMoveStop={(i, position) => {
-              const stops = internal.stops.map((s, idx) =>
-                idx === i ? { ...s, position } : s,
-              )
+              const moved = { ...internal.stops[i], position }
+              // Re-sort so array order matches visual order — `formatGradient`
+              // emits stops in array order, and a stop positioned below its
+              // predecessor renders wrong (browsers clamp it). Mirror the
+              // `onAddStop` pattern: sort, then re-find the moved stop by
+              // reference so the dragged handle stays selected/tracked even
+              // after it leapfrogs a neighbor.
+              const stops = internal.stops
+                .map((s, idx) => (idx === i ? moved : s))
+                .sort((a, b) => a.position - b.position)
+              const newIndex = stops.indexOf(moved)
+              setSelectedStopIndex(newIndex)
               emit({ ...internal, stops })
+              return newIndex
             }}
             onAddStop={(position) => {
               if (internal.stops.length >= maxStops) return -1
-              // Pick interpolated color from neighbors; fallback to last stop's color.
+              // Inherit the last stop's color (fallback to black if somehow empty).
               const newColor =
                 internal.stops[internal.stops.length - 1]?.color ?? "#000000"
               const newStop = { color: newColor, position }
@@ -312,6 +322,14 @@ function InterpolationPicker({
   )
 }
 
+// Angle dial geometry, in SVG userspace units of the 40x40 viewBox below.
+const DIAL_CENTER = 20 // viewBox midpoint (40 / 2) — origin for the indicator line
+const DIAL_RADIUS = 16 // indicator-line length; leaves a ~4u margin to the dial edge
+// CSS gradient angles measure 0deg = up, clockwise; atan2 measures 0 = +x axis.
+// Offsetting by a quarter-turn rotates between the two conventions.
+const ATAN2_TO_CSS_ANGLE_OFFSET = 90 // atan2 (0 = right) → CSS angle (0 = up)
+const ANGLE_SNAP_STEP = 15 // shift-drag / shift-arrow snap increment, in degrees
+
 function AngleDial({
   angle,
   onChange,
@@ -325,16 +343,17 @@ function AngleDial({
     const cy = rect.top + rect.height / 2
     const dx = event.clientX - cx
     const dy = event.clientY - cy
-    // 0deg = up; rotate by -90 to align CSS angle convention
-    let deg = (Math.atan2(dy, dx) * 180) / Math.PI + 90
+    // 0deg = up; rotate by +90 to align CSS angle convention
+    let deg = (Math.atan2(dy, dx) * 180) / Math.PI + ATAN2_TO_CSS_ANGLE_OFFSET
     if (deg < 0) deg += 360
-    if (event.shiftKey) deg = Math.round(deg / 15) * 15
+    if (event.shiftKey)
+      deg = Math.round(deg / ANGLE_SNAP_STEP) * ANGLE_SNAP_STEP
     onChange(Math.round(deg) % 360)
   }
   // Convert to radians for the indicator line; CSS 0deg = up means angle-90 in atan2 terms.
-  const rad = ((angle - 90) * Math.PI) / 180
-  const x = 20 + 16 * Math.cos(rad)
-  const y = 20 + 16 * Math.sin(rad)
+  const rad = ((angle - ATAN2_TO_CSS_ANGLE_OFFSET) * Math.PI) / 180
+  const x = DIAL_CENTER + DIAL_RADIUS * Math.cos(rad)
+  const y = DIAL_CENTER + DIAL_RADIUS * Math.sin(rad)
   return (
     <div
       role="slider"
@@ -343,7 +362,7 @@ function AngleDial({
       aria-valuemax={360}
       aria-valuenow={Math.round(angle)}
       tabIndex={0}
-      className="size-10 shrink-0 touch-none cursor-grab rounded-full border bg-muted/40"
+      className="size-10 shrink-0 cursor-grab touch-none rounded-full border bg-muted/40"
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId)
         handlePointer(event)
@@ -352,18 +371,22 @@ function AngleDial({
         if (event.buttons) handlePointer(event)
       }}
       onKeyDown={(event) => {
-        const step = event.shiftKey ? 15 : 1
+        const step = event.shiftKey ? ANGLE_SNAP_STEP : 1
         if (event.key === "ArrowLeft") onChange((angle - step + 360) % 360)
         if (event.key === "ArrowRight") onChange((angle + step) % 360)
       }}
       data-slot="gradient-editor-angle-dial"
     >
-      <svg viewBox="0 0 40 40" className="h-full w-full" aria-hidden="true">
+      <svg
+        viewBox={`0 0 ${DIAL_CENTER * 2} ${DIAL_CENTER * 2}`}
+        className="h-full w-full"
+        aria-hidden="true"
+      >
         <title>Angle dial</title>
-        <circle cx="20" cy="20" r="1.5" fill="currentColor" />
+        <circle cx={DIAL_CENTER} cy={DIAL_CENTER} r="1.5" fill="currentColor" />
         <line
-          x1="20"
-          y1="20"
+          x1={DIAL_CENTER}
+          y1={DIAL_CENTER}
           x2={x}
           y2={y}
           stroke="currentColor"
@@ -424,7 +447,7 @@ function PositionPicker({
   return (
     <div className="flex items-center gap-3">
       <div
-        className="relative size-16 shrink-0 touch-none cursor-crosshair rounded border bg-muted/40"
+        className="relative size-16 shrink-0 cursor-crosshair touch-none rounded border bg-muted/40"
         onPointerDown={(event) => {
           event.currentTarget.setPointerCapture(event.pointerId)
           handlePointer(event)
@@ -441,7 +464,7 @@ function PositionPicker({
         />
       </div>
       <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+        <div className="flex items-center gap-1 font-mono text-[10px] text-muted-foreground">
           <span aria-hidden="true">x:</span>
           <UnitInput
             unit="%"
@@ -453,7 +476,7 @@ function PositionPicker({
             className="h-6 w-12"
           />
         </div>
-        <div className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+        <div className="flex items-center gap-1 font-mono text-[10px] text-muted-foreground">
           <span aria-hidden="true">y:</span>
           <UnitInput
             unit="%"
@@ -656,7 +679,12 @@ function GradientPreview({
   state: InternalState
   selectedIndex: number
   onSelectStop: (i: number) => void
-  onMoveStop: (i: number, position: number) => void
+  /**
+   * Moves stop `i` to `position`, re-sorts, and returns the moved stop's new
+   * sorted index. Drag handlers must feed this back into their tracked index so
+   * they keep moving the SAME stop after it crosses a neighbor.
+   */
+  onMoveStop: (i: number, position: number) => number
   /** Returns the new stop's sorted index, or -1 if not added. */
   onAddStop: (position: number) => number
   onDeleteStop: (i: number) => void
@@ -674,6 +702,12 @@ function GradientPreview({
   const dragStateRef = useRef<{ stopIndex: number; pointerId: number } | null>(
     null,
   )
+  // Handle-level drag: a stop's array index changes when a re-sort moves it
+  // past a neighbor. The handle keeps pointer capture on the same DOM node
+  // (which React rebinds to a different stop by index key), so we cannot reuse
+  // the closure index across moves. Track the live index here and feed it the
+  // value `onMoveStop` returns after sorting.
+  const handleDragIndexRef = useRef<number | null>(null)
   // Across-press drag detection — needed to distinguish click-add → quick
   // click-drag (where browser fires dblclick at the end because both clicks
   // land near each other) from true double-clicks. Either click in the pair
@@ -714,7 +748,12 @@ function GradientPreview({
     wasDraggedThisPressRef.current = true
     const rect = event.currentTarget.getBoundingClientRect()
     const pct = computePct(event.clientX, rect)
-    onMoveStop(dragStateRef.current.stopIndex, Math.round(pct))
+    // Track the moved stop by its new sorted index so the SAME stop keeps
+    // moving after it leapfrogs a neighbor (re-sort changes its array index).
+    dragStateRef.current.stopIndex = onMoveStop(
+      dragStateRef.current.stopIndex,
+      Math.round(pct),
+    )
   }
 
   const handleTrackPointerUp = () => {
@@ -754,6 +793,7 @@ function GradientPreview({
               event.stopPropagation()
               event.currentTarget.setPointerCapture(event.pointerId)
               captureDragHistoryAtPointerDown()
+              handleDragIndexRef.current = i
               onSelectStop(i)
             }}
             onPointerMove={(event) => {
@@ -763,13 +803,26 @@ function GradientPreview({
                   event.currentTarget.parentElement?.getBoundingClientRect()
                 if (!trackRect) return
                 const pct = computePct(event.clientX, trackRect)
-                onMoveStop(i, Math.round(pct))
+                // Use the live tracked index (seeded at pointerdown, updated on
+                // each move) so a re-sort that reorders this stop doesn't make
+                // us start dragging whichever stop now sits at the old index.
+                const current = handleDragIndexRef.current ?? i
+                handleDragIndexRef.current = onMoveStop(
+                  current,
+                  Math.round(pct),
+                )
               }
+            }}
+            onPointerUp={() => {
+              handleDragIndexRef.current = null
+            }}
+            onPointerCancel={() => {
+              handleDragIndexRef.current = null
             }}
             className={cn(
               "absolute inset-y-0 -translate-x-1/2 cursor-grab rounded-sm border border-black/40 shadow-[0_0_0_1px_white] transition",
               i === selectedIndex
-                ? "w-1.5 ring-2 ring-primary z-10"
+                ? "z-10 w-1.5 ring-2 ring-primary"
                 : "w-1 hover:w-1.5",
             )}
             style={{

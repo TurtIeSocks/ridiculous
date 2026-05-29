@@ -24,9 +24,9 @@ export function InstallCta({ args, showTabs = true }: InstallCtaProps) {
   const commands = lines.map((line) => commandFor(pm, line))
   const copyPayload = commands.join("\n")
   return (
-    <div className="glass-card rounded-2xl overflow-hidden">
+    <div className="glass-card overflow-hidden rounded-2xl">
       {showTabs ? (
-        <div className="border-b border-white/10 bg-black/20 px-2">
+        <div className="border-white/10 border-b bg-black/20 px-2">
           <div role="tablist" aria-label="Package manager" className="flex">
             {PACKAGE_MANAGERS.map((option) => {
               const active = option === pm
@@ -38,10 +38,10 @@ export function InstallCta({ args, showTabs = true }: InstallCtaProps) {
                   aria-selected={active}
                   onClick={() => setPackageManager(option)}
                   className={cn(
-                    "px-3 py-2 text-xs font-mono uppercase tracking-[0.12em] transition border-b-2 -mb-px",
+                    "-mb-px border-b-2 px-3 py-2 font-mono text-xs uppercase tracking-[0.12em] transition",
                     active
-                      ? "text-foreground border-violet-glow"
-                      : "text-muted-foreground border-transparent hover:text-foreground",
+                      ? "border-violet-glow text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground",
                   )}
                 >
                   {option}
@@ -52,7 +52,7 @@ export function InstallCta({ args, showTabs = true }: InstallCtaProps) {
         </div>
       ) : null}
       <div className="relative">
-        <pre className="px-6 md:px-8 py-5 pr-14 text-sm md:text-base font-mono overflow-x-auto whitespace-pre">
+        <pre className="overflow-x-auto whitespace-pre px-6 py-5 pr-14 font-mono text-sm md:px-8 md:text-base">
           {commands.map((command, index) => (
             <CommandLine
               // biome-ignore lint/suspicious/noArrayIndexKey: lines are positional and stable
@@ -80,7 +80,7 @@ function CommandLine({
   const head = tokens.slice(0, -1).join(" ")
   return (
     <>
-      <span className="text-muted-foreground select-none">$ </span>
+      <span className="select-none text-muted-foreground">$ </span>
       <span className="text-foreground">{head} </span>
       <span className="text-gradient">{last}</span>
       {isLast ? null : "\n"}
@@ -115,7 +115,7 @@ function CopyButton({ text }: { text: string }) {
         <span
           className={cn(
             "transition-all duration-200",
-            copied ? "scale-100 opacity-100" : "scale-75 opacity-0 absolute",
+            copied ? "scale-100 opacity-100" : "absolute scale-75 opacity-0",
           )}
         >
           <CheckIcon />
@@ -123,7 +123,7 @@ function CopyButton({ text }: { text: string }) {
         <span
           className={cn(
             "transition-all duration-200",
-            copied ? "scale-75 opacity-0 absolute" : "scale-100 opacity-100",
+            copied ? "absolute scale-75 opacity-0" : "scale-100 opacity-100",
           )}
         >
           <CopyIcon />
@@ -132,8 +132,8 @@ function CopyButton({ text }: { text: string }) {
       <span
         aria-hidden="true"
         className={cn(
-          "pointer-events-none absolute right-0 bottom-full mb-2 rounded-md bg-foreground px-2 py-1 text-xs font-mono text-background shadow-lg transition-all duration-200",
-          copied ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1",
+          "pointer-events-none absolute right-0 bottom-full mb-2 rounded-md bg-foreground px-2 py-1 font-mono text-background text-xs shadow-lg transition-all duration-200",
+          copied ? "translate-y-0 opacity-100" : "translate-y-1 opacity-0",
         )}
       >
         Copied

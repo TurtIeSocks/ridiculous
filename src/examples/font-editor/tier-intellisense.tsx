@@ -2,45 +2,44 @@
 
 import { useState } from "react"
 import { FontEditor, type FontString } from "@/components/ui/font-editor"
+import { CodeBlock } from "@/examples/_shared/code-block"
+import { ExampleCard } from "@/examples/_shared/example-card"
+import { ValueReadout } from "@/examples/_shared/value-readout"
 
 export function TierIntellisense() {
   const [value, setValue] = useState<FontString>("bold 16px sans-serif")
   return (
-    <div className="glass-card flex flex-col rounded-2xl p-6">
-      <div className="flex items-baseline justify-between">
-        <div className="font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
-          <span className="text-gradient">02</span> intellisense
-        </div>
-        <span className="font-mono text-[10px] text-muted-foreground/60">
-          FontString
-        </span>
-      </div>
-      <h3 className="mt-3 font-semibold text-lg tracking-tight">
-        Suggestion-shaped hints
-      </h3>
-      <p className="mt-2 text-muted-foreground text-sm">
-        State typed as <code className="text-foreground">FontString</code> — the
-        system-font keywords plus any space-containing shorthand. It is also the{" "}
-        <code className="text-foreground">onChange</code> return type. Precise
-        validation lives in the strict tier.
-      </p>
+    <ExampleCard
+      tierIndex={2}
+      tierLabel="intellisense"
+      typeBadge="FontString"
+      title="Suggestion-shaped hints"
+      description={
+        <>
+          State typed as <code className="text-foreground">FontString</code> —
+          the system-font keywords plus any space-containing shorthand. It is
+          also the <code className="text-foreground">onChange</code> return
+          type. Precise validation lives in the strict tier.
+        </>
+      }
+    >
       <div className="mt-5 flex items-center gap-2">
         <FontEditor value={value} onChange={setValue} />
-        <code className="min-w-0 flex-1 truncate rounded-md border border-white/10 bg-black/40 px-2.5 py-1 font-mono text-xs">
-          {value}
-        </code>
+        <ValueReadout value={value} />
       </div>
-      <pre className="mt-6 overflow-x-auto rounded-lg border border-white/10 bg-black/40 p-4 font-mono text-[11px] leading-relaxed">
-        <span className="text-violet-glow">const</span> [value, setValue] ={" "}
-        <span className="text-cyan-glow">useState</span>
-        {"<"}
-        <span className="text-pink-glow">FontString</span>
-        {">"}(
-        <span className="text-emerald-400">
-          &quot;bold 16px sans-serif&quot;
-        </span>
-        )
-      </pre>
-    </div>
+      <CodeBlock
+        className="mt-6"
+        tokens={[
+          { kind: "kw", text: "const" },
+          { kind: "plain", text: " [value, setValue] = " },
+          { kind: "fn", text: "useState" },
+          { kind: "plain", text: "<" },
+          { kind: "type", text: "FontString" },
+          { kind: "plain", text: ">(" },
+          { kind: "str", text: '"bold 16px sans-serif"' },
+          { kind: "plain", text: ")" },
+        ]}
+      />
+    </ExampleCard>
   )
 }

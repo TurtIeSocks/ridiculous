@@ -365,12 +365,3 @@ export function fontFamilies(src: string): string[] {
 export function defaultParts(): FontParts {
   return { kind: "shorthand", size: "16px", family: ["sans-serif"] }
 }
-
-// ---------------------------------------------------------------------------
-// ParseResult facade
-// ---------------------------------------------------------------------------
-
-export interface ParseResult {
-  parts: FontParts | null
-  error: string | null
-}

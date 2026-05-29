@@ -268,6 +268,24 @@ describe("UnitInput keyboard", () => {
     fireEvent.keyDown(input, { key: "ArrowUp", altKey: true })
     expect(onChange).toHaveBeenCalledWith("45.1deg")
   })
+
+  it("steps up from a draft of '0' to 1, not from the original value", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <UnitInput
+        value="45deg"
+        unit="deg"
+        onChange={onChange}
+        aria-label="Angle"
+      />,
+    )
+    const input = container.querySelector("input") as HTMLInputElement
+    // User wipes the field to "0" but hasn't committed yet, then steps up.
+    fireEvent.change(input, { target: { value: "0" } })
+    fireEvent.keyDown(input, { key: "ArrowUp" })
+    // 0 + 1 = 1, NOT 45 + 1 = 46 (falsy-zero fallback bug).
+    expect(onChange).toHaveBeenCalledWith("1deg")
+  })
 })
 
 describe("UnitInput defensive behavior", () => {

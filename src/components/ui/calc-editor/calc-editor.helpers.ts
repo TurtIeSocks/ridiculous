@@ -311,7 +311,7 @@ class Parser {
       this.next() // lparen
 
       if (name === "var") {
-        return this.parseVarRest(t.value)
+        return this.parseVarRest()
       }
       if (!CALC_FUNCTIONS.has(name)) {
         return this.fail(`unsupported function "${t.value}"`)
@@ -323,7 +323,7 @@ class Parser {
   }
 
   // var(--name [, fallback]) — captured verbatim, treated as opaque.
-  private parseVarRest(rawName: string): CalcNode | null {
+  private parseVarRest(): CalcNode | null {
     const nameTok = this.next()
     if (!nameTok || nameTok.type !== "ident" || !nameTok.value.startsWith("--"))
       return this.fail("var() expects a custom property name")
@@ -343,7 +343,6 @@ class Parser {
       this.next()
     }
     const raw = `var(${parts.join(" ")})`
-    void rawName
     return { kind: "var", name: nameTok.value, raw }
   }
 

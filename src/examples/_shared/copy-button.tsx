@@ -1,21 +1,39 @@
-import { useState } from "react"
+"use client"
 
-export function CopyButton({ value }: { value: string }) {
+import { useEffect, useRef, useState } from "react"
+
+export function CopyButton({
+  value,
+  label = "Copy",
+}: {
+  value: string
+  label?: string
+}) {
   const [copied, setCopied] = useState(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current !== null) clearTimeout(timeoutRef.current)
+    }
+  }, [])
+
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(value)
       setCopied(true)
-      setTimeout(() => setCopied(false), 1200)
+      if (timeoutRef.current !== null) clearTimeout(timeoutRef.current)
+      timeoutRef.current = setTimeout(() => setCopied(false), 1200)
     } catch {
       // clipboard unavailable — silently ignore
     }
   }
+
   return (
     <button
       type="button"
       onClick={copy}
-      aria-label={copied ? "Copied" : "Copy color"}
+      aria-label={copied ? "Copied" : label}
       className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/10 bg-black/40 text-muted-foreground transition hover:border-white/25 hover:text-foreground"
     >
       {copied ? (

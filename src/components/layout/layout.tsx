@@ -10,14 +10,14 @@ interface LayoutProps {
 
 export function Layout({ variant, children }: LayoutProps) {
   return (
-    <div className="relative min-h-screen bg-background text-foreground overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden bg-background text-foreground">
       <div
         aria-hidden="true"
-        className="bg-mesh pointer-events-none fixed inset-0 -z-10"
+        className="pointer-events-none fixed inset-0 -z-10 bg-mesh"
       />
       <div
         aria-hidden="true"
-        className="bg-grid pointer-events-none fixed inset-0 -z-10"
+        className="pointer-events-none fixed inset-0 -z-10 bg-grid"
       />
       <Header variant={variant} />
       <div className="container mx-auto max-w-6xl px-6">

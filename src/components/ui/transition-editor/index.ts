@@ -2,21 +2,20 @@ export type {
   AddLayerButtonProps,
   KeywordSelectProps,
   TimeFieldProps,
+} from "./controls"
+export { AddLayerButton, KeywordSelect, TimeField } from "./controls"
+export type { TransitionPreviewProps } from "./preview"
+export { TransitionPreview } from "./preview"
+export type {
   TransitionEditorPanelProps,
   TransitionEditorProps,
   TransitionLayerRowProps,
-  TransitionPreviewProps,
 } from "./transition-editor"
 export {
-  AddLayerButton,
-  KeywordSelect,
-  TimeField,
   TransitionEditor,
   TransitionEditorPanel,
   TransitionLayerRow,
-  TransitionPreview,
 } from "./transition-editor"
-export type { ParseResult } from "./transition-editor.helpers"
 export {
   animationLayerToCss,
   defaultAnimationLayer,

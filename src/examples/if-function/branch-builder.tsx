@@ -2,31 +2,32 @@
 
 import { useState } from "react"
 import { IfFunctionPanel } from "@/components/ui/if-function"
+import { ExampleCard } from "@/examples/_shared/example-card"
 
 export function BranchBuilder() {
   const [value, setValue] = useState<string>(
     "if(media(width >= 800px): 2rem; supports(width: 1cqi): 1.5rem; else: 1rem)",
   )
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8">
-      <div className="mb-2 font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
-        <span className="text-gradient">/</span> branch-builder
-      </div>
-      <h3 className="font-semibold text-xl tracking-tight">
-        Build the branch list
-      </h3>
-      <p className="mt-2 max-w-prose text-muted-foreground text-sm">
-        Each row is one branch: a condition-kind{" "}
-        <code className="font-mono text-foreground">select</code> (
-        <code className="font-mono text-foreground">media</code> /{" "}
-        <code className="font-mono text-foreground">supports</code> /{" "}
-        <code className="font-mono text-foreground">style</code>), a
-        condition-body input, and the value. Add or remove branches; the final
-        row may switch to a trailing{" "}
-        <code className="font-mono text-foreground">else</code>. The produced{" "}
-        <code className="font-mono text-foreground">if()</code> string updates
-        live.
-      </p>
+    <ExampleCard
+      className="md:p-8"
+      eyebrow="branch-builder"
+      title="Build the branch list"
+      description={
+        <>
+          Each row is one branch: a condition-kind{" "}
+          <code className="font-mono text-foreground">select</code> (
+          <code className="font-mono text-foreground">media</code> /{" "}
+          <code className="font-mono text-foreground">supports</code> /{" "}
+          <code className="font-mono text-foreground">style</code>), a
+          condition-body input, and the value. Add or remove branches; the final
+          row may switch to a trailing{" "}
+          <code className="font-mono text-foreground">else</code>. The produced{" "}
+          <code className="font-mono text-foreground">if()</code> string updates
+          live.
+        </>
+      }
+    >
       <div className="mt-6 flex flex-col gap-3 lg:flex-row lg:items-start">
         <IfFunctionPanel value={value} onChange={setValue} className="w-full" />
         <div className="min-w-0 flex-1 space-y-2">
@@ -44,6 +45,6 @@ export function BranchBuilder() {
           </p>
         </div>
       </div>
-    </div>
+    </ExampleCard>
   )
 }

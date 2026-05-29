@@ -136,7 +136,7 @@ export function parseStop(
   if (splitAt !== -1) {
     const tail = trimmed.slice(splitAt + 1).trim()
     if (tail.endsWith("%")) {
-      const n = parseFloat(tail.slice(0, -1))
+      const n = Number.parseFloat(tail.slice(0, -1))
       if (!Number.isNaN(n)) {
         colorPart = trimmed.slice(0, splitAt).trim()
         positionPart = tail
@@ -147,7 +147,7 @@ export function parseStop(
   if (parseColor(colorPart) == null) return null
   return {
     color: colorPart as ColorString,
-    position: positionPart == null ? null : parseFloat(positionPart),
+    position: positionPart == null ? null : Number.parseFloat(positionPart),
   }
 }
 
@@ -268,7 +268,7 @@ export function parseGradient(value: string): InternalState | null {
       angle = SIDE_TO_ANGLE[prelude]
     } else {
       const m = prelude.match(/^(-?\d+(?:\.\d+)?)deg$/)
-      if (m) angle = parseFloat(m[1])
+      if (m) angle = Number.parseFloat(m[1])
       else return null
     }
     preludeIndex = 1
@@ -302,7 +302,7 @@ export function parseGradient(value: string): InternalState | null {
       i++
       const m = tokens[i++].match(/^(-?\d+(?:\.\d+)?)deg$/)
       if (!m) return null
-      fromAngle = parseFloat(m[1])
+      fromAngle = Number.parseFloat(m[1])
     }
     if (tokens[i] === "at") {
       i++
@@ -347,7 +347,7 @@ export function parseGradient(value: string): InternalState | null {
 function parsePercent(input: string | undefined): number | null {
   if (!input) return null
   if (!input.endsWith("%")) return null
-  const n = parseFloat(input.slice(0, -1))
+  const n = Number.parseFloat(input.slice(0, -1))
   return Number.isNaN(n) ? null : n
 }
 

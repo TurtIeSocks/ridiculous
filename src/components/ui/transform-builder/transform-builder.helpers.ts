@@ -5,6 +5,12 @@
 // the SUPERSET of the strict type tier: it tolerates calc()/var() inside
 // arguments (kept verbatim, opaque), validates arity, and drives the UI
 // from a single ARG_SPEC dispatch table.
+//
+// ARG_SPEC is the SINGLE SOURCE OF TRUTH. Every per-function behavior —
+// arity, slot kinds/labels, arg <-> item conversion, CSS serialization and
+// the seed default — lives in one row. The five operations below
+// (`buildItem`, `defaultItem`, `itemToCss`, `itemArgs`, `itemFromArgs`) are
+// THIN readers of that table; adding a function = adding one row.
 // =====================================================================
 
 import type {
@@ -33,6 +39,14 @@ export interface ArgSpec {
   kinds: ArgKind[]
   /** Axis / slot labels for the UI. */
   labels: string[]
+  /** Seed item for a freshly-added row. */
+  default: TransformItem
+  /** Pull the per-slot argument strings out of an item, for editing. */
+  toArgs: (item: TransformItem) => string[]
+  /** Rebuild an item from edited argument strings. */
+  fromArgs: (args: string[]) => TransformItem
+  /** Serialize an item to its CSS function string. */
+  toCss: (item: TransformItem) => string
 }
 
 const LP: ArgKind = "length-percentage"
@@ -41,48 +55,290 @@ const ANG: ArgKind = "angle"
 const NUM: ArgKind = "number"
 const NP: ArgKind = "number-percentage"
 
+// ---------------------------------------------------------------------------
+// Shape families — one set of {toArgs, fromArgs, toCss} per item shape.
+//
+// Each TransformItem variant is one of six shapes. Encoding the conversions
+// per shape (rather than per function) is what collapses the five duplicated
+// `switch(fn)` ladders into table lookups. The casts narrow the union to the
+// shape the row is known to hold — `argSpec(item.fn)` is only ever called
+// with an item whose `fn` selects a row of the matching shape.
+// ---------------------------------------------------------------------------
+
+interface Shape {
+  toArgs: (item: TransformItem) => string[]
+  fromArgs: (fn: TransformFunctionName, args: string[]) => TransformItem
+  toCss: (item: TransformItem) => string
+}
+
+/** One `value` slot: translateX/Y/Z, perspective, scaleX/Y/Z. */
+const valueShape: Shape = {
+  toArgs: (item) => [(item as { value: string }).value],
+  fromArgs: (fn, args) => ({ fn, value: args[0] }) as TransformItem,
+  toCss: (item) => `${item.fn}(${(item as { value: string }).value})`,
+}
+
+/** One `angle` slot: rotate/X/Y/Z, skewX/Y. */
+const angleShape: Shape = {
+  toArgs: (item) => [(item as { angle: string }).angle],
+  fromArgs: (fn, args) => ({ fn, angle: args[0] }) as TransformItem,
+  toCss: (item) => `${item.fn}(${(item as { angle: string }).angle})`,
+}
+
+/** One required `x`, optional `y`: translate, scale, skew. */
+const xyOptionalShape: Shape = {
+  toArgs: (item) => {
+    const it = item as { x: string; y?: string }
+    return it.y === undefined ? [it.x] : [it.x, it.y]
+  },
+  fromArgs: (fn, args) =>
+    (args.length > 1 && args[1] !== undefined
+      ? { fn, x: args[0], y: args[1] }
+      : { fn, x: args[0] }) as TransformItem,
+  toCss: (item) => {
+    const it = item as { x: string; y?: string }
+    return it.y === undefined
+      ? `${item.fn}(${it.x})`
+      : `${item.fn}(${it.x}, ${it.y})`
+  },
+}
+
+/** Three slots x,y,z: translate3d, scale3d. */
+const xyzShape: Shape = {
+  toArgs: (item) => {
+    const it = item as { x: string; y: string; z: string }
+    return [it.x, it.y, it.z]
+  },
+  fromArgs: (fn, args) =>
+    ({ fn, x: args[0], y: args[1], z: args[2] }) as TransformItem,
+  toCss: (item) => {
+    const it = item as { x: string; y: string; z: string }
+    return `${item.fn}(${it.x}, ${it.y}, ${it.z})`
+  },
+}
+
+/** Axis vector + angle: rotate3d. */
+const xyzAngleShape: Shape = {
+  toArgs: (item) => {
+    const it = item as { x: string; y: string; z: string; angle: string }
+    return [it.x, it.y, it.z, it.angle]
+  },
+  fromArgs: (fn, args) =>
+    ({
+      fn,
+      x: args[0],
+      y: args[1],
+      z: args[2],
+      angle: args[3],
+    }) as TransformItem,
+  toCss: (item) => {
+    const it = item as { x: string; y: string; z: string; angle: string }
+    return `${item.fn}(${it.x}, ${it.y}, ${it.z}, ${it.angle})`
+  },
+}
+
+/** N-tuple of numbers: matrix, matrix3d. */
+const valuesShape: Shape = {
+  toArgs: (item) => (item as { values: string[] }).values,
+  fromArgs: (fn, args) => ({ fn, values: args }) as TransformItem,
+  toCss: (item) =>
+    `${item.fn}(${(item as { values: string[] }).values.join(", ")})`,
+}
+
+/**
+ * Build one ARG_SPEC row. Binds a shape's conversions to a concrete `fn`
+ * (so `fromArgs` needs no argument) and carries the row's arity + UI metadata.
+ */
+function row(
+  fn: TransformFunctionName,
+  shape: Shape,
+  spec: {
+    min: number
+    max: number
+    kinds: ArgKind[]
+    labels: string[]
+    default: TransformItem
+  },
+): ArgSpec {
+  return {
+    min: spec.min,
+    max: spec.max,
+    kinds: spec.kinds,
+    labels: spec.labels,
+    default: spec.default,
+    toArgs: shape.toArgs,
+    fromArgs: (args) => shape.fromArgs(fn, args),
+    toCss: shape.toCss,
+  }
+}
+
+const M3D_DEFAULT: string[] = [
+  "1",
+  "0",
+  "0",
+  "0",
+  "0",
+  "1",
+  "0",
+  "0",
+  "0",
+  "0",
+  "1",
+  "0",
+  "0",
+  "0",
+  "0",
+  "1",
+]
+
 const ARG_SPEC: Record<TransformFunctionName, ArgSpec> = {
-  translate: { min: 1, max: 2, kinds: [LP, LP], labels: ["x", "y"] },
-  translateX: { min: 1, max: 1, kinds: [LP], labels: ["x"] },
-  translateY: { min: 1, max: 1, kinds: [LP], labels: ["y"] },
-  translateZ: { min: 1, max: 1, kinds: [LEN], labels: ["z"] },
-  translate3d: {
+  translate: row("translate", xyOptionalShape, {
+    min: 1,
+    max: 2,
+    kinds: [LP, LP],
+    labels: ["x", "y"],
+    default: { fn: "translate", x: "0px", y: "0px" },
+  }),
+  translateX: row("translateX", valueShape, {
+    min: 1,
+    max: 1,
+    kinds: [LP],
+    labels: ["x"],
+    default: { fn: "translateX", value: "0px" },
+  }),
+  translateY: row("translateY", valueShape, {
+    min: 1,
+    max: 1,
+    kinds: [LP],
+    labels: ["y"],
+    default: { fn: "translateY", value: "0px" },
+  }),
+  translateZ: row("translateZ", valueShape, {
+    min: 1,
+    max: 1,
+    kinds: [LEN],
+    labels: ["z"],
+    default: { fn: "translateZ", value: "0px" },
+  }),
+  translate3d: row("translate3d", xyzShape, {
     min: 3,
     max: 3,
     kinds: [LP, LP, LEN],
     labels: ["x", "y", "z"],
-  },
-  scale: { min: 1, max: 2, kinds: [NP, NP], labels: ["x", "y"] },
-  scaleX: { min: 1, max: 1, kinds: [NP], labels: ["x"] },
-  scaleY: { min: 1, max: 1, kinds: [NP], labels: ["y"] },
-  scaleZ: { min: 1, max: 1, kinds: [NP], labels: ["z"] },
-  scale3d: { min: 3, max: 3, kinds: [NP, NP, NP], labels: ["x", "y", "z"] },
-  rotate: { min: 1, max: 1, kinds: [ANG], labels: ["angle"] },
-  rotateX: { min: 1, max: 1, kinds: [ANG], labels: ["angle"] },
-  rotateY: { min: 1, max: 1, kinds: [ANG], labels: ["angle"] },
-  rotateZ: { min: 1, max: 1, kinds: [ANG], labels: ["angle"] },
-  rotate3d: {
+    default: { fn: "translate3d", x: "0px", y: "0px", z: "0px" },
+  }),
+  scale: row("scale", xyOptionalShape, {
+    min: 1,
+    max: 2,
+    kinds: [NP, NP],
+    labels: ["x", "y"],
+    default: { fn: "scale", x: "1" },
+  }),
+  scaleX: row("scaleX", valueShape, {
+    min: 1,
+    max: 1,
+    kinds: [NP],
+    labels: ["x"],
+    default: { fn: "scaleX", value: "1" },
+  }),
+  scaleY: row("scaleY", valueShape, {
+    min: 1,
+    max: 1,
+    kinds: [NP],
+    labels: ["y"],
+    default: { fn: "scaleY", value: "1" },
+  }),
+  scaleZ: row("scaleZ", valueShape, {
+    min: 1,
+    max: 1,
+    kinds: [NP],
+    labels: ["z"],
+    default: { fn: "scaleZ", value: "1" },
+  }),
+  scale3d: row("scale3d", xyzShape, {
+    min: 3,
+    max: 3,
+    kinds: [NP, NP, NP],
+    labels: ["x", "y", "z"],
+    default: { fn: "scale3d", x: "1", y: "1", z: "1" },
+  }),
+  rotate: row("rotate", angleShape, {
+    min: 1,
+    max: 1,
+    kinds: [ANG],
+    labels: ["angle"],
+    default: { fn: "rotate", angle: "0deg" },
+  }),
+  rotateX: row("rotateX", angleShape, {
+    min: 1,
+    max: 1,
+    kinds: [ANG],
+    labels: ["angle"],
+    default: { fn: "rotateX", angle: "0deg" },
+  }),
+  rotateY: row("rotateY", angleShape, {
+    min: 1,
+    max: 1,
+    kinds: [ANG],
+    labels: ["angle"],
+    default: { fn: "rotateY", angle: "0deg" },
+  }),
+  rotateZ: row("rotateZ", angleShape, {
+    min: 1,
+    max: 1,
+    kinds: [ANG],
+    labels: ["angle"],
+    default: { fn: "rotateZ", angle: "0deg" },
+  }),
+  rotate3d: row("rotate3d", xyzAngleShape, {
     min: 4,
     max: 4,
     kinds: [NUM, NUM, NUM, ANG],
     labels: ["x", "y", "z", "angle"],
-  },
-  skew: { min: 1, max: 2, kinds: [ANG, ANG], labels: ["x", "y"] },
-  skewX: { min: 1, max: 1, kinds: [ANG], labels: ["x"] },
-  skewY: { min: 1, max: 1, kinds: [ANG], labels: ["y"] },
-  matrix: {
+    default: { fn: "rotate3d", x: "1", y: "1", z: "1", angle: "0deg" },
+  }),
+  skew: row("skew", xyOptionalShape, {
+    min: 1,
+    max: 2,
+    kinds: [ANG, ANG],
+    labels: ["x", "y"],
+    default: { fn: "skew", x: "0deg", y: "0deg" },
+  }),
+  skewX: row("skewX", angleShape, {
+    min: 1,
+    max: 1,
+    kinds: [ANG],
+    labels: ["x"],
+    default: { fn: "skewX", angle: "0deg" },
+  }),
+  skewY: row("skewY", angleShape, {
+    min: 1,
+    max: 1,
+    kinds: [ANG],
+    labels: ["y"],
+    default: { fn: "skewY", angle: "0deg" },
+  }),
+  matrix: row("matrix", valuesShape, {
     min: 6,
     max: 6,
     kinds: [NUM, NUM, NUM, NUM, NUM, NUM],
     labels: ["a", "b", "c", "d", "e", "f"],
-  },
-  matrix3d: {
+    default: { fn: "matrix", values: ["1", "0", "0", "1", "0", "0"] },
+  }),
+  matrix3d: row("matrix3d", valuesShape, {
     min: 16,
     max: 16,
     kinds: Array.from({ length: 16 }, () => NUM),
     labels: Array.from({ length: 16 }, (_, i) => `m${i + 1}`),
-  },
-  perspective: { min: 1, max: 1, kinds: [LEN], labels: ["depth"] },
+    default: { fn: "matrix3d", values: M3D_DEFAULT },
+  }),
+  perspective: row("perspective", valueShape, {
+    min: 1,
+    max: 1,
+    kinds: [LEN],
+    labels: ["depth"],
+    default: { fn: "perspective", value: "800px" },
+  }),
 }
 
 const FUNCTION_NAMES = new Set<string>(Object.keys(ARG_SPEC))
@@ -145,39 +401,7 @@ function buildItem(
 ): TransformItem | null {
   const spec = ARG_SPEC[fn]
   if (args.length < spec.min || args.length > spec.max) return null
-
-  switch (fn) {
-    case "translateX":
-    case "translateY":
-    case "translateZ":
-    case "perspective":
-    case "scaleX":
-    case "scaleY":
-    case "scaleZ":
-      return { fn, value: args[0] }
-    case "rotate":
-    case "rotateX":
-    case "rotateY":
-    case "rotateZ":
-    case "skewX":
-    case "skewY":
-      return { fn, angle: args[0] }
-    case "translate":
-    case "scale":
-    case "skew":
-      return args.length === 1
-        ? { fn, x: args[0] }
-        : { fn, x: args[0], y: args[1] }
-    case "translate3d":
-      return { fn, x: args[0], y: args[1], z: args[2] }
-    case "scale3d":
-      return { fn, x: args[0], y: args[1], z: args[2] }
-    case "rotate3d":
-      return { fn, x: args[0], y: args[1], z: args[2], angle: args[3] }
-    case "matrix":
-    case "matrix3d":
-      return { fn, values: args }
-  }
+  return spec.fromArgs(args)
 }
 
 /**
@@ -218,62 +442,24 @@ export function transformFunctions(src: string): string[] {
 
 /** A sensible default item for a freshly-added function row. */
 export function defaultItem(fn: TransformFunctionName): TransformItem {
-  switch (fn) {
-    case "translateX":
-    case "translateY":
-    case "translateZ":
-      return { fn, value: "0px" }
-    case "perspective":
-      return { fn, value: "800px" }
-    case "scaleX":
-    case "scaleY":
-    case "scaleZ":
-      return { fn, value: "1" }
-    case "rotate":
-    case "rotateX":
-    case "rotateY":
-    case "rotateZ":
-      return { fn, angle: "0deg" }
-    case "skewX":
-    case "skewY":
-      return { fn, angle: "0deg" }
-    case "translate":
-      return { fn, x: "0px", y: "0px" }
-    case "scale":
-      return { fn, x: "1" }
-    case "skew":
-      return { fn, x: "0deg", y: "0deg" }
-    case "translate3d":
-      return { fn, x: "0px", y: "0px", z: "0px" }
-    case "scale3d":
-      return { fn, x: "1", y: "1", z: "1" }
-    case "rotate3d":
-      return { fn, x: "1", y: "1", z: "1", angle: "0deg" }
-    case "matrix":
-      return { fn, values: ["1", "0", "0", "1", "0", "0"] }
-    case "matrix3d":
-      return {
-        fn,
-        values: [
-          "1",
-          "0",
-          "0",
-          "0",
-          "0",
-          "1",
-          "0",
-          "0",
-          "0",
-          "0",
-          "1",
-          "0",
-          "0",
-          "0",
-          "0",
-          "1",
-        ],
-      }
-  }
+  return ARG_SPEC[fn].default
+}
+
+// ---------------------------------------------------------------------------
+// item ↔ args — per-slot editing surface for the UI
+// ---------------------------------------------------------------------------
+
+/** Pull the per-slot argument strings out of an item, for editing. */
+export function itemArgs(item: TransformItem): string[] {
+  return ARG_SPEC[item.fn].toArgs(item)
+}
+
+/** Rebuild an item from edited argument strings. */
+export function itemFromArgs(
+  fn: TransformFunctionName,
+  args: string[],
+): TransformItem {
+  return ARG_SPEC[fn].fromArgs(args)
 }
 
 // ---------------------------------------------------------------------------
@@ -282,50 +468,11 @@ export function defaultItem(fn: TransformFunctionName): TransformItem {
 
 /** Serialize one item to its CSS function string. */
 export function itemToCss(item: TransformItem): string {
-  switch (item.fn) {
-    case "translateX":
-    case "translateY":
-    case "translateZ":
-    case "perspective":
-    case "scaleX":
-    case "scaleY":
-    case "scaleZ":
-      return `${item.fn}(${item.value})`
-    case "rotate":
-    case "rotateX":
-    case "rotateY":
-    case "rotateZ":
-    case "skewX":
-    case "skewY":
-      return `${item.fn}(${item.angle})`
-    case "translate":
-    case "scale":
-    case "skew":
-      return item.y === undefined
-        ? `${item.fn}(${item.x})`
-        : `${item.fn}(${item.x}, ${item.y})`
-    case "translate3d":
-    case "scale3d":
-      return `${item.fn}(${item.x}, ${item.y}, ${item.z})`
-    case "rotate3d":
-      return `rotate3d(${item.x}, ${item.y}, ${item.z}, ${item.angle})`
-    case "matrix":
-    case "matrix3d":
-      return `${item.fn}(${item.values.join(", ")})`
-  }
+  return ARG_SPEC[item.fn].toCss(item)
 }
 
 /** Canonical re-serialization of a transform list. Empty → `none`. */
 export function formatTransform(items: TransformItem[]): string {
   if (items.length === 0) return "none"
   return items.map(itemToCss).join(" ")
-}
-
-// ---------------------------------------------------------------------------
-// ParseResult facade
-// ---------------------------------------------------------------------------
-
-export interface ParseResult {
-  items: TransformItem[] | null
-  error: string | null
 }

@@ -7,6 +7,7 @@ import {
   FluidTypePlayground,
   parseCalc,
 } from "@/components/ui/calc-editor"
+import { ExampleCard } from "@/examples/_shared/example-card"
 
 const PRESET = "clamp(1rem, 0.75rem + 2vw, 2.5rem)"
 
@@ -22,21 +23,20 @@ export function FluidTypePlaygroundExample() {
   }
 
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8">
-      <div className="mb-2 font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
-        <span className="text-gradient">/</span> fluid-type playground
-      </div>
-      <h3 className="font-semibold text-xl tracking-tight">
-        clamp() across the viewport
-      </h3>
-      <p className="mt-2 max-w-prose text-muted-foreground text-sm">
-        Drag the viewport slider and watch the computed{" "}
-        <code className="font-mono text-foreground">font-size</code> resolve
-        live. This is fluid typography — a single{" "}
-        <code className="font-mono text-foreground">clamp()</code> that scales
-        between a min and max as the screen grows.
-      </p>
-
+    <ExampleCard
+      eyebrow="fluid-type playground"
+      title="clamp() across the viewport"
+      description={
+        <>
+          Drag the viewport slider and watch the computed{" "}
+          <code className="font-mono text-foreground">font-size</code> resolve
+          live. This is fluid typography — a single{" "}
+          <code className="font-mono text-foreground">clamp()</code> that scales
+          between a min and max as the screen grows.
+        </>
+      }
+      className="md:p-8"
+    >
       <div className="mt-6 grid gap-6 md:grid-cols-2">
         <div className="space-y-4">
           <CalcEditorPanel value={expr} onChange={setExpr} fn="clamp" />
@@ -71,6 +71,6 @@ export function FluidTypePlaygroundExample() {
           </p>
         </div>
       </div>
-    </div>
+    </ExampleCard>
   )
 }

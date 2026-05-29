@@ -14,7 +14,6 @@ export {
   ShadowLayerRow,
   ShadowLengthEditor,
 } from "./box-shadow-editor"
-export type { ParseResult } from "./box-shadow-editor.helpers"
 export {
   boxShadowLayerCount,
   defaultLayer,

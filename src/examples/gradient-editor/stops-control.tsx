@@ -1,6 +1,10 @@
+"use client"
+
 import { useState } from "react"
 import { GradientEditor } from "@/components/ui/gradient-editor"
-import { CopyButton } from "../color-picker/copy-button"
+import { CopyButton } from "@/examples/_shared/copy-button"
+import { ExampleCard } from "@/examples/_shared/example-card"
+import { ValueReadout } from "@/examples/_shared/value-readout"
 
 export function StopsControl() {
   const [tight, setTight] = useState<string>(
@@ -10,41 +14,39 @@ export function StopsControl() {
     "linear-gradient(45deg, #ff0000, #ff8800, #ffff00, #88ff00, #00ff00, #00ff88, #00ffff, #0088ff, #0000ff)",
   )
   return (
-    <div className="glass-card rounded-2xl p-6 md:p-8">
-      <div className="text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground mb-2">
-        <span className="text-gradient">/</span> maxStops
-      </div>
-      <h3 className="text-xl font-semibold tracking-tight">Stops Control</h3>
-      <p className="mt-2 text-sm text-muted-foreground max-w-prose">
-        The <code className="text-foreground">maxStops</code> prop caps how many
-        stops the editor will allow. Min 2 is always enforced.
-      </p>
-      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+    <ExampleCard
+      className="md:p-8"
+      eyebrow="maxStops"
+      title="Stops Control"
+      description={
+        <>
+          The <code className="text-foreground">maxStops</code> prop caps how
+          many stops the editor will allow. Min 2 is always enforced.
+        </>
+      }
+    >
+      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="glass-card rounded-xl p-4">
-          <div className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground mb-3">
+          <div className="mb-3 font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
             <span className="text-gradient">→</span> maxStops=3
           </div>
           <div className="flex items-center gap-2">
             <GradientEditor value={tight} maxStops={3} onChange={setTight} />
-            <code className="text-xs font-mono bg-black/40 border border-white/10 px-2.5 py-1 rounded-md truncate min-w-0 flex-1">
-              {tight}
-            </code>
-            <CopyButton value={tight} />
+            <ValueReadout value={tight} />
+            <CopyButton value={tight} label="Copy color" />
           </div>
         </div>
         <div className="glass-card rounded-xl p-4">
-          <div className="font-mono text-xs uppercase tracking-[0.15em] text-muted-foreground mb-3">
+          <div className="mb-3 font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
             <span className="text-gradient">→</span> maxStops=12
           </div>
           <div className="flex items-center gap-2">
             <GradientEditor value={loose} maxStops={12} onChange={setLoose} />
-            <code className="text-xs font-mono bg-black/40 border border-white/10 px-2.5 py-1 rounded-md truncate min-w-0 flex-1">
-              {loose}
-            </code>
-            <CopyButton value={loose} />
+            <ValueReadout value={loose} />
+            <CopyButton value={loose} label="Copy color" />
           </div>
         </div>
       </div>
-    </div>
+    </ExampleCard>
   )
 }
