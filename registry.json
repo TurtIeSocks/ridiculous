@@ -184,17 +184,55 @@
       ]
     },
     {
+      "name": "transform-builder",
+      "type": "registry:ui",
+      "title": "Transform Builder",
+      "description": "Ridiculously typed CSS transform editor — a space-separated function list with compile-time FUNCTION-NAME DISPATCH (per-function arity + per-argument dimension typing: rotate wants an angle, translateX a length-%), a tolerant runtime parser, and a live 3D-preview card driven by the typed string.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "button",
+        "popover",
+        "input",
+        "label",
+        "slider"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/transform-builder/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/transform-builder/index.ts"
+        },
+        {
+          "path": "src/components/ui/transform-builder/transform-builder.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/transform-builder/transform-builder.tsx"
+        },
+        {
+          "path": "src/components/ui/transform-builder/transform-builder.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/transform-builder/transform-builder.types.ts"
+        },
+        {
+          "path": "src/components/ui/transform-builder/transform-builder.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/transform-builder/transform-builder.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, and calc-editor in one command.",
+      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, and transform-builder in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
         "https://turtiesocks.github.io/ridiculous/r/unit-input.json",
         "https://turtiesocks.github.io/ridiculous/r/gradient-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/easing-picker.json",
-        "https://turtiesocks.github.io/ridiculous/r/calc-editor.json"
+        "https://turtiesocks.github.io/ridiculous/r/calc-editor.json",
+        "https://turtiesocks.github.io/ridiculous/r/transform-builder.json"
       ],
       "dependencies": [],
       "files": []

@@ -34,6 +34,10 @@ export default defineConfig({
           "pages/easing-picker/index.html",
         ),
         "calc-editor": path.resolve(__dirname, "pages/calc-editor/index.html"),
+        "transform-builder": path.resolve(
+          __dirname,
+          "pages/transform-builder/index.html",
+        ),
       },
     },
   },
