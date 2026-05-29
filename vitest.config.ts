@@ -30,6 +30,7 @@ export default defineConfig({
         "src/components/ui/font-editor/**",
         "src/components/ui/color-function/**",
         "src/components/ui/if-function/**",
+        "src/components/ui/query-builder/**",
       ],
       thresholds: {
         statements: 90,

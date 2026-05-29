@@ -317,6 +317,282 @@ describe("QueryPreview", () => {
 })
 
 // ===========================================================================
+// FeatureTestRow — shape changes + range3 + enum snap (coverage)
+// ===========================================================================
+
+describe("FeatureTestRow shape + feature changes", () => {
+  test("the shape select reshapes a plain test to a 2-part range", () => {
+    const onChange = vi.fn()
+    render(
+      <FeatureTestRow
+        mode="media"
+        test={{ kind: "plain", feature: "width", value: "600px" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("shape"), {
+      target: { value: "range2" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: "range2", feature: "width" }),
+    )
+  })
+
+  test("the shape select reshapes to boolean", () => {
+    const onChange = vi.fn()
+    render(
+      <FeatureTestRow
+        mode="media"
+        test={{ kind: "plain", feature: "hover", value: "hover" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("shape"), {
+      target: { value: "boolean" },
+    })
+    expect(onChange).toHaveBeenCalledWith({ kind: "boolean", feature: "hover" })
+  })
+
+  test("the shape select reshapes to a 3-part range", () => {
+    const onChange = vi.fn()
+    render(
+      <FeatureTestRow
+        mode="media"
+        test={{ kind: "range2", feature: "width", op: ">=", value: "600px" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("shape"), {
+      target: { value: "range3" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: "range3", feature: "width" }),
+    )
+  })
+
+  test("a range3 test renders two operators and two values", () => {
+    render(
+      <FeatureTestRow
+        mode="media"
+        index={0}
+        test={{
+          kind: "range3",
+          feature: "width",
+          op: "<=",
+          value: "400px",
+          op2: "<=",
+          value2: "700px",
+        }}
+        onChange={() => {}}
+        onRemove={() => {}}
+      />,
+    )
+    expect(screen.getByLabelText("operator 1")).toBeInTheDocument()
+    expect(screen.getByLabelText("operator2 1")).toBeInTheDocument()
+    expect(screen.getByLabelText("value 1")).toBeInTheDocument()
+    expect(screen.getByLabelText("value2 1")).toBeInTheDocument()
+  })
+
+  test("editing the second range3 operator emits it", () => {
+    const onChange = vi.fn()
+    render(
+      <FeatureTestRow
+        mode="media"
+        test={{
+          kind: "range3",
+          feature: "width",
+          op: "<=",
+          value: "400px",
+          op2: "<=",
+          value2: "700px",
+        }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("operator2"), {
+      target: { value: "<" },
+    })
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ op2: "<" }))
+  })
+
+  test("editing a range2 operator emits it", () => {
+    const onChange = vi.fn()
+    render(
+      <FeatureTestRow
+        mode="media"
+        test={{ kind: "range2", feature: "width", op: ">=", value: "600px" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("operator"), {
+      target: { value: ">" },
+    })
+    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ op: ">" }))
+  })
+
+  test("switching to an enum feature snaps the value to a valid keyword", () => {
+    const onChange = vi.fn()
+    render(
+      <FeatureTestRow
+        mode="media"
+        test={{ kind: "plain", feature: "width", value: "600px" }}
+        onChange={onChange}
+        onRemove={() => {}}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("feature"), {
+      target: { value: "orientation" },
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      kind: "plain",
+      feature: "orientation",
+      value: "portrait",
+    })
+  })
+
+  test("a ratio feature uses a plain input (not unit-input)", () => {
+    render(
+      <FeatureTestRow
+        mode="media"
+        test={{ kind: "plain", feature: "aspect-ratio", value: "16/9" }}
+        onChange={() => {}}
+        onRemove={() => {}}
+      />,
+    )
+    expect(screen.getByLabelText("value")).toHaveValue("16/9")
+  })
+})
+
+// ===========================================================================
+// MediaTypeSelect — modifier path
+// ===========================================================================
+
+describe("MediaTypeSelect modifier", () => {
+  test("emits the chosen modifier", () => {
+    const onChange = vi.fn()
+    render(
+      <MediaTypeSelect
+        modifier={undefined}
+        mediaType="screen"
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText(/media modifier/i), {
+      target: { value: "only" },
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      modifier: "only",
+      mediaType: "screen",
+    })
+  })
+
+  test("clearing the media type emits undefined", () => {
+    const onChange = vi.fn()
+    render(
+      <MediaTypeSelect
+        modifier="only"
+        mediaType="screen"
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText(/^media type/i), {
+      target: { value: "" },
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      modifier: "only",
+      mediaType: undefined,
+    })
+  })
+})
+
+// ===========================================================================
+// QueryPreview — matches true + change listener + unavailable
+// ===========================================================================
+
+describe("QueryPreview matchMedia paths", () => {
+  test("reflects a matching query and subscribes to change", () => {
+    const addEventListener = vi.fn()
+    const removeEventListener = vi.fn()
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      configurable: true,
+      value: vi.fn().mockReturnValue({
+        matches: true,
+        media: "(min-width: 1px)",
+        addEventListener,
+        removeEventListener,
+      }),
+    })
+    const { unmount } = render(
+      <QueryPreview value="(min-width: 1px)" mode="media" />,
+    )
+    expect(screen.getByRole("status").textContent).toMatch(/matches now/i)
+    expect(addEventListener).toHaveBeenCalledWith(
+      "change",
+      expect.any(Function),
+    )
+    const handler = addEventListener.mock.calls[0][1] as (
+      e: MediaQueryListEvent,
+    ) => void
+    handler({ matches: false } as MediaQueryListEvent)
+    unmount()
+    expect(removeEventListener).toHaveBeenCalled()
+  })
+
+  test("shows 'unavailable' when matchMedia is missing", () => {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      configurable: true,
+      value: undefined,
+    })
+    render(<QueryPreview value="(min-width: 1px)" mode="media" />)
+    expect(screen.getByRole("status").textContent).toMatch(/unavailable/i)
+  })
+
+  test("returns null state when matchMedia throws", () => {
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      configurable: true,
+      value: vi.fn(() => {
+        throw new Error("bad")
+      }),
+    })
+    render(<QueryPreview value="(min-width: 1px)" mode="media" />)
+    expect(screen.getByRole("status").textContent).toMatch(/unavailable/i)
+  })
+})
+
+// ===========================================================================
+// QueryBuilderPanel — mode switch resync
+// ===========================================================================
+
+describe("QueryBuilderPanel mode switch", () => {
+  test("switching mode re-parses with the new feature table", () => {
+    const { rerender } = render(
+      <QueryBuilderPanel
+        mode="media"
+        value="(min-width: 600px)"
+        onChange={() => {}}
+      />,
+    )
+    expect(screen.getByLabelText(/media type/i)).toBeInTheDocument()
+    rerender(
+      <QueryBuilderPanel
+        mode="container"
+        value="(inline-size > 30rem)"
+        onChange={() => {}}
+      />,
+    )
+    expect(screen.getByLabelText(/container name/i)).toBeInTheDocument()
+  })
+})
+
+// ===========================================================================
 // QueryBuilder (popover)
 // ===========================================================================
 

@@ -64,6 +64,10 @@ export default defineConfig({
           "pages/color-function/index.html",
         ),
         "if-function": path.resolve(__dirname, "pages/if-function/index.html"),
+        "query-builder": path.resolve(
+          __dirname,
+          "pages/query-builder/index.html",
+        ),
       },
     },
   },

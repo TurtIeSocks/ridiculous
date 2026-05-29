@@ -1,11 +1,19 @@
 import { describe, expect, test } from "vitest"
 import {
+  formatFeatureTest,
   formatQuery,
   matchesNow,
   parseQuery,
   queryToString,
 } from "@/components/ui/query-builder/query-builder.helpers"
-import type { QueryState } from "@/components/ui/query-builder/query-builder.types"
+import type {
+  QueryNode,
+  QueryState,
+} from "@/components/ui/query-builder/query-builder.types"
+import {
+  cssContainerQuery,
+  cssMediaQuery,
+} from "@/components/ui/query-builder/query-builder.types"
 
 // ===========================================================================
 // formatQuery — canonical serialization of a parsed node
@@ -150,9 +158,91 @@ describe("round-trip", () => {
 // matchesNow — media only, guarded
 // ===========================================================================
 
+// ===========================================================================
+// formatFeatureTest / formatQuery — node-shape coverage
+// ===========================================================================
+
+describe("formatFeatureTest", () => {
+  test("all four shapes", () => {
+    expect(formatFeatureTest({ kind: "boolean", feature: "hover" })).toBe(
+      "hover",
+    )
+    expect(
+      formatFeatureTest({ kind: "plain", feature: "min-width", value: "1px" }),
+    ).toBe("min-width: 1px")
+    expect(
+      formatFeatureTest({
+        kind: "range2",
+        feature: "width",
+        op: ">=",
+        value: "1px",
+      }),
+    ).toBe("width >= 1px")
+    expect(
+      formatFeatureTest({
+        kind: "range3",
+        feature: "width",
+        op: "<=",
+        value: "1px",
+        op2: "<=",
+        value2: "9px",
+      }),
+    ).toBe("1px <= width <= 9px")
+  })
+})
+
+describe("formatQuery node shapes", () => {
+  test("a test node (not group)", () => {
+    const node: QueryNode = {
+      type: "test",
+      not: false,
+      test: { kind: "boolean", feature: "hover" },
+    }
+    expect(formatQuery(node, "media")).toBe("(hover)")
+  })
+
+  test("a negated test node", () => {
+    const node: QueryNode = {
+      type: "test",
+      not: true,
+      test: { kind: "boolean", feature: "monochrome" },
+    }
+    expect(formatQuery(node, "media")).toBe("not (monochrome)")
+  })
+
+  test("a raw node", () => {
+    const node: QueryNode = { type: "raw", not: false, text: "(weird: thing)" }
+    expect(formatQuery(node, "media")).toBe("(weird: thing)")
+    const negated: QueryNode = { type: "raw", not: true, text: "(x)" }
+    expect(formatQuery(negated, "media")).toBe("not (x)")
+  })
+})
+
+describe("call-site helpers at runtime", () => {
+  test("cssMediaQuery / cssContainerQuery return their argument", () => {
+    expect(cssMediaQuery("(min-width: 600px)")).toBe("(min-width: 600px)")
+    expect(cssContainerQuery("(width > 400px)")).toBe("(width > 400px)")
+  })
+})
+
+// ===========================================================================
+// matchesNow — media only, guarded
+// ===========================================================================
+
 describe("matchesNow", () => {
   test("container mode returns null", () => {
     expect(matchesNow("(width > 400px)", "container")).toBeNull()
+  })
+
+  test("returns null when matchMedia throws", () => {
+    Object.defineProperty(window, "matchMedia", {
+      value: vi.fn(() => {
+        throw new Error("bad query")
+      }),
+      writable: true,
+      configurable: true,
+    })
+    expect(matchesNow("(min-width: 1px)", "media")).toBeNull()
   })
 
   test("media mode reads window.matchMedia", () => {

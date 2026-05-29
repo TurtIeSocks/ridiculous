@@ -7,6 +7,7 @@ import {
   featuresFor,
   parseFeatureTest,
   parseQuery,
+  parseQueryState,
 } from "@/components/ui/query-builder/query-builder.helpers"
 
 // ===========================================================================
@@ -212,5 +213,126 @@ describe("defaults", () => {
     expect(q.mode).toBe("media")
     expect(q.tests).toHaveLength(1)
     expect(q.joiner).toBe("and")
+  })
+
+  test("defaultQuery container has no media type", () => {
+    const q = defaultQuery("container")
+    expect(q.mode).toBe("container")
+    expect(q.mediaType).toBeUndefined()
+    expect(q.tests[0]).toMatchObject({ feature: "inline-size" })
+  })
+})
+
+// ===========================================================================
+// parseFeatureTest — more shapes / edge cases (coverage)
+// ===========================================================================
+
+describe("parseFeatureTest edge cases", () => {
+  test("a lone operator (empty left) is null", () => {
+    expect(parseFeatureTest(">= 600px")).toBeNull()
+  })
+
+  test("a 3-part range with a missing bound is null", () => {
+    expect(parseFeatureTest("400px <= width <=")).toBeNull()
+  })
+
+  test("a range2 with a missing right side is null", () => {
+    expect(parseFeatureTest("width >=")).toBeNull()
+  })
+
+  test("an = operator range keeps the literal", () => {
+    expect(parseFeatureTest("width = 600px")).toEqual({
+      kind: "range2",
+      feature: "width",
+      op: "=",
+      value: "600px",
+    })
+  })
+})
+
+// ===========================================================================
+// parseQuery — nested groups, not on groups, errors
+// ===========================================================================
+
+describe("parseQuery nesting + edge cases", () => {
+  test("a nested group flattens to its tests", () => {
+    const { node } = parseQuery(
+      "((min-width: 600px) and (max-width: 900px))",
+      "media",
+    )
+    expect(node?.type).toBe("group")
+    if (node?.type === "group") expect(node.tests).toHaveLength(2)
+  })
+
+  test("a not on a parenthesized group is captured", () => {
+    const { node } = parseQuery("not ((hover) and (color))", "media")
+    expect(node?.not).toBe(true)
+  })
+
+  test("a bare media type with no condition parses to an empty group", () => {
+    const { node, error } = parseQuery("only screen", "media")
+    expect(error).toBeNull()
+    if (node?.type === "group") expect(node.tests).toHaveLength(0)
+  })
+
+  test("a media type without `and` before the condition errors", () => {
+    const { node, error } = parseQuery("screen (min-width: 600px)", "media")
+    expect(node).toBeNull()
+    expect(error).not.toBeNull()
+  })
+
+  test("a branch without a feature errors (empty parens)", () => {
+    const { node } = parseQuery("()", "media")
+    expect(node).toBeNull()
+  })
+})
+
+// ===========================================================================
+// parseQueryState — the flat editor bridge
+// ===========================================================================
+
+describe("parseQueryState", () => {
+  test("media type + modifier + and-condition", () => {
+    const s = parseQueryState("only screen and (min-width: 600px)", "media")
+    expect(s).toMatchObject({
+      mode: "media",
+      modifier: "only",
+      mediaType: "screen",
+      joiner: "and",
+      not: false,
+    })
+    expect(s?.tests).toHaveLength(1)
+  })
+
+  test("a bare media type yields an empty test list", () => {
+    const s = parseQueryState("screen", "media")
+    expect(s).toMatchObject({ mediaType: "screen", tests: [] })
+  })
+
+  test("a single test captures its negation", () => {
+    const s = parseQueryState("not (monochrome)", "media")
+    expect(s?.not).toBe(true)
+    expect(s?.tests).toHaveLength(1)
+  })
+
+  test("an or-joined condition keeps the joiner", () => {
+    const s = parseQueryState("(hover) or (pointer: coarse)", "media")
+    expect(s?.joiner).toBe("or")
+    expect(s?.tests).toHaveLength(2)
+  })
+
+  test("a container name is captured", () => {
+    const s = parseQueryState("sidebar (width > 400px)", "container")
+    expect(s?.containerName).toBe("sidebar")
+    expect(s?.tests).toHaveLength(1)
+  })
+
+  test("an empty or unbalanced string is null", () => {
+    expect(parseQueryState("", "media")).toBeNull()
+    expect(parseQueryState("(min-width: 600px", "media")).toBeNull()
+  })
+
+  test("a media type with no `and` before the condition is null", () => {
+    expect(parseQueryState("screen (min-width: 600px)", "media")).toBeNull()
   })
 })

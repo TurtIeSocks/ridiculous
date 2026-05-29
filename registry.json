@@ -524,10 +524,48 @@
       ]
     },
     {
+      "name": "query-builder",
+      "type": "registry:ui",
+      "title": "Media / Container Query Builder",
+      "description": "Ridiculously typed editor for CSS media queries AND container queries (mode prop: media | container). MediaQueryLiteral<S> / ContainerQueryLiteral<S> validate the query skeleton \u2014 balanced parens, the optional leading only/not + media-type or container name, the boolean combination of parenthesized feature tests enforcing the CSS no-mixing-and-and-or-at-one-level rule \u2014 and each feature test's VALUE dimension against a known feature table: length features want a <length>, resolution features a <resolution>, aspect-ratio a <ratio> (16/9), enum features one of their keywords (orientation, pointer, prefers-color-scheme, \u2026). (width: 16/9) resolves to never; (min-resolution: 600px) to never; (a) and (b) or (c) to never (mixes and/or). Container mode restricts the feature set to the size subset (width, height, inline-size, block-size, aspect-ratio) + orientation. Unknown/exotic features, calc() values, and deep nesting past a depth cap of 4 are deferred to the runtime parser (lenient by design). Ships cssMediaQuery/cssContainerQuery call-site helpers, parseQuery/parseQueryState/formatQuery/queryToString/featureKind/featuresFor/enumOptionsFor/matchesNow helpers, FeaturesOf/FeatureCountOf utility types, FeatureTest/QueryNode/QueryState internal state, a popover + inline panel, a condition-builder UI, and a live matchMedia 'matches now?' indicator (media mode).",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "unit-input",
+        "button",
+        "popover",
+        "input",
+        "label",
+        "select"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/query-builder/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/query-builder/index.ts"
+        },
+        {
+          "path": "src/components/ui/query-builder/query-builder.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/query-builder/query-builder.tsx"
+        },
+        {
+          "path": "src/components/ui/query-builder/query-builder.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/query-builder/query-builder.types.ts"
+        },
+        {
+          "path": "src/components/ui/query-builder/query-builder.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/query-builder/query-builder.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, and if-function in one command.",
+      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, and query-builder in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -543,7 +581,8 @@
         "https://turtiesocks.github.io/ridiculous/r/transition-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/font-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/color-function.json",
-        "https://turtiesocks.github.io/ridiculous/r/if-function.json"
+        "https://turtiesocks.github.io/ridiculous/r/if-function.json",
+        "https://turtiesocks.github.io/ridiculous/r/query-builder.json"
       ],
       "dependencies": [],
       "files": []
