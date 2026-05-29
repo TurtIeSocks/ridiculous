@@ -24,6 +24,7 @@ export default defineConfig({
         "src/components/ui/transform-builder/**",
         "src/components/ui/filter-builder/**",
         "src/components/ui/grid-builder/**",
+        "src/components/ui/clip-path-editor/**",
       ],
       thresholds: {
         statements: 90,

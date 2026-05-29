@@ -296,10 +296,48 @@
       ]
     },
     {
+      "name": "clip-path-editor",
+      "type": "registry:ui",
+      "title": "Clip Path Editor",
+      "description": "Ridiculously typed CSS clip-path / shape-outside editor \u2014 a single <basic-shape> (inset / circle / ellipse / polygon) with an optional geometry-box keyword, validated by compile-time BASIC-SHAPE DISPATCH. ClipPathLiteral routes the value through ParseFunction to a per-shape validator: inset checks 1-4 length-percentages (+ a weak round tail), circle a radius (length-% or keyword) + at-position, ellipse exactly two radii, polygon a variadic vertex list (each vertex two length-percentages, validated to a 32-vertex depth cap then weak-validated). At most one leading/trailing geometry box. Ships a tolerant runtime parser and a live preview with draggable polygon vertices writing percentage coordinates.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "unit-input",
+        "button",
+        "popover",
+        "input",
+        "label",
+        "select"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/clip-path-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/clip-path-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/clip-path-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/clip-path-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/clip-path-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/clip-path-editor/clip-path-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/clip-path-editor/clip-path-editor.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, and grid-builder in one command.",
+      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, and clip-path-editor in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -309,7 +347,8 @@
         "https://turtiesocks.github.io/ridiculous/r/calc-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/transform-builder.json",
         "https://turtiesocks.github.io/ridiculous/r/filter-builder.json",
-        "https://turtiesocks.github.io/ridiculous/r/grid-builder.json"
+        "https://turtiesocks.github.io/ridiculous/r/grid-builder.json",
+        "https://turtiesocks.github.io/ridiculous/r/clip-path-editor.json"
       ],
       "dependencies": [],
       "files": []
