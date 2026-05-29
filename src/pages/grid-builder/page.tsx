@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/grid-builder/api-reference"
 import { BasicUsage } from "@/examples/grid-builder/basic-usage"
@@ -10,7 +9,7 @@ import { TierStrict } from "@/examples/grid-builder/tier-strict"
 
 export function GridBuilderPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="Grid Builder"
@@ -52,6 +51,6 @@ export function GridBuilderPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/grid-builder.json" />
       </div>
-    </Layout>
+    </>
   )
 }

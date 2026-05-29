@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 
 interface ExportGroup {
@@ -90,7 +89,7 @@ px("16deg")`
 
 export function RidiculousTypeKitPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="foundation"
         title="Ridiculous Type Kit"
@@ -157,6 +156,6 @@ export function RidiculousTypeKitPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json" />
       </div>
-    </Layout>
+    </>
   )
 }

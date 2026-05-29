@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/clip-path-editor/api-reference"
 import { BasicUsage } from "@/examples/clip-path-editor/basic-usage"
@@ -10,7 +9,7 @@ import { TierStrict } from "@/examples/clip-path-editor/tier-strict"
 
 export function ClipPathEditorPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="Clip Path Editor"
@@ -52,6 +51,6 @@ export function ClipPathEditorPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/clip-path-editor.json" />
       </div>
-    </Layout>
+    </>
   )
 }

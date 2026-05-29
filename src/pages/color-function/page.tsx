@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/color-function/api-reference"
 import { BasicUsage } from "@/examples/color-function/basic-usage"
@@ -10,7 +9,7 @@ import { TierStrict } from "@/examples/color-function/tier-strict"
 
 export function ColorFunctionPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="Color Function"
@@ -52,6 +51,6 @@ export function ColorFunctionPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/color-function.json" />
       </div>
-    </Layout>
+    </>
   )
 }

@@ -8,17 +8,15 @@ import {
 import { NAV } from "@/generated/nav"
 import { NavLink } from "./nav-link"
 
-const BASE = import.meta.env.BASE_URL
-
 function SidebarNav() {
   return (
     <nav aria-label="Components" className="flex flex-col gap-1">
-      <NavLink href={BASE}>Home</NavLink>
+      <NavLink to="/">Home</NavLink>
       <div className="mt-4 px-3 text-xs font-mono uppercase tracking-[0.15em] text-muted-foreground">
         Components
       </div>
       {NAV.map((item) => (
-        <NavLink key={item.name} href={`${BASE}${item.name}/`}>
+        <NavLink key={item.name} to={`/${item.name}`}>
           {item.title}
         </NavLink>
       ))}

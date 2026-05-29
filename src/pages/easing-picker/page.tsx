@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/easing-picker/api-reference"
 import { EasingPlayground } from "@/examples/easing-picker/playground"
@@ -9,7 +8,7 @@ import { TypeLockedExample } from "@/examples/easing-picker/type-locked"
 
 export function EasingPickerPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="Easing Picker"
@@ -41,6 +40,6 @@ export function EasingPickerPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/easing-picker.json" />
       </div>
-    </Layout>
+    </>
   )
 }

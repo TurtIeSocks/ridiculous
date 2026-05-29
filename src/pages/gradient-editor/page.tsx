@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/gradient-editor/api-reference"
 import { BasicUsage } from "@/examples/gradient-editor/basic-usage"
@@ -9,7 +8,7 @@ import { TypeLocked } from "@/examples/gradient-editor/type-locked"
 
 export function GradientEditorPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="Gradient Editor"
@@ -41,6 +40,6 @@ export function GradientEditorPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/gradient-editor.json" />
       </div>
-    </Layout>
+    </>
   )
 }

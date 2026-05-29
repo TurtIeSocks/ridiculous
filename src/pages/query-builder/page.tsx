@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/query-builder/api-reference"
 import { BasicUsage } from "@/examples/query-builder/basic-usage"
@@ -10,7 +9,7 @@ import { TierStrict } from "@/examples/query-builder/tier-strict"
 
 export function QueryBuilderPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="Media / Container Query Builder"
@@ -52,6 +51,6 @@ export function QueryBuilderPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/query-builder.json" />
       </div>
-    </Layout>
+    </>
   )
 }

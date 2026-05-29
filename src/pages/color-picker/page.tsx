@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/color-picker/api-reference"
 import { BasicUsage } from "@/examples/color-picker/basic-usage"
@@ -8,7 +7,7 @@ import { Native } from "@/examples/color-picker/native"
 
 export function ColorPickerPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="Color Picker"
@@ -39,6 +38,6 @@ export function ColorPickerPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/color-picker.json" />
       </div>
-    </Layout>
+    </>
   )
 }

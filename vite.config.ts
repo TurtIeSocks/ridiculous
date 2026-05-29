@@ -1,11 +1,13 @@
+import { existsSync, renameSync, rmSync } from "node:fs"
 import path from "node:path"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
+// Pulls in the `ssgOptions` augmentation on Vite's UserConfig.
+import type {} from "vite-react-ssg"
 
 export default defineConfig({
   base: "/ridiculous/",
-  root: "pages",
   publicDir: path.resolve(__dirname, "public"),
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -16,63 +18,24 @@ export default defineConfig({
   build: {
     outDir: path.resolve(__dirname, "dist"),
     emptyOutDir: true,
-    rollupOptions: {
-      input: {
-        index: path.resolve(__dirname, "pages/index.html"),
-        404: path.resolve(__dirname, "pages/404.html"),
-        "ridiculous-type-kit": path.resolve(
-          __dirname,
-          "pages/ridiculous-type-kit/index.html",
-        ),
-        "color-picker": path.resolve(
-          __dirname,
-          "pages/color-picker/index.html",
-        ),
-        "gradient-editor": path.resolve(
-          __dirname,
-          "pages/gradient-editor/index.html",
-        ),
-        "unit-input": path.resolve(__dirname, "pages/unit-input/index.html"),
-        "easing-picker": path.resolve(
-          __dirname,
-          "pages/easing-picker/index.html",
-        ),
-        "calc-editor": path.resolve(__dirname, "pages/calc-editor/index.html"),
-        "transform-builder": path.resolve(
-          __dirname,
-          "pages/transform-builder/index.html",
-        ),
-        "filter-builder": path.resolve(
-          __dirname,
-          "pages/filter-builder/index.html",
-        ),
-        "grid-builder": path.resolve(
-          __dirname,
-          "pages/grid-builder/index.html",
-        ),
-        "clip-path-editor": path.resolve(
-          __dirname,
-          "pages/clip-path-editor/index.html",
-        ),
-        "box-shadow-editor": path.resolve(
-          __dirname,
-          "pages/box-shadow-editor/index.html",
-        ),
-        "transition-editor": path.resolve(
-          __dirname,
-          "pages/transition-editor/index.html",
-        ),
-        "font-editor": path.resolve(__dirname, "pages/font-editor/index.html"),
-        "color-function": path.resolve(
-          __dirname,
-          "pages/color-function/index.html",
-        ),
-        "if-function": path.resolve(__dirname, "pages/if-function/index.html"),
-        "query-builder": path.resolve(
-          __dirname,
-          "pages/query-builder/index.html",
-        ),
-      },
+  },
+  ssgOptions: {
+    // /foo -> dist/foo/index.html (deep links served directly by GitHub Pages)
+    dirStyle: "nested",
+    // Render the catch-all route at a concrete /404 path so the NotFound page
+    // is prerendered. The splat ("*") itself is dynamic and dropped by the
+    // built-in filter, so without this there'd be no 404 page at all.
+    includedRoutes: (paths) => [...paths, "/404"],
+    // GitHub Pages serves /404.html for unmatched URLs. Promote the
+    // prerendered dist/404/index.html to dist/404.html.
+    onFinished: () => {
+      const dist = path.resolve(__dirname, "dist")
+      const nested = path.join(dist, "404", "index.html")
+      const flat = path.join(dist, "404.html")
+      if (existsSync(nested)) {
+        renameSync(nested, flat)
+        rmSync(path.join(dist, "404"), { recursive: true, force: true })
+      }
     },
   },
 })

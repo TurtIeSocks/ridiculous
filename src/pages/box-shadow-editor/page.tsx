@@ -1,5 +1,4 @@
 import { InstallCta } from "@/components/layout/install-cta"
-import { Layout } from "@/components/layout/layout"
 import { SectionHeader } from "@/components/layout/section-header"
 import { ApiReference } from "@/examples/box-shadow-editor/api-reference"
 import { BasicUsage } from "@/examples/box-shadow-editor/basic-usage"
@@ -10,7 +9,7 @@ import { TierStrict } from "@/examples/box-shadow-editor/tier-strict"
 
 export function BoxShadowEditorPage() {
   return (
-    <Layout variant="compact">
+    <>
       <SectionHeader
         eyebrow="component"
         title="Box Shadow Editor"
@@ -52,6 +51,6 @@ export function BoxShadowEditorPage() {
       <div className="mt-6">
         <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/box-shadow-editor.json" />
       </div>
-    </Layout>
+    </>
   )
 }
