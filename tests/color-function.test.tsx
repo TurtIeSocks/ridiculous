@@ -114,6 +114,37 @@ describe("ColorFunctionPanel — relative", () => {
       "oklch(from #ff0000 calc(l * 1.2) c h)",
     )
   })
+
+  test("editing channels 2 and 3 emits the updated tokens", () => {
+    const onChange = vi.fn()
+    // Use the sub-component (pure state->onChange) so each edit is isolated
+    // from the controlled-panel resync.
+    render(
+      <RelativeColorEditor
+        state={{
+          kind: "relative",
+          fn: "oklch",
+          from: "#ff0000",
+          c1: "l",
+          c2: "c",
+          c3: "h",
+        }}
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText(/channel 2/i), {
+      target: { value: "0.2" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ c2: "0.2" }),
+    )
+    fireEvent.change(screen.getByLabelText(/channel 3/i), {
+      target: { value: "270" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ c3: "270" }),
+    )
+  })
 })
 
 describe("ColorFunctionPanel — light-dark", () => {
@@ -142,6 +173,21 @@ describe("ColorFunctionPanel — light-dark", () => {
       target: { value: "#111111" },
     })
     expect(onChange).toHaveBeenCalledWith("light-dark(#ffffff, #111111)")
+  })
+
+  test("editing the light color emits an updated light-dark string", () => {
+    const onChange = vi.fn()
+    render(
+      <ColorFunctionPanel
+        mode="light-dark"
+        value="light-dark(#ffffff, #000000)"
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText(/light color/i), {
+      target: { value: "#eeeeee" },
+    })
+    expect(onChange).toHaveBeenCalledWith("light-dark(#eeeeee, #000000)")
   })
 })
 
@@ -232,5 +278,183 @@ describe("ColorMixEditor / RelativeColorEditor / LightDarkEditor (sub-components
   test("RelativeColorEditor and LightDarkEditor are exported", () => {
     expect(typeof RelativeColorEditor).toBe("function")
     expect(typeof LightDarkEditor).toBe("function")
+  })
+})
+
+describe("ColorMixEditor — ratio toggles, swap, second slider, hue method", () => {
+  const base = {
+    kind: "color-mix" as const,
+    space: "oklch",
+    hue: "shorter",
+    colorA: "#ff0000",
+    pctA: "30%",
+    colorB: "#0000ff",
+    pctB: "70%",
+  }
+
+  test("toggling the first ratio off drops its percentage", () => {
+    const onChange = vi.fn()
+    render(<ColorMixEditor state={base} onChange={onChange} />)
+    fireEvent.click(screen.getByLabelText(/toggle first ratio/i))
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ pctA: undefined }),
+    )
+  })
+
+  test("toggling a ratio back on restores a default percentage", () => {
+    const onChange = vi.fn()
+    render(
+      <ColorMixEditor
+        state={{ ...base, hue: undefined, pctA: undefined, pctB: undefined }}
+        onChange={onChange}
+      />,
+    )
+    fireEvent.click(screen.getByLabelText(/toggle first ratio/i))
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ pctA: "50%" }),
+    )
+  })
+
+  test("the second slider emits the second percentage", () => {
+    const onChange = vi.fn()
+    render(<ColorMixEditor state={base} onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText(/second color ratio/i), {
+      target: { value: "40" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ pctB: "40%" }),
+    )
+  })
+
+  test("swap colors exchanges the two colors and weights", () => {
+    const onChange = vi.fn()
+    render(<ColorMixEditor state={base} onChange={onChange} />)
+    fireEvent.click(screen.getByText(/swap colors/i))
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({
+        colorA: "#0000ff",
+        colorB: "#ff0000",
+        pctA: "70%",
+        pctB: "30%",
+      }),
+    )
+  })
+
+  test("changing the hue method emits the new method", () => {
+    const onChange = vi.fn()
+    render(<ColorMixEditor state={base} onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText(/hue interpolation/i), {
+      target: { value: "longer" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ hue: "longer" }),
+    )
+  })
+
+  test("switching to a rectangular space drops the hue method", () => {
+    const onChange = vi.fn()
+    render(<ColorMixEditor state={base} onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText(/interpolation colorspace/i), {
+      target: { value: "srgb" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ space: "srgb", hue: undefined }),
+    )
+  })
+})
+
+describe("RelativeColorEditor — fn switch, color() ident, alpha", () => {
+  const base = {
+    kind: "relative" as const,
+    fn: "oklch",
+    from: "#ff0000",
+    c1: "l",
+    c2: "c",
+    c3: "h",
+  }
+
+  test("switching the function resets the channels to its keywords", () => {
+    const onChange = vi.fn()
+    render(<RelativeColorEditor state={base} onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText(/relative function/i), {
+      target: { value: "rgb" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ fn: "rgb", c1: "r", c2: "g", c3: "b" }),
+    )
+  })
+
+  test("switching to color() seeds a colorspace ident", () => {
+    const onChange = vi.fn()
+    render(<RelativeColorEditor state={base} onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText(/relative function/i), {
+      target: { value: "color" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ fn: "color", space: "srgb" }),
+    )
+  })
+
+  test("the color() space ident is editable", () => {
+    const onChange = vi.fn()
+    render(
+      <RelativeColorEditor
+        state={{
+          ...base,
+          fn: "color",
+          space: "srgb",
+          c1: "r",
+          c2: "g",
+          c3: "b",
+        }}
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText(/color space/i), {
+      target: { value: "display-p3" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ space: "display-p3" }),
+    )
+  })
+
+  test("editing the alpha emits it; clearing it drops it", () => {
+    const onChange = vi.fn()
+    const { rerender } = render(
+      <RelativeColorEditor state={base} onChange={onChange} />,
+    )
+    fireEvent.change(screen.getByLabelText(/alpha channel/i), {
+      target: { value: "50%" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ alpha: "50%" }),
+    )
+    rerender(
+      <RelativeColorEditor
+        state={{ ...base, alpha: "50%" }}
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText(/alpha channel/i), {
+      target: { value: "" },
+    })
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ alpha: undefined }),
+    )
+  })
+})
+
+describe("ColorFunction popover opens the panel", () => {
+  test("clicking the trigger reveals the editor controls", () => {
+    render(
+      <ColorFunction
+        mode="color-mix"
+        value="color-mix(in oklch, #ff0000, #0000ff)"
+        onChange={() => {}}
+      />,
+    )
+    fireEvent.click(screen.getByLabelText(/edit a css color function/i))
+    // PopoverContent now mounted — the interpolation select is present.
+    expect(screen.getByLabelText(/interpolation colorspace/i)).toBeTruthy()
   })
 })
