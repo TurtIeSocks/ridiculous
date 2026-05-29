@@ -20,6 +20,10 @@ export default defineConfig({
       input: {
         index: path.resolve(__dirname, "pages/index.html"),
         404: path.resolve(__dirname, "pages/404.html"),
+        "ridiculous-type-kit": path.resolve(
+          __dirname,
+          "pages/ridiculous-type-kit/index.html",
+        ),
         "color-picker": path.resolve(
           __dirname,
           "pages/color-picker/index.html",
