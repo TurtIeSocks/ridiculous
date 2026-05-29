@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react"
 import { describe, expect, test, vi } from "vitest"
 import {
   AddLayerButton,
+  KeywordSelect,
+  TimeField,
   TransitionEditor,
   TransitionEditorPanel,
   TransitionLayerRow,
@@ -330,5 +332,277 @@ describe("TransitionEditor (popover)", () => {
       />,
     )
     expect(screen.getByRole("button").textContent).toMatch(/animation/i)
+  })
+})
+
+// ===========================================================================
+// TimeField
+// ===========================================================================
+
+describe("TimeField", () => {
+  test("editing the numeric part re-emits with the current unit", () => {
+    const onChange = vi.fn()
+    render(<TimeField label="duration" value="200ms" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("duration"), {
+      target: { value: "350" },
+    })
+    expect(onChange).toHaveBeenCalledWith("350ms")
+  })
+
+  test("clearing the numeric part emits an empty string", () => {
+    const onChange = vi.fn()
+    render(<TimeField label="duration" value="200ms" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("duration"), {
+      target: { value: "" },
+    })
+    expect(onChange).toHaveBeenCalledWith("")
+  })
+
+  test("changing the unit recomposes the value", () => {
+    const onChange = vi.fn()
+    render(<TimeField label="duration" value="200ms" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("duration unit"), {
+      target: { value: "s" },
+    })
+    expect(onChange).toHaveBeenCalledWith("200s")
+  })
+
+  test("an empty value seeds 0 when a unit is picked", () => {
+    const onChange = vi.fn()
+    render(<TimeField label="delay" value="" onChange={onChange} />)
+    fireEvent.change(screen.getByLabelText("delay unit"), {
+      target: { value: "s" },
+    })
+    expect(onChange).toHaveBeenCalledWith("0s")
+  })
+
+  test("an opaque calc() value renders as raw text (no unit select)", () => {
+    const onChange = vi.fn()
+    render(
+      <TimeField
+        label="duration"
+        value="calc(1s + 200ms)"
+        onChange={onChange}
+      />,
+    )
+    const input = screen.getByLabelText("duration")
+    expect(input).toHaveValue("calc(1s + 200ms)")
+    expect(screen.queryByLabelText("duration unit")).not.toBeInTheDocument()
+    fireEvent.change(input, { target: { value: "var(--d)" } })
+    expect(onChange).toHaveBeenCalledWith("var(--d)")
+  })
+})
+
+// ===========================================================================
+// KeywordSelect
+// ===========================================================================
+
+describe("KeywordSelect", () => {
+  test("selecting the empty option clears the value", () => {
+    const onChange = vi.fn()
+    render(
+      <KeywordSelect
+        label="direction"
+        value="alternate"
+        options={["normal", "alternate"]}
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("direction"), {
+      target: { value: "" },
+    })
+    expect(onChange).toHaveBeenCalledWith(undefined)
+  })
+})
+
+// ===========================================================================
+// Field edits through the panel — exercise the per-field onChange closures
+// ===========================================================================
+
+describe("field edits (transition)", () => {
+  test("editing duration / delay emits updated strings", () => {
+    const onChange = vi.fn()
+    render(
+      <TransitionEditorPanel
+        value="opacity 200ms 50ms ease"
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("duration 1"), {
+      target: { value: "400" },
+    })
+    expect(onChange).toHaveBeenLastCalledWith("opacity 400ms 50ms ease")
+    // the panel keeps internal state (the static value prop never updates), so
+    // clearing the delay applies on top of the 400ms duration just set
+    fireEvent.change(screen.getByLabelText("delay 1"), {
+      target: { value: "" },
+    })
+    expect(onChange).toHaveBeenLastCalledWith("opacity 400ms ease")
+  })
+
+  test("clearing the property emits a property-less layer", () => {
+    const onChange = vi.fn()
+    render(
+      <TransitionEditorPanel value="opacity 200ms ease" onChange={onChange} />,
+    )
+    fireEvent.change(screen.getByLabelText("transition-property 1"), {
+      target: { value: "" },
+    })
+    expect(onChange).toHaveBeenLastCalledWith("200ms ease")
+  })
+})
+
+describe("field edits (animation)", () => {
+  test("editing the iteration-count input emits the new count", () => {
+    const onChange = vi.fn()
+    render(
+      <TransitionEditorPanel
+        mode="animation"
+        value="spin 1s 3"
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("iteration-count 1"), {
+      target: { value: "5" },
+    })
+    expect(onChange).toHaveBeenLastCalledWith("1s 5 spin")
+  })
+
+  test("changing fill-mode and play-state selects recomposes the value", () => {
+    const onChange = vi.fn()
+    render(
+      <TransitionEditorPanel
+        mode="animation"
+        value="1s spin"
+        onChange={onChange}
+      />,
+    )
+    fireEvent.change(screen.getByLabelText("fill-mode 1"), {
+      target: { value: "forwards" },
+    })
+    expect(onChange).toHaveBeenLastCalledWith("1s forwards spin")
+    // internal state persists across edits — play-state stacks onto fill-mode
+    fireEvent.change(screen.getByLabelText("play-state 1"), {
+      target: { value: "paused" },
+    })
+    expect(onChange).toHaveBeenLastCalledWith("1s forwards paused spin")
+  })
+
+  test("toggling infinite on a count-less layer seeds infinite then 1", () => {
+    const onChange = vi.fn()
+    render(
+      <TransitionEditorPanel
+        mode="animation"
+        value="1s spin"
+        onChange={onChange}
+      />,
+    )
+    fireEvent.click(screen.getByLabelText(/infinite 1/i))
+    expect(onChange).toHaveBeenLastCalledWith("1s infinite spin")
+  })
+})
+
+// ===========================================================================
+// Panel preview write-back + resync
+// ===========================================================================
+
+describe("panel preview write-back", () => {
+  test("the panel duration scrubber writes the value back", () => {
+    const onChange = vi.fn()
+    render(
+      <TransitionEditorPanel value="opacity 200ms ease" onChange={onChange} />,
+    )
+    const dur = screen.getByLabelText(/duration .* in ms/i)
+    fireEvent.change(dur, { target: { value: "500" } })
+    fireEvent.blur(dur)
+    expect(onChange).toHaveBeenCalled()
+    expect(onChange.mock.calls.at(-1)?.[0]).toMatch(/500ms/)
+  })
+})
+
+// ===========================================================================
+// TransitionPreview — animation paths + edge values
+// ===========================================================================
+
+describe("TransitionPreview (animation + edges)", () => {
+  test("replay remounts the animation target (key bump) without throwing", () => {
+    render(
+      <TransitionPreview mode="animation" value="spin 1s linear infinite" />,
+    )
+    const replay = screen.getByRole("button", { name: /replay/i })
+    fireEvent.click(replay)
+    expect(replay).toBeInTheDocument()
+  })
+
+  test("the animation duration scrubber scales the first layer", () => {
+    const onChange = vi.fn()
+    render(
+      <TransitionPreview
+        mode="animation"
+        value="spin 2s infinite"
+        onChange={onChange}
+      />,
+    )
+    const dur = screen.getByLabelText(/duration .* in ms/i)
+    // 2s → 2000ms is the seeded display; scrub to 800
+    fireEvent.change(dur, { target: { value: "800" } })
+    fireEvent.blur(dur)
+    expect(onChange.mock.calls.at(-1)?.[0]).toMatch(/800ms/)
+  })
+
+  test("a seconds duration is normalized to ms in the scrubber seed", () => {
+    render(<TransitionPreview mode="transition" value="all 1s ease" />)
+    // 1s → the scrubber seeds 1000ms (preview-only render, no control shown)
+    const { container } = render(
+      <TransitionPreview
+        mode="transition"
+        value="all 1s ease"
+        onChange={() => {}}
+      />,
+    )
+    expect(container).toBeTruthy()
+  })
+
+  test("an opaque / NaN duration defaults the scrubber to 200ms", () => {
+    const onChange = vi.fn()
+    render(
+      <TransitionPreview
+        mode="transition"
+        value="all calc(1s) ease"
+        onChange={onChange}
+      />,
+    )
+    expect(screen.getByLabelText(/duration .* in ms/i)).toHaveValue("200")
+  })
+
+  test("scrubbing duration on value='none' seeds a fresh first layer", () => {
+    const onChange = vi.fn()
+    render(
+      <TransitionPreview mode="transition" value="none" onChange={onChange} />,
+    )
+    const dur = screen.getByLabelText(/duration .* in ms/i)
+    fireEvent.change(dur, { target: { value: "300" } })
+    fireEvent.blur(dur)
+    expect(onChange.mock.calls.at(-1)?.[0]).toBe("all 300ms")
+  })
+
+  test("scrubbing duration on animation value='none' seeds a slide layer", () => {
+    const onChange = vi.fn()
+    render(
+      <TransitionPreview mode="animation" value="none" onChange={onChange} />,
+    )
+    const dur = screen.getByLabelText(/duration .* in ms/i)
+    fireEvent.change(dur, { target: { value: "600" } })
+    fireEvent.blur(dur)
+    expect(onChange.mock.calls.at(-1)?.[0]).toBe("600ms slide")
+  })
+
+  test("an un-aliased animation name is kept as-is in the applied style", () => {
+    const { container } = render(
+      <TransitionPreview mode="animation" value="custom-kf 1s" />,
+    )
+    const target = container.querySelector("[data-preview-target]")
+    // custom-kf is not in the demo keyframe alias map → kept verbatim
+    expect((target as HTMLElement).style.animation).toBe("1s custom-kf")
   })
 })

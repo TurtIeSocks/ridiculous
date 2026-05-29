@@ -54,6 +54,10 @@ export default defineConfig({
           __dirname,
           "pages/box-shadow-editor/index.html",
         ),
+        "transition-editor": path.resolve(
+          __dirname,
+          "pages/transition-editor/index.html",
+        ),
       },
     },
   },

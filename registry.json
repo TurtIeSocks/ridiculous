@@ -373,10 +373,49 @@
       ]
     },
     {
+      "name": "transition-editor",
+      "type": "registry:ui",
+      "title": "Transition + Animation Editor",
+      "description": "Ridiculously typed CSS transition + animation editor \u2014 a mode prop edits either comma-separated layer list with compile-time PER-LAYER TOKEN-KIND CLASSIFICATION. The list splits by comma into layers, each layer by space into tokens; every token is classified by KIND with a per-kind cardinality cap (order-independent within a layer). TransitionLiteral validates per layer \u22642 <time> (duration, delay), \u22641 <easing-function> (via easing-picker's EasingLiteral), \u22641 <property> (all|none|<custom-ident>), \u22641 allow-discrete. AnimationLiteral validates \u22642 <time>, \u22641 easing, \u22641 iteration-count (<number>|infinite), \u22641 direction, \u22641 fill-mode, \u22641 play-state, \u22641 <keyframes-name>. Excess cardinality, an unknown token, or a bad easing resolve to never; calc()/var() and weak <custom-ident> are deferred to the tolerant runtime parser. Ships cssTransition/cssAnimation helpers, the parser, and a live preview that actually transitions/animates with a play/replay button, embedded EasingPicker, and a duration scrubber.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "easing-picker",
+        "unit-input",
+        "button",
+        "popover",
+        "input",
+        "label",
+        "select"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/transition-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/transition-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/transition-editor/transition-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/transition-editor/transition-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/transition-editor/transition-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/transition-editor/transition-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/transition-editor/transition-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/transition-editor/transition-editor.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, and box-shadow-editor in one command.",
+      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, and transition-editor in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -388,7 +427,8 @@
         "https://turtiesocks.github.io/ridiculous/r/filter-builder.json",
         "https://turtiesocks.github.io/ridiculous/r/grid-builder.json",
         "https://turtiesocks.github.io/ridiculous/r/clip-path-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/box-shadow-editor.json"
+        "https://turtiesocks.github.io/ridiculous/r/box-shadow-editor.json",
+        "https://turtiesocks.github.io/ridiculous/r/transition-editor.json"
       ],
       "dependencies": [],
       "files": []
