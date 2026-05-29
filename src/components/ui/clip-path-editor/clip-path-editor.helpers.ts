@@ -129,7 +129,7 @@ function peelBox(src: string): BoxPeel {
 function buildInset(argStr: string): ClipPathShapeState | null {
   const tokens = splitSpace(argStr)
   if (tokens.length === 0) return null
-  const roundIdx = tokens.findIndex((t) => t === "round")
+  const roundIdx = tokens.indexOf("round")
   const box = roundIdx === -1 ? tokens : tokens.slice(0, roundIdx)
   const round = roundIdx === -1 ? undefined : tokens.slice(roundIdx + 1)
   if (box.length < 1 || box.length > 4) return null

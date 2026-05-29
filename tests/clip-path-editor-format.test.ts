@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest"
 import {
   formatClipPath,
   parseClipPath,
+  shapeToCss,
 } from "@/components/ui/clip-path-editor/clip-path-editor.helpers"
 import type { ClipPathState } from "@/components/ui/clip-path-editor/clip-path-editor.types"
 
@@ -118,5 +119,32 @@ describe("formatClipPath", () => {
       const state = parseClipPath(src) as ClipPathState
       expect(formatClipPath(state)).toBe(src)
     }
+  })
+})
+
+describe("shapeToCss — direct per-shape serialization", () => {
+  test("each shape variant serializes to its function string", () => {
+    expect(shapeToCss({ shape: "inset", top: "10px" })).toBe("inset(10px)")
+    expect(shapeToCss({ shape: "circle", radius: "closest-side" })).toBe(
+      "circle(closest-side)",
+    )
+    expect(shapeToCss({ shape: "ellipse", rx: "40%", ry: "60%" })).toBe(
+      "ellipse(40% 60%)",
+    )
+    expect(
+      shapeToCss({
+        shape: "polygon",
+        fillRule: "nonzero",
+        vertices: [
+          { x: "0%", y: "0%" },
+          { x: "100%", y: "100%" },
+        ],
+      }),
+    ).toBe("polygon(nonzero, 0% 0%, 100% 100%)")
+  })
+
+  test("empty circle / ellipse serialize to bare calls", () => {
+    expect(shapeToCss({ shape: "ellipse" })).toBe("ellipse()")
+    expect(formatClipPath({ shape: { shape: "ellipse" } })).toBe("ellipse()")
   })
 })
