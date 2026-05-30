@@ -108,7 +108,9 @@ export function TimeField({
         aria-label={`${label} unit`}
         value={unitPart}
         onChange={(e) =>
-          onChange(value === "" ? "" : `${numPart || "0"}${e.target.value}`)
+          // Picking a concrete unit is an explicit intent to set a time, so an
+          // empty field seeds 0 (`numPart || "0"`) rather than emitting "".
+          onChange(`${numPart || "0"}${e.target.value}`)
         }
         className="h-8 rounded-r-md rounded-l-none border border-input bg-background px-1 font-mono text-xs"
       >
