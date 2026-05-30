@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react"
 import type { ReactNode } from "react"
 import { NavLink as RouterNavLink } from "react-router-dom"
 import { cn } from "@/lib/utils"
@@ -7,9 +8,11 @@ interface NavLinkProps {
   to: string
   children: ReactNode
   className?: string
+  /** Optional decorative icon rendered before the label. */
+  icon?: LucideIcon
 }
 
-export function NavLink({ to, children, className }: NavLinkProps) {
+export function NavLink({ to, children, className, icon: Icon }: NavLinkProps) {
   return (
     <RouterNavLink
       to={to}
@@ -17,7 +20,7 @@ export function NavLink({ to, children, className }: NavLinkProps) {
       data-active-link
       className={({ isActive }) =>
         cn(
-          "block rounded-md px-3 py-2 text-sm transition",
+          "flex items-center gap-2.5 rounded-md px-3 py-2 text-sm transition",
           isActive
             ? "bg-white/10 text-foreground"
             : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
@@ -25,6 +28,7 @@ export function NavLink({ to, children, className }: NavLinkProps) {
         )
       }
     >
+      {Icon ? <Icon className="size-4 shrink-0" aria-hidden="true" /> : null}
       {children}
     </RouterNavLink>
   )

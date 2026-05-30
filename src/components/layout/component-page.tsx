@@ -1,4 +1,5 @@
 import type { ReactNode } from "react"
+import { iconForComponent } from "@/components/layout/component-icons"
 import { InstallCta } from "@/components/layout/install-cta"
 import { SectionHeader } from "@/components/layout/section-header"
 import { registryUrl } from "@/lib/registry"
@@ -47,6 +48,7 @@ export function ComponentPage({
         eyebrow="component"
         title={meta.title}
         description={meta.description}
+        icon={iconForComponent(meta.slug)}
       />
       <div className={examplesLayout}>{examples}</div>
 

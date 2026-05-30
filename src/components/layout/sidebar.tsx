@@ -1,4 +1,6 @@
+import { Home } from "lucide-react"
 import type { ReactNode } from "react"
+import { iconForComponent } from "@/components/layout/component-icons"
 import {
   Sheet,
   SheetContent,
@@ -11,12 +13,18 @@ import { NavLink } from "./nav-link"
 function SidebarNav() {
   return (
     <nav aria-label="Components" className="flex flex-col gap-1">
-      <NavLink to="/">Home</NavLink>
+      <NavLink to="/" icon={Home}>
+        Home
+      </NavLink>
       <div className="mt-4 px-3 font-mono text-muted-foreground text-xs uppercase tracking-[0.15em]">
         Components
       </div>
       {NAV.map((item) => (
-        <NavLink key={item.name} to={`/${item.name}`}>
+        <NavLink
+          key={item.name}
+          to={`/${item.name}`}
+          icon={iconForComponent(item.name)}
+        >
           {item.title}
         </NavLink>
       ))}
