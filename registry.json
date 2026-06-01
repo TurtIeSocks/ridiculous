@@ -7,7 +7,7 @@
       "name": "ridiculous-type-kit",
       "type": "registry:lib",
       "title": "Ridiculous Type Kit",
-      "description": "Shared template-literal type machinery: char/number primitives, CSS dimension validators (IsLength/IsAngle/IsTime/...), DimensionOf, and paren-aware parser combinators powering every ridiculous component.",
+      "description": "Shared template-literal type machinery powering every ridiculous component. Provides char/number primitives, CSS dimension validators (IsLength/IsAngle/IsTime/…), DimensionOf, and paren-aware parser combinators.",
       "dependencies": [],
       "registryDependencies": [],
       "files": [
@@ -157,7 +157,7 @@
       "name": "easing-picker",
       "type": "registry:ui",
       "title": "Easing Picker",
-      "description": "Ridiculously typed CSS easing function picker — bezier canvas, spring/bounce/wiggle physics baked to linear(), polynomial preset gallery, 6-property animation preview, 3-format output (CSS/Tailwind v3/v4).",
+      "description": "Ridiculously typed CSS easing-function picker with a bezier canvas, spring/bounce/wiggle physics baked to linear(), and a polynomial preset gallery. Ships a 6-property animation preview and 3-format output (CSS / Tailwind v3 / v4).",
       "registryDependencies": ["button", "popover"],
       "dependencies": [],
       "files": [
@@ -252,7 +252,7 @@
       "name": "calc-editor",
       "type": "registry:ui",
       "title": "Calc Editor",
-      "description": "Ridiculously typed CSS math editor — calc/clamp/min/max with compile-time DIMENSIONAL ANALYSIS (length±length ✓, length±angle ✗, length×length ✗, ÷ by non-number ✗), a full runtime parser/evaluator, and a fluid-type clamp() playground.",
+      "description": "Ridiculously typed CSS math editor for calc/clamp/min/max with compile-time dimensional analysis (length±length ✓, length±angle ✗, ÷ by non-number ✗). Ships a full runtime parser/evaluator and a fluid-type clamp() playground.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "button",
@@ -287,7 +287,7 @@
       "name": "transform-builder",
       "type": "registry:ui",
       "title": "Transform Builder",
-      "description": "Ridiculously typed CSS transform editor — a space-separated function list with compile-time FUNCTION-NAME DISPATCH (per-function arity + per-argument dimension typing: rotate wants an angle, translateX a length-%), a tolerant runtime parser, and a live 3D-preview card driven by the typed string.",
+      "description": "Ridiculously typed CSS transform editor — a space-separated function list with compile-time function-name dispatch (per-function arity and per-argument dimension typing: rotate wants an angle, translateX a length-%). Ships a tolerant runtime parser and a live 3D-preview card driven by the typed string.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "button",
@@ -339,7 +339,7 @@
       "name": "filter-builder",
       "type": "registry:ui",
       "title": "Filter Builder",
-      "description": "Ridiculously typed CSS filter / backdrop-filter editor — a space-separated function list with compile-time FUNCTION-LIST DISPATCH (per-function arity + per-argument dimension typing: blur wants a length, hue-rotate an angle, the amount functions a non-negative number or percentage), a drop-shadow whose optional trailing color is validated against the color-picker ColorLiteral, a tolerant runtime parser, and a live image/card preview with a filter ↔ backdrop-filter toggle.",
+      "description": "Ridiculously typed CSS filter / backdrop-filter editor — a space-separated function list with compile-time per-function arity and dimension typing, plus a drop-shadow color validated against the color-picker ColorLiteral. Ships a tolerant runtime parser and a live preview with a filter ↔ backdrop-filter toggle.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "color-picker",
@@ -392,7 +392,7 @@
       "name": "grid-builder",
       "type": "registry:ui",
       "title": "Grid Builder",
-      "description": "Ridiculously typed CSS grid-template editor — track lists (grid-template-columns / grid-template-rows) and grid-template-areas across three modes. TrackListLiteral fully validates the track grammar (length/percentage/flex/keywords, minmax with an inflexible-min guard, fit-content, depth-capped repeat with a recursive track list + auto-fill/auto-fit, and [named-line] idents); GridAreasLiteral validates quoting + equal column counts + cell idents at the type level, with the contiguous-rectangle invariant enforced at runtime. Ships a live display:grid preview and a clickable areas painter.",
+      "description": "Ridiculously typed CSS grid-template editor for track lists and grid-template-areas across three modes, with TrackListLiteral validating the full track grammar and GridAreasLiteral checking quoting, equal column counts, and cell idents at the type level. Ships a live display:grid preview and a clickable areas painter.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "unit-input",
@@ -449,7 +449,7 @@
       "name": "clip-path-editor",
       "type": "registry:ui",
       "title": "Clip Path Editor",
-      "description": "Ridiculously typed CSS clip-path / shape-outside editor — a single <basic-shape> (inset / circle / ellipse / polygon) with an optional geometry-box keyword, validated by compile-time BASIC-SHAPE DISPATCH. ClipPathLiteral routes the value through ParseFunction to a per-shape validator: inset checks 1-4 length-percentages (+ a weak round tail), circle a radius (length-% or keyword) + at-position, ellipse exactly two radii, polygon a variadic vertex list (each vertex two length-percentages, validated to a 32-vertex depth cap then weak-validated). At most one leading/trailing geometry box. Ships a tolerant runtime parser and a live preview with draggable polygon vertices writing percentage coordinates.",
+      "description": "Ridiculously typed CSS clip-path / shape-outside editor for a single <basic-shape> (inset / circle / ellipse / polygon) with an optional geometry-box keyword, validated by compile-time basic-shape dispatch through ParseFunction. Ships a tolerant runtime parser and a live preview with draggable polygon vertices.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "unit-input",
@@ -567,7 +567,7 @@
       "name": "box-shadow-editor",
       "type": "registry:ui",
       "title": "Box Shadow Editor",
-      "description": "Ridiculously typed CSS box-shadow editor — a comma-separated list of shadow layers with compile-time PER-LAYER TOKEN VALIDATION. The list splits by comma into layers, each layer by space into tokens; BoxShadowLiteral validates per layer 2-4 lengths (offset-x, offset-y required; blur non-negative; spread optional), at most one inset keyword (leading or trailing), and at most one trailing color checked against the color-picker ColorLiteral. Bare keyword colors and a leading color resolve to never at the strict tier (the runtime parser is tolerant). Ships a tolerant runtime parser and a live preview with a draggable light source that re-casts every layer's offsets plus an elevation scrubber.",
+      "description": "Ridiculously typed CSS box-shadow editor — a comma-separated list of shadow layers with compile-time per-layer token validation (2–4 lengths, at most one inset, a trailing color checked against the color-picker ColorLiteral). Ships a tolerant runtime parser and a live preview with a draggable light source and elevation scrubber.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "color-picker",
@@ -621,7 +621,7 @@
       "name": "transition-editor",
       "type": "registry:ui",
       "title": "Transition + Animation Editor",
-      "description": "Ridiculously typed CSS transition + animation editor — a mode prop edits either comma-separated layer list with compile-time PER-LAYER TOKEN-KIND CLASSIFICATION. The list splits by comma into layers, each layer by space into tokens; every token is classified by KIND with a per-kind cardinality cap (order-independent within a layer). TransitionLiteral validates per layer ≤2 <time> (duration, delay), ≤1 <easing-function> (via easing-picker's EasingLiteral), ≤1 <property> (all|none|<custom-ident>), ≤1 allow-discrete. AnimationLiteral validates ≤2 <time>, ≤1 easing, ≤1 iteration-count (<number>|infinite), ≤1 direction, ≤1 fill-mode, ≤1 play-state, ≤1 <keyframes-name>. Excess cardinality, an unknown token, or a bad easing resolve to never; calc()/var() and weak <custom-ident> are deferred to the tolerant runtime parser. Ships cssTransition/cssAnimation helpers, the parser, and a live preview that actually transitions/animates with a play/replay button, embedded EasingPicker, and a duration scrubber.",
+      "description": "Ridiculously typed CSS transition + animation editor whose mode prop edits either comma-separated layer list with compile-time per-kind token classification and cardinality caps (times, easing via the easing-picker EasingLiteral, property, iteration-count, direction, …). Ships cssTransition/cssAnimation helpers, a tolerant runtime parser, and a live preview that actually transitions/animates with an embedded EasingPicker and duration scrubber.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "easing-picker",
@@ -675,7 +675,7 @@
       "name": "font-editor",
       "type": "registry:ui",
       "title": "Font Editor",
-      "description": "Ridiculously typed CSS font-shorthand editor with a compile-time STRICT-ORDER PARSE — the most order-sensitive of the common shorthands. FontLiteral parses an order-free prefix (font-style/variant/weight/stretch, each at most once via a 4-flag accumulator), then a mandatory <font-size>, an optional / <line-height> (attached 16px/1.5 and every spaced form), then a mandatory comma-separated <font-family> list; or a system-font keyword (caption..status-bar) as the whole value. A missing size, missing family, duplicate prefix kind, or line-height without a size resolves to never; var()/calc(), the <number> weight range, oblique <angle>, and bare <custom-ident> family names are weak-validated / deferred to the tolerant runtime parser. Ships the cssFont call-site helper, parseFont/formatFont, and a live text preview that renders sample text with the built font applied.",
+      "description": "Ridiculously typed CSS font-shorthand editor with a compile-time strict-order parse — an order-free style/variant/weight/stretch prefix, a mandatory <font-size>, optional / <line-height>, and a mandatory <font-family> list, or a system-font keyword. Ships the cssFont helper, parseFont/formatFont, and a live text preview rendered with the built font.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "unit-input",
@@ -713,7 +713,7 @@
       "name": "color-function",
       "type": "registry:ui",
       "title": "Color Function",
-      "description": "Ridiculously typed editor for the modern CSS color functions, dispatching on the leading function name into three independent compile-time grammars. ColorMixLiteral fully validates color-mix(in <space> [<method> hue]?, <color> <pct>?, <color> <pct>?) — the 14-member interpolation colorspace set, with a hue-interpolation method allowed only on the four cylindrical spaces (hsl/hwb/lch/oklch), and exactly two colors with optional percentage weights. LightDarkLiteral validates light-dark(<color>, <color>). RelativeColorLiteral validates <fn>(from <color> <c1> <c2> <c3> [/ <alpha>]?) for rgb/hsl/hwb/lab/lch/oklab/oklch/color with PER-SPACE channel-keyword strictness (oklch -> l c h, rgb -> r g b) — so oklch(from #f00 r g b) resolves to never. var() is accepted wherever a <color> is expected; calc() channel bodies and channel magnitudes are weak-validated, and a bare color like rgb(255 0 0) resolves to never (color-picker's domain). Reuses color-picker's ColorLiteral and ColorPicker UI. Ships the cssColorFn call-site helper, parseColorFunction/formatColorFunction, and a result-swatch preview with a light-dark color-scheme toggle.",
+      "description": "Ridiculously typed editor for the modern CSS color functions, dispatching on the function name into three compile-time grammars: color-mix() (interpolation colorspace, cylindrical-only hue method, two weighted colors), light-dark(), and relative color with per-space channel-keyword strictness (oklch → l c h). Reuses color-picker's ColorLiteral and UI, and ships the cssColorFn helper, parseColorFunction/formatColorFunction, and a result-swatch preview with a light-dark toggle.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "color-picker",
@@ -782,7 +782,7 @@
       "name": "if-function",
       "type": "registry:ui",
       "title": "if() Conditional Value",
-      "description": "Ridiculously typed editor for the CSS if() conditional value function (shipped 2025). IfFunctionLiteral<S> validates the if() wrapper (via the kit's ParseFunction), splits the body on TOP-LEVEL semicolons (a local paren-aware splitter — the kit ships none), splits each branch on its FIRST top-level colon (so a colon inside style(--x: 1) is not a split point), checks the condition kind (media()/supports()/style()/else), enforces else-as-last-branch, and requires a non-empty value. Condition bodies are validated leniently (non-empty + balanced parens); the runtime parser does fuller structural work. if(foo(x): 1) resolves to never (unknown kind); if(else: a; media(x): b) resolves to never (else not last). Ships the cssIf call-site helper, parseIf/formatIf/branchToCss/defaultBranch/branchCount helpers, BranchesOf/BranchCountOf/ConditionKindsOf utility types, IfBranch/IfFunctionState internal state, a popover + inline panel, a branch-builder UI, and an if() preview with a cutting-edge browser-support note.",
+      "description": "Ridiculously typed editor for the CSS if() conditional value function (shipped 2025), with IfFunctionLiteral validating the wrapper, splitting branches on top-level semicolons and each branch on its first top-level colon, checking the condition kind (media/supports/style/else), and enforcing else-as-last. Ships the cssIf helper, parse/format/branch helpers, branch utility types, a popover + inline branch-builder UI, and an if() preview with a browser-support note.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "button",
@@ -817,7 +817,7 @@
       "name": "query-builder",
       "type": "registry:ui",
       "title": "Media / Container Query Builder",
-      "description": "Ridiculously typed editor for CSS media queries AND container queries (mode prop: media | container). MediaQueryLiteral<S> / ContainerQueryLiteral<S> validate the query skeleton — balanced parens, the optional leading only/not + media-type or container name, the boolean combination of parenthesized feature tests enforcing the CSS no-mixing-and-and-or-at-one-level rule — and each feature test's VALUE dimension against a known feature table: length features want a <length>, resolution features a <resolution>, aspect-ratio a <ratio> (16/9), enum features one of their keywords (orientation, pointer, prefers-color-scheme, …). (width: 16/9) resolves to never; (min-resolution: 600px) to never; (a) and (b) or (c) to never (mixes and/or). Container mode restricts the feature set to the size subset (width, height, inline-size, block-size, aspect-ratio) + orientation. Unknown/exotic features, calc() values, and deep nesting past a depth cap of 4 are deferred to the runtime parser (lenient by design). Ships cssMediaQuery/cssContainerQuery call-site helpers, parseQuery/parseQueryState/formatQuery/queryToString/featureKind/featuresFor/enumOptionsFor/matchesNow helpers, FeaturesOf/FeatureCountOf utility types, FeatureTest/QueryNode/QueryState internal state, a popover + inline panel, a condition-builder UI, and a live matchMedia 'matches now?' indicator (media mode).",
+      "description": "Ridiculously typed editor for CSS media and container queries (mode prop) that validates the query skeleton — leading only/not + type/name, the no-mixing-and-and-or rule — and each feature test's value dimension against a feature table (length, resolution, ratio, enum keywords). Container mode restricts to the size subset; unknown features and calc() defer to a lenient runtime parser, and it ships query helpers, a condition-builder UI, and a live matchMedia 'matches now?' indicator.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "unit-input",
