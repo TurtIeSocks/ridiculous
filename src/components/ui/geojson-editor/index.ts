@@ -1,6 +1,16 @@
 export type { GeometryType } from "./geojson-editor.constants"
 export { COORD_DEPTH, GEOMETRY_TYPES } from "./geojson-editor.constants"
-export { parseGeojson, validateGeojson } from "./geojson-editor.helpers"
+export {
+  blankFeature,
+  blankGeometry,
+  closeRing,
+  formatGeojson,
+  getAtPath,
+  parseGeojson,
+  reverseRing,
+  setAtPath,
+  validateGeojson,
+} from "./geojson-editor.helpers"
 export type {
   Feature,
   FeatureCollection,
