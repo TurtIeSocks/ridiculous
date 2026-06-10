@@ -2394,30 +2394,22 @@ export function LivePreview() {
 }
 ```
 
-- [ ] **Step 2: Create the page + MPA entry**
+- [ ] **Step 2: Create the docs page (SPA — no MPA files)**
 
-Mirror `src/pages/coordinate-input/page.tsx` (built in the coordinate-input plan): a `SectionHeader` per example, mount all six examples, `InstallCta args="add https://turtiesocks.github.io/ridiculous/r/geojson-editor.json"`, default export. Copy the MPA pair:
-```bash
-mkdir -p pages/geojson-editor
-cp pages/coordinate-input/main.tsx pages/geojson-editor/main.tsx
-cp pages/coordinate-input/index.html pages/geojson-editor/index.html
-```
-Edit `pages/geojson-editor/main.tsx` to import `@/pages/geojson-editor/page`; set the `index.html` title to `GeoJSON Editor — ridiculous`.
+This repo is an SPA via `vite-react-ssg`; routes are auto-generated from the NAV manifest (`pnpm nav:build` reads `registry.json` → `src/generated/nav.ts`). There is NO top-level `pages/` directory and no per-page Vite input. Just create `src/pages/geojson-editor/page.tsx`.
 
-- [ ] **Step 3: Register the MPA input**
+Read `src/pages/coordinate-input/page.tsx` and mirror its exact structure + imports (the real layout components — do not invent names): a section per example, mounting all six examples, an `InstallCta` with `args="add https://turtiesocks.github.io/ridiculous/r/geojson-editor.json"`, default export. Routing is wired automatically once `pnpm nav:build` runs in Task 14.
 
-In `vite.config.ts`, add `"geojson-editor"` to the MPA inputs map.
+- [ ] **Step 3: Verify the page compiles**
 
-- [ ] **Step 4: Verify in the browser**
+Run: `pnpm typecheck`
+Expected: PASS. (Interactive browser verification happens later; do not start a dev server.)
 
-Run `pnpm dev`, open `http://localhost:5173/ridiculous/geojson-editor/`. Confirm all three presets render, editing a coordinate updates the raw pane, invalid raw text shows an error and keeps the text, and the strict example compiles. Stop the server.
-
-- [ ] **Step 5: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
-git add src/examples/geojson-editor/ src/pages/geojson-editor/ \
-  pages/geojson-editor/ vite.config.ts
-git commit -m "Add geojson-editor examples, page, and MPA entry"
+git add src/examples/geojson-editor/ src/pages/geojson-editor/
+git commit -m "Add geojson-editor examples and docs page"
 ```
 
 ---
