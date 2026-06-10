@@ -1,2 +1,7 @@
-// Barrel re-exports. Populated as types, helpers, and component land.
-export {}
+export type {
+  CoordinateLiteral,
+  IsLatitude,
+  IsLongitude,
+  Position,
+} from "./coordinate-input.types"
+export { coordinate } from "./coordinate-input.types"
