@@ -1,3 +1,5 @@
+export type { CoordinateInputProps } from "./coordinate-input"
+export { CoordinateInput } from "./coordinate-input"
 export {
   clampLat,
   clampLon,
