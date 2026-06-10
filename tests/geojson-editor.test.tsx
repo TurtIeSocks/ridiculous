@@ -6,6 +6,7 @@ import {
   FeatureTree,
   GeojsonEditorProvider,
   GeometryFields,
+  PropertiesGrid,
   RawJsonPane,
   useGeojsonEditor,
 } from "@/components/ui/geojson-editor"
@@ -217,5 +218,27 @@ describe("GeometryFields", () => {
     expect(
       (container.querySelector("select") as HTMLSelectElement)?.disabled,
     ).toBe(true)
+  })
+})
+
+describe("PropertiesGrid", () => {
+  it("renders existing properties and edits a value", () => {
+    const onChange = vi.fn()
+    const sel: GeoJSON = {
+      type: "Feature",
+      geometry: { type: "Point", coordinates: [0, 0] },
+      properties: { name: "Park" },
+    }
+    const { container } = render(
+      <GeojsonEditorProvider value={sel} selection={[]} onChange={onChange}>
+        <PropertiesGrid />
+      </GeojsonEditorProvider>,
+    )
+    const valueInput = container.querySelectorAll(
+      "input",
+    )[1] as HTMLInputElement
+    fireEvent.change(valueInput, { target: { value: "Plaza" } })
+    fireEvent.blur(valueInput)
+    expect(onChange).toHaveBeenCalled()
   })
 })
