@@ -95,3 +95,65 @@ describe("CoordinateInput commit", () => {
     expect(onChange).toHaveBeenCalledWith([1, 2, 5])
   })
 })
+
+describe("CoordinateInput scrub", () => {
+  it("requests pointer lock on axis-label pointerdown", () => {
+    const { container } = render(
+      <CoordinateInput value={[0, 0]} onChange={() => {}} />,
+    )
+    const label = container.querySelector(
+      '[data-slot="coordinate-axis-label"]',
+    ) as HTMLElement
+    fireEvent.pointerDown(label, { pointerId: 1 })
+    expect(Element.prototype.requestPointerLock).toHaveBeenCalled()
+  })
+
+  it("scrubs the axis on pointermove (1px = 1 unit)", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <CoordinateInput value={[0, 0]} onChange={onChange} />,
+    )
+    const lonLabel = container.querySelector(
+      '[data-slot="coordinate-axis-label"]',
+    ) as HTMLElement
+    fireEvent.pointerDown(lonLabel, { pointerId: 1 })
+    fireEvent.pointerMove(window, { movementX: 5 })
+    expect(onChange).toHaveBeenCalledWith([5, 0])
+  })
+
+  it("clamps while scrubbing past the range", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <CoordinateInput value={[0, 89]} onChange={onChange} />,
+    )
+    const latLabel = container.querySelectorAll(
+      '[data-slot="coordinate-axis-label"]',
+    )[1] as HTMLElement
+    fireEvent.pointerDown(latLabel, { pointerId: 1 })
+    fireEvent.pointerMove(window, { movementX: 10 })
+    expect(onChange).toHaveBeenLastCalledWith([0, 90])
+  })
+
+  it("releases pointer lock on pointerup", () => {
+    const { container } = render(
+      <CoordinateInput value={[0, 0]} onChange={() => {}} />,
+    )
+    const label = container.querySelector(
+      '[data-slot="coordinate-axis-label"]',
+    ) as HTMLElement
+    fireEvent.pointerDown(label, { pointerId: 1 })
+    fireEvent.pointerUp(window)
+    expect(document.exitPointerLock).toHaveBeenCalled()
+  })
+
+  it("does not scrub when disabled", () => {
+    const { container } = render(
+      <CoordinateInput value={[0, 0]} disabled onChange={() => {}} />,
+    )
+    const label = container.querySelector(
+      '[data-slot="coordinate-axis-label"]',
+    ) as HTMLElement
+    fireEvent.pointerDown(label, { pointerId: 1 })
+    expect(Element.prototype.requestPointerLock).not.toHaveBeenCalled()
+  })
+})
