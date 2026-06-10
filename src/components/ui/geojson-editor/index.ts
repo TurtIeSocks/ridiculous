@@ -3,11 +3,13 @@ export type {
   FeatureCollection,
   GeoJSON,
   GeoJsonProperties,
-  Geometry,
-  GeometryCollection,
   GeojsonError,
   GeojsonErrorSeverity,
+  GeojsonLiteral,
   GeojsonPath,
+  Geometry,
+  GeometryCollection,
+  GeometryLiteral,
   Json,
   LineString,
   MultiLineString,
@@ -16,4 +18,6 @@ export type {
   Point,
   Polygon,
   Position,
+  PositionLiteral,
 } from "./geojson-editor.types"
+export { geojson } from "./geojson-editor.types"
