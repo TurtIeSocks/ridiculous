@@ -39,3 +39,4 @@ export type {
 } from "./geojson-editor.types"
 export { geojson } from "./geojson-editor.types"
 export { useGeojsonEditor } from "./use-geojson-editor"
+export { ErrorRail } from "./views/error-rail"

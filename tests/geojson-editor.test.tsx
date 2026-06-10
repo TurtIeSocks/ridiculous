@@ -1,7 +1,11 @@
-import { act, renderHook } from "@testing-library/react"
+import { act, render, renderHook } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import type { GeoJSON } from "@/components/ui/geojson-editor"
-import { useGeojsonEditor } from "@/components/ui/geojson-editor"
+import {
+  ErrorRail,
+  GeojsonEditorProvider,
+  useGeojsonEditor,
+} from "@/components/ui/geojson-editor"
 
 const point: GeoJSON = { type: "Point", coordinates: [0, 0] }
 
@@ -48,5 +52,24 @@ describe("useGeojsonEditor", () => {
     expect(result.current.canUndo).toBe(true)
     act(() => result.current.undo())
     expect(result.current.value).toEqual(point)
+  })
+})
+
+describe("ErrorRail", () => {
+  it("lists errors and selects the node on click", () => {
+    const onSelectionChange = vi.fn()
+    const bad: GeoJSON = { type: "Point", coordinates: [200, 0] }
+    const { getByText } = render(
+      <GeojsonEditorProvider
+        value={bad}
+        onChange={() => {}}
+        onSelectionChange={onSelectionChange}
+      >
+        <ErrorRail />
+      </GeojsonEditorProvider>,
+    )
+    const item = getByText(/between -180 and 180/i)
+    item.click()
+    expect(onSelectionChange).toHaveBeenCalled()
   })
 })
