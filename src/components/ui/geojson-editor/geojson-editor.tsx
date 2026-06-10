@@ -37,6 +37,12 @@ export interface GeojsonEditorProps<V extends GeoJSON = GeoJSON> {
   variant?: GeojsonEditorVariant
   selection?: GeojsonPath
   onSelectionChange?: (path: GeojsonPath | null) => void
+  /**
+   * Caller-enforced. When you narrow `V` (e.g. `Feature<Polygon>`), set this
+   * yourself to disable the geometry-type switcher and keep `onChange(V)`
+   * sound. Types are erased at runtime, so the editor can't auto-derive it
+   * from `V` — passing it is the only signal that the type is locked.
+   */
   lockGeometryType?: boolean
   className?: string
 }

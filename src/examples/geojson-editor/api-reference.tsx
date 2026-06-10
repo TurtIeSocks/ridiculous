@@ -16,9 +16,11 @@ export function ApiReference() {
           <code>GeojsonPath</code> seam for a co-mounted map view.
         </li>
         <li>
-          <code>lockGeometryType?</code> — disable the type switcher when{" "}
-          <code>V</code> is narrowed (e.g. <code>Feature&lt;Polygon&gt;</code>)
-          so <code>onChange(V)</code> stays sound.
+          <code>lockGeometryType?</code> — <em>caller-enforced</em>: when you
+          narrow <code>V</code> (e.g. <code>Feature&lt;Polygon&gt;</code>), set
+          this yourself to disable the type switcher so <code>onChange(V)</code>{" "}
+          stays sound. Types are erased at runtime, so it can't be auto-derived
+          from <code>V</code>.
         </li>
       </ul>
       <h3>Composition</h3>

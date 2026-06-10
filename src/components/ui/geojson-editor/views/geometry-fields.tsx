@@ -15,11 +15,9 @@ function geometryPath(
   value: unknown,
 ): GeojsonPath | null {
   if (selection === null) {
-    if (
-      (value as Geometry)?.type &&
-      (value as Geometry).type !== "GeometryCollection"
-    )
-      return []
+    const type = (value as { type?: string } | undefined)?.type
+    if (type && GEOMETRY_TYPES.includes(type as Geometry["type"])) return []
+    if (type === "Feature") return ["geometry"]
     return null
   }
   const at = getAtPath(value, selection) as { type?: string } | undefined

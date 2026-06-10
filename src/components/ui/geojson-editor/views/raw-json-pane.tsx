@@ -10,6 +10,7 @@ export function RawJsonPane({ className }: { className?: string }) {
   return (
     <textarea
       data-slot="raw-json-pane"
+      aria-label="Raw GeoJSON"
       spellCheck={false}
       value={rawText}
       onChange={(e) => setRawText(e.target.value)}

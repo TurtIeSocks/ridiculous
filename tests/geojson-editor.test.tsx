@@ -158,6 +158,45 @@ describe("FeatureTree", () => {
     expect(onSelectionChange).toHaveBeenCalledWith(["features", 0])
   })
 
+  it("matches selection segment-wise, not by string prefix (10 vs 1)", () => {
+    const bigFc: GeoJSON = {
+      type: "FeatureCollection",
+      features: Array.from({ length: 11 }, () => ({
+        type: "Feature" as const,
+        geometry: {
+          type: "Point" as const,
+          coordinates: [0, 0] as [number, number],
+        },
+        properties: null,
+      })),
+    }
+    const rowsFor = (selection: [string, number]) => {
+      // Scope queries to this render's own container — two renders share the
+      // jsdom document, so a global getAllByRole would see both trees.
+      const { container } = render(
+        <GeojsonEditorProvider
+          value={bigFc}
+          selection={selection}
+          onChange={() => {}}
+        >
+          <FeatureTree />
+        </GeojsonEditorProvider>,
+      )
+      return Array.from(container.querySelectorAll("button")).filter((b) =>
+        b.textContent?.includes("Feature"),
+      )
+    }
+    // Old string startsWith: selecting "features.10" makes "features.1" match.
+    // classList membership is exact (hover:bg-muted/50 is a different token).
+    const sel10 = rowsFor(["features", 10])
+    expect(sel10[10].classList.contains("bg-muted")).toBe(true)
+    expect(sel10[1].classList.contains("bg-muted")).toBe(false)
+    // And the reverse: selecting feature 1 must not light up feature 10.
+    const sel1 = rowsFor(["features", 1])
+    expect(sel1[1].classList.contains("bg-muted")).toBe(true)
+    expect(sel1[10].classList.contains("bg-muted")).toBe(false)
+  })
+
   it("adds a feature via the add button", () => {
     const onChange = vi.fn()
     const { getByText } = render(
@@ -220,6 +259,36 @@ describe("GeometryFields", () => {
       (container.querySelector("select") as HTMLSelectElement)?.disabled,
     ).toBe(true)
   })
+
+  it("treats a bare Feature with no selection as the geometry itself", () => {
+    const bare: GeoJSON = {
+      type: "Feature",
+      geometry: { type: "Point", coordinates: [0, 0] },
+      properties: null,
+    }
+    const { container } = render(
+      <GeojsonEditorProvider value={bare} onChange={() => {}}>
+        <GeometryFields />
+      </GeojsonEditorProvider>,
+    )
+    // The Point's CoordinateInput renders (lon/lat inputs), not a feature hint.
+    expect(container.querySelectorAll("input").length).toBeGreaterThan(0)
+    expect(container.textContent).not.toContain("Select a feature.")
+    // The geometry-type select reflects "Point", not "Feature".
+    expect((container.querySelector("select") as HTMLSelectElement).value).toBe(
+      "Point",
+    )
+  })
+
+  it("shows the 'Select a feature.' hint for a FeatureCollection with no selection", () => {
+    const { container } = render(
+      <GeojsonEditorProvider value={fc} onChange={() => {}}>
+        <GeometryFields />
+      </GeojsonEditorProvider>,
+    )
+    expect(container.textContent).toContain("Select a feature.")
+    expect(container.querySelector("select")).toBeNull()
+  })
 })
 
 describe("PropertiesGrid", () => {
@@ -245,11 +314,14 @@ describe("PropertiesGrid", () => {
 })
 
 describe("GeojsonEditor presets", () => {
-  it("renders the drill-down preset by default with a feature tree + raw pane", () => {
-    const { container } = render(
+  it("renders the drill-down preset with the raw pane summoned on demand", () => {
+    const { container, getByText } = render(
       <GeojsonEditor value={fc} onChange={() => {}} />,
     )
     expect(container.querySelector('[data-slot="feature-tree"]')).toBeTruthy()
+    // §6.3: raw pane is hidden by default, summoned on demand.
+    expect(container.querySelector('[data-slot="raw-json-pane"]')).toBeNull()
+    fireEvent.click(getByText(/raw/i))
     expect(container.querySelector('[data-slot="raw-json-pane"]')).toBeTruthy()
   })
 
@@ -264,7 +336,7 @@ describe("GeojsonEditor presets", () => {
     const { getByText, container } = render(
       <GeojsonEditor value={fc} variant="toggle" onChange={() => {}} />,
     )
-    getByText("Raw").click()
+    fireEvent.click(getByText("Raw"))
     expect(container.querySelector('[data-slot="raw-json-pane"]')).toBeTruthy()
   })
 })

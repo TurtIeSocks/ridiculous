@@ -1,5 +1,6 @@
 import * as React from "react"
 import type {
+  Feature,
   GeoJSON,
   GeojsonError,
   GeojsonPath,
@@ -17,7 +18,7 @@ export interface GeojsonEditorStore {
   setRawText(next: string): void
   select(path: GeojsonPath | null): void
   updateGeometry(path: GeojsonPath, geometry: Geometry): void
-  addFeature(feature?: GeoJSON): void
+  addFeature(feature?: Feature): void
   removeFeature(index: number): void
   setProperty(featurePath: GeojsonPath, key: string, value: Json): void
   undo(): void

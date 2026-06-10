@@ -28,7 +28,7 @@ export function FeatureTree({ className }: { className?: string }) {
         (isFC ? e.path[0] === "features" && e.path[1] === i : true),
     )
   const isSelected = (p: GeojsonPath) =>
-    selection?.join(".").startsWith(p.join("."))
+    selection !== null && p.every((seg, i) => selection[i] === seg)
 
   return (
     <div

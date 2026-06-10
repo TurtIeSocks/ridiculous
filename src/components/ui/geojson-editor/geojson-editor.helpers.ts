@@ -1,6 +1,7 @@
 import type { GeometryType } from "./geojson-editor.constants"
 import { COORD_DEPTH, GEOMETRY_TYPES } from "./geojson-editor.constants"
 import type {
+  Feature,
   GeoJSON,
   GeojsonError,
   GeojsonPath,
@@ -355,6 +356,6 @@ export function blankGeometry(type: GeometryType): Geometry {
   }
 }
 
-export function blankFeature(): GeoJSON {
+export function blankFeature(): Feature {
   return { type: "Feature", geometry: blankGeometry("Point"), properties: {} }
 }

@@ -15,7 +15,7 @@ export function DrillDown({
   className?: string
   lockGeometryType?: boolean
 }) {
-  const [rawOpen, setRawOpen] = React.useState(true)
+  const [rawOpen, setRawOpen] = React.useState(false)
   return (
     <div
       data-slot="preset-drill-down"

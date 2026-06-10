@@ -8,6 +8,7 @@ import {
   validateGeojson,
 } from "./geojson-editor.helpers"
 import type {
+  Feature,
   GeoJSON,
   GeojsonPath,
   Geometry,
@@ -24,6 +25,17 @@ interface UseGeojsonEditorOptions<V extends GeoJSON = GeoJSON> {
 
 const HISTORY_CAP = 100
 
+/**
+ * Controlled/uncontrolled GeoJSON editor store.
+ *
+ * Note on the raw-pane draft: every structural mutator (`setValue`,
+ * `updateGeometry`, `addFeature`, `removeFeature`, `setProperty`, `undo`,
+ * `redo`) commits through `commitValue`, which clears any in-flight raw-pane
+ * draft. An invalid raw buffer is therefore discarded the moment you edit via
+ * the model — editing through the structured views is an explicit "I'm working
+ * in the model now" signal, and the raw text re-derives from the committed
+ * value.
+ */
 export function useGeojsonEditor<V extends GeoJSON = GeoJSON>(
   options: UseGeojsonEditorOptions<V>,
 ): GeojsonEditorStore {
@@ -69,6 +81,8 @@ export function useGeojsonEditor<V extends GeoJSON = GeoJSON>(
     [isControlled, options, value],
   )
 
+  // Structural edit: commits `next` and discards any in-flight raw-pane draft
+  // (see the hook-level JSDoc — model edits supersede an unsaved raw buffer).
   const setValue = React.useCallback(
     (next: GeoJSON) => commitValue(next),
     [commitValue],
@@ -104,7 +118,7 @@ export function useGeojsonEditor<V extends GeoJSON = GeoJSON>(
   )
 
   const addFeature = React.useCallback(
-    (feature?: GeoJSON) => {
+    (feature?: Feature) => {
       if (value.type !== "FeatureCollection") return
       const next = setAtPath(
         value,

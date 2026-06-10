@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { flushSync } from "react-dom"
 import { cn } from "@/lib/utils"
 import { ErrorRail } from "../views/error-rail"
 import { FeatureTree } from "../views/feature-tree"
@@ -30,7 +29,7 @@ export function Toggle({
           <button
             key={m}
             type="button"
-            onClick={() => flushSync(() => setMode(m))}
+            onClick={() => setMode(m)}
             className={cn(
               "px-3 py-1 capitalize",
               mode === m ? "bg-muted" : "text-muted-foreground",
