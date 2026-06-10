@@ -34,12 +34,14 @@ const err = (
   path: GeojsonPath,
   message: string,
   code: string,
-): GeojsonError => ({ path, message, severity: "error", code })
+  fix?: GeojsonError["fix"],
+): GeojsonError => ({ path, message, severity: "error", code, fix })
 const warn = (
   path: GeojsonPath,
   message: string,
   code: string,
-): GeojsonError => ({ path, message, severity: "warning", code })
+  fix?: GeojsonError["fix"],
+): GeojsonError => ({ path, message, severity: "warning", code, fix })
 
 function isObject(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null && !Array.isArray(v)
@@ -103,6 +105,7 @@ function validateRing(ring: unknown, path: GeojsonPath, out: GeojsonError[]) {
         path,
         "Polygon ring isn't closed — the first and last point must match.",
         "ring-not-closed",
+        { label: "close ring", kind: "close-ring" },
       ),
     )
     return
@@ -117,6 +120,7 @@ function validateRing(ring: unknown, path: GeojsonPath, out: GeojsonError[]) {
         path,
         "Ring winds clockwise; GeoJSON prefers counter-clockwise (right-hand rule).",
         "winding-order",
+        { label: "reverse", kind: "reverse-ring" },
       ),
     )
 }

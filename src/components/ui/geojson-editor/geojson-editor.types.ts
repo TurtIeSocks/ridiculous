@@ -96,6 +96,9 @@ export interface GeojsonError {
   message: string
   severity: GeojsonErrorSeverity
   code: string
+  // Serializable one-click fix descriptor. The validator is pure, so it
+  // describes the remedy; ErrorRail (which has store access) applies it.
+  fix?: { label: string; kind: "close-ring" | "reverse-ring" }
 }
 
 // =====================================================================

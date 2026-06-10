@@ -10,6 +10,7 @@ import {
   PropertiesGrid,
   RawJsonPane,
   useGeojsonEditor,
+  validateGeojson,
 } from "@/components/ui/geojson-editor"
 
 const point: GeoJSON = { type: "Point", coordinates: [0, 0] }
@@ -76,6 +77,36 @@ describe("ErrorRail", () => {
     const item = getByText(/between -180 and 180/i)
     item.click()
     expect(onSelectionChange).toHaveBeenCalled()
+  })
+
+  it("renders a 'close ring' fix and closes the ring on click", () => {
+    const onChange = vi.fn()
+    const unclosed: GeoJSON = {
+      type: "Polygon",
+      coordinates: [
+        [
+          [0, 0],
+          [1, 0],
+          [1, 1],
+        ],
+      ],
+    }
+    const { getByText } = render(
+      <GeojsonEditorProvider value={unclosed} onChange={onChange}>
+        <ErrorRail />
+      </GeojsonEditorProvider>,
+    )
+    fireEvent.click(getByText(/close ring/i))
+    expect(onChange).toHaveBeenCalled()
+    const next = onChange.mock.calls[0][0] as typeof unclosed
+    const ring = (next as { coordinates: number[][][] }).coordinates[0]
+    // First point appended → ring closed.
+    expect(ring[ring.length - 1]).toEqual([0, 0])
+    expect(ring).toHaveLength(4)
+    // Re-validation: ring-not-closed is gone.
+    expect(
+      validateGeojson(next).some((e) => e.code === "ring-not-closed"),
+    ).toBe(false)
   })
 })
 
