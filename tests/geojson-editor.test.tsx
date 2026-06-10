@@ -5,6 +5,7 @@ import {
   ErrorRail,
   FeatureTree,
   GeojsonEditorProvider,
+  GeometryFields,
   RawJsonPane,
   useGeojsonEditor,
 } from "@/components/ui/geojson-editor"
@@ -166,5 +167,55 @@ describe("FeatureTree", () => {
     expect(onChange).toHaveBeenCalled()
     const next = onChange.mock.calls[0][0] as typeof fc
     expect(next.type === "FeatureCollection" && next.features).toHaveLength(3)
+  })
+})
+
+describe("GeometryFields", () => {
+  it("edits a selected Point's coordinate", () => {
+    const onChange = vi.fn()
+    const sel: GeoJSON = {
+      type: "Feature",
+      geometry: { type: "Point", coordinates: [0, 0] },
+      properties: null,
+    }
+    const { container } = render(
+      <GeojsonEditorProvider
+        value={sel}
+        selection={["geometry"]}
+        onChange={onChange}
+      >
+        <GeometryFields />
+      </GeojsonEditorProvider>,
+    )
+    const lon = container.querySelectorAll("input")[0] as HTMLInputElement
+    fireEvent.change(lon, { target: { value: "12" } })
+    fireEvent.blur(lon)
+    expect(onChange).toHaveBeenCalled()
+    const next = onChange.mock.calls[0][0] as typeof sel
+    expect(
+      next.type === "Feature" &&
+        next.geometry?.type === "Point" &&
+        next.geometry.coordinates[0],
+    ).toBe(12)
+  })
+
+  it("disables the geometry-type select when lockGeometryType is set", () => {
+    const sel: GeoJSON = {
+      type: "Feature",
+      geometry: { type: "Point", coordinates: [0, 0] },
+      properties: null,
+    }
+    const { container } = render(
+      <GeojsonEditorProvider
+        value={sel}
+        selection={["geometry"]}
+        onChange={() => {}}
+      >
+        <GeometryFields lockGeometryType />
+      </GeojsonEditorProvider>,
+    )
+    expect(
+      (container.querySelector("select") as HTMLSelectElement)?.disabled,
+    ).toBe(true)
   })
 })
