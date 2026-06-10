@@ -9,6 +9,7 @@ import {
   GitBranch,
   Grid3x3,
   type LucideIcon,
+  MapPin,
   MonitorSmartphone,
   Pipette,
   Ruler,
@@ -44,6 +45,7 @@ export const COMPONENT_ICONS: Record<string, LucideIcon> = {
   "color-function": SwatchBook,
   "if-function": GitBranch,
   "query-builder": MonitorSmartphone,
+  "coordinate-input": MapPin,
 }
 
 /**

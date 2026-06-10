@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { CoordinateInput } from "@/components/ui/coordinate-input"
 import type { Position } from "@/components/ui/coordinate-input"
+import { CoordinateInput } from "@/components/ui/coordinate-input"
 import { ExampleCard } from "@/examples/_shared/example-card"
 
 export function LivePreview() {
@@ -21,7 +21,7 @@ export function LivePreview() {
           onChange={setPos}
           aria-label="Drag a label to scrub"
         />
-        <code className="text-xs text-muted-foreground">
+        <code className="text-muted-foreground text-xs">
           {JSON.stringify(pos)}
         </code>
       </div>

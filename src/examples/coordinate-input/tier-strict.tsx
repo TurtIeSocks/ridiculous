@@ -25,7 +25,7 @@ export function TierStrict() {
         </>
       }
     >
-      <pre className="mt-5 text-xs text-muted-foreground">
+      <pre className="mt-5 text-muted-foreground text-xs">
         {JSON.stringify(valid)}
       </pre>
     </ExampleCard>

@@ -16,6 +16,9 @@ ergonomic escape hatches when you just want JavaScript.
 - **Unit Input** — typed CSS-unit input (deg / % / px / rem / em / vw / vh)
   with pointer-locked drag scrubbing, Shift / Alt step modifiers, and a
   call-site validator helper per unit.
+- **Coordinate Input** — typed lon/lat/alt Position input with pointer-lock
+  drag scrubbing, per-axis clamp (±180 / ±90), and a compile-time
+  `coordinate()` call-site validator for numeric literals.
 
 ## Install
 

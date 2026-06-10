@@ -872,10 +872,44 @@
       ]
     },
     {
+      "name": "coordinate-input",
+      "type": "registry:ui",
+      "title": "Coordinate Input",
+      "description": "Ridiculously typed lon/lat/alt Position input with pointer-lock drag scrubbing and range-validated axes. Three usage tiers: casual (plain tuple), IntelliSense (typed constant storage), strict (compile-time range validation via the coordinate() call-site helper — lon ±180, lat ±90).",
+      "registryDependencies": [
+        "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
+        "input",
+        "label"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/coordinate-input/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/coordinate-input/index.ts"
+        },
+        {
+          "path": "src/components/ui/coordinate-input/coordinate-input.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/coordinate-input/coordinate-input.tsx"
+        },
+        {
+          "path": "src/components/ui/coordinate-input/coordinate-input.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/coordinate-input/coordinate-input.types.ts"
+        },
+        {
+          "path": "src/components/ui/coordinate-input/coordinate-input.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/coordinate-input/coordinate-input.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, and query-builder in one command.",
+      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, query-builder, and coordinate-input in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -892,7 +926,8 @@
         "https://turtiesocks.github.io/ridiculous/r/font-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/color-function.json",
         "https://turtiesocks.github.io/ridiculous/r/if-function.json",
-        "https://turtiesocks.github.io/ridiculous/r/query-builder.json"
+        "https://turtiesocks.github.io/ridiculous/r/query-builder.json",
+        "https://turtiesocks.github.io/ridiculous/r/coordinate-input.json"
       ],
       "dependencies": [],
       "files": []
