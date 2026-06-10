@@ -4,9 +4,8 @@ export function ApiReference() {
       <h3>{"<GeojsonEditor<V> />"}</h3>
       <ul>
         <li>
-          <code>value: V</code> /{" "}
-          <code>onChange(value: V): void</code> — controlled, generic over{" "}
-          <code>V extends GeoJSON</code>.
+          <code>value: V</code> / <code>onChange(value: V): void</code> —
+          controlled, generic over <code>V extends GeoJSON</code>.
         </li>
         <li>
           <code>variant?: "drill-down" | "dual-pane" | "toggle"</code> (default{" "}
@@ -27,9 +26,8 @@ export function ApiReference() {
         Wrap <code>{"<GeojsonEditorProvider>"}</code> and compose{" "}
         <code>FeatureTree</code>, <code>GeometryFields</code>,{" "}
         <code>PropertiesGrid</code>, <code>RawJsonPane</code>,{" "}
-        <code>ErrorRail</code> — or a custom{" "}
-        <code>{"<MapView>"}</code> that reads{" "}
-        <code>useGeojsonEditorContext()</code>.
+        <code>ErrorRail</code> — or a custom <code>{"<MapView>"}</code> that
+        reads <code>useGeojsonEditorContext()</code>.
       </p>
       <h3>Strict helper</h3>
       <p>

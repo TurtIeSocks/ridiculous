@@ -1,8 +1,8 @@
 "use client"
 
 import * as React from "react"
-import { GeojsonEditor } from "@/components/ui/geojson-editor"
 import type { GeoJSON } from "@/components/ui/geojson-editor"
+import { GeojsonEditor } from "@/components/ui/geojson-editor"
 import { ExampleCard } from "@/examples/_shared/example-card"
 
 const seed: GeoJSON = {
@@ -25,9 +25,9 @@ export function BasicUsage() {
       description={
         <>
           Controlled <code className="font-mono text-foreground">value</code> +{" "}
-          <code className="font-mono text-foreground">onChange</code>. Drill-down
-          preset: feature tree, geometry fields, properties grid, raw pane toggle,
-          and error rail.
+          <code className="font-mono text-foreground">onChange</code>.
+          Drill-down preset: feature tree, geometry fields, properties grid, raw
+          pane toggle, and error rail.
         </>
       }
     >

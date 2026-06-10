@@ -6,7 +6,14 @@ const park: Feature<Polygon, { name: string }> = {
   type: "Feature",
   geometry: {
     type: "Polygon",
-    coordinates: [[[0, 0], [1, 0], [1, 1], [0, 0]]],
+    coordinates: [
+      [
+        [0, 0],
+        [1, 0],
+        [1, 1],
+        [0, 0],
+      ],
+    ],
   },
   properties: { name: "Park" },
 }
@@ -21,12 +28,10 @@ export function TierIntellisense() {
       description={
         <>
           Annotate stored values as{" "}
-          <code className="text-foreground">
-            Feature&lt;Polygon, P&gt;
-          </code>{" "}
-          (or any narrowed geometry) for shape hints and autocomplete.{" "}
-          <code className="text-foreground">GeoJSON&lt;G, P&gt;</code> is generic
-          over both.
+          <code className="text-foreground">Feature&lt;Polygon, P&gt;</code> (or
+          any narrowed geometry) for shape hints and autocomplete.{" "}
+          <code className="text-foreground">GeoJSON&lt;G, P&gt;</code> is
+          generic over both.
         </>
       }
     >

@@ -1,8 +1,11 @@
 "use client"
 
 import * as React from "react"
+import type {
+  GeoJSON,
+  GeojsonEditorVariant,
+} from "@/components/ui/geojson-editor"
 import { GeojsonEditor } from "@/components/ui/geojson-editor"
-import type { GeoJSON, GeojsonEditorVariant } from "@/components/ui/geojson-editor"
 import { ExampleCard } from "@/examples/_shared/example-card"
 
 const seed: GeoJSON = {
@@ -30,7 +33,8 @@ const VARIANTS: GeojsonEditorVariant[] = ["drill-down", "dual-pane", "toggle"]
 
 export function LivePreview() {
   const [value, setValue] = React.useState<GeoJSON>(seed)
-  const [variant, setVariant] = React.useState<GeojsonEditorVariant>("drill-down")
+  const [variant, setVariant] =
+    React.useState<GeojsonEditorVariant>("drill-down")
   return (
     <ExampleCard
       eyebrow="live-preview"
