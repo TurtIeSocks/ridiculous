@@ -6,8 +6,11 @@ import { defineConfig } from "vite"
 // Pulls in the `ssgOptions` augmentation on Vite's UserConfig.
 import type {} from "vite-react-ssg"
 
-export default defineConfig({
-  base: "/ridiculous/",
+export default defineConfig(({ command }) => ({
+  // GitHub Pages serves the demo under /ridiculous/, so prod (`build`) keeps
+  // that base. The dev server (`serve`) runs at root ("/") so the Claude
+  // preview and local dev avoid the slow base-path indirection.
+  base: command === "build" ? "/ridiculous/" : "/",
   publicDir: path.resolve(__dirname, "public"),
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -38,4 +41,4 @@ export default defineConfig({
       }
     },
   },
-})
+}))

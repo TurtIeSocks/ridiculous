@@ -31,6 +31,8 @@ export default defineConfig({
         "src/components/ui/color-function/**",
         "src/components/ui/if-function/**",
         "src/components/ui/query-builder/**",
+        "src/components/ui/coordinate-input/**",
+        "src/components/ui/geojson-editor/**",
       ],
       thresholds: {
         statements: 90,

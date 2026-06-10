@@ -872,10 +872,137 @@
       ]
     },
     {
+      "name": "coordinate-input",
+      "type": "registry:ui",
+      "title": "Coordinate Input",
+      "description": "Ridiculously typed lon/lat/alt Position input with pointer-lock drag scrubbing and range-validated axes. Three usage tiers: casual (plain tuple), IntelliSense (typed constant storage), strict (compile-time range validation via the coordinate() call-site helper — lon ±180, lat ±90).",
+      "registryDependencies": [
+        "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
+        "input",
+        "label"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/coordinate-input/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/coordinate-input/index.ts"
+        },
+        {
+          "path": "src/components/ui/coordinate-input/coordinate-input.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/coordinate-input/coordinate-input.tsx"
+        },
+        {
+          "path": "src/components/ui/coordinate-input/coordinate-input.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/coordinate-input/coordinate-input.types.ts"
+        },
+        {
+          "path": "src/components/ui/coordinate-input/coordinate-input.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/coordinate-input/coordinate-input.helpers.ts"
+        }
+      ]
+    },
+    {
+      "name": "geojson-editor",
+      "type": "registry:ui",
+      "title": "GeoJSON Editor",
+      "description": "RFC 7946 GeoJSON editor with a headless core, five composable view parts, and three layout presets (drill-down / dual-pane / toggle). Generic over the value type and map-ready via shared context. Three usage tiers: casual (plain GeoJSON object), IntelliSense (discriminated-union typed constants), strict (geometry-deep compile-time validation via the geojson() call-site helper).",
+      "registryDependencies": [
+        "https://turtiesocks.github.io/ridiculous/r/coordinate-input.json",
+        "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
+        "button",
+        "input",
+        "label",
+        "select",
+        "popover"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/geojson-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/geojson-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/geojson-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/geojson-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/geojson-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/geojson-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/geojson-editor.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/geojson-editor.constants.ts",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/geojson-editor.constants.ts"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/context.ts",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/context.ts"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/use-geojson-editor.ts",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/use-geojson-editor.ts"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/views/raw-json-pane.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/views/raw-json-pane.tsx"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/views/feature-tree.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/views/feature-tree.tsx"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/views/geometry-fields.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/views/geometry-fields.tsx"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/views/properties-grid.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/views/properties-grid.tsx"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/views/error-rail.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/views/error-rail.tsx"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/presets/drill-down.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/presets/drill-down.tsx"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/presets/dual-pane.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/presets/dual-pane.tsx"
+        },
+        {
+          "path": "src/components/ui/geojson-editor/presets/toggle.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/geojson-editor/presets/toggle.tsx"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, and query-builder in one command.",
+      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, query-builder, coordinate-input, and geojson-editor in one command.",
       "registryDependencies": [
         "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
         "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
@@ -892,7 +1019,9 @@
         "https://turtiesocks.github.io/ridiculous/r/font-editor.json",
         "https://turtiesocks.github.io/ridiculous/r/color-function.json",
         "https://turtiesocks.github.io/ridiculous/r/if-function.json",
-        "https://turtiesocks.github.io/ridiculous/r/query-builder.json"
+        "https://turtiesocks.github.io/ridiculous/r/query-builder.json",
+        "https://turtiesocks.github.io/ridiculous/r/coordinate-input.json",
+        "https://turtiesocks.github.io/ridiculous/r/geojson-editor.json"
       ],
       "dependencies": [],
       "files": []

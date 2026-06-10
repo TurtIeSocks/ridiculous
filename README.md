@@ -16,6 +16,14 @@ ergonomic escape hatches when you just want JavaScript.
 - **Unit Input** — typed CSS-unit input (deg / % / px / rem / em / vw / vh)
   with pointer-locked drag scrubbing, Shift / Alt step modifiers, and a
   call-site validator helper per unit.
+- **Coordinate Input** — typed lon/lat/alt Position input with pointer-lock
+  drag scrubbing, per-axis clamp (±180 / ±90), and a compile-time
+  `coordinate()` call-site validator for numeric literals.
+- **GeoJSON Editor** — RFC 7946 GeoJSON editor with a headless core, five
+  composable view parts (FeatureTree, GeometryFields, PropertiesGrid,
+  RawJsonPane, ErrorRail), three layout presets (drill-down / dual-pane /
+  toggle), and a `geojson()` call-site helper for geometry-deep compile-time
+  validation.
 
 ## Install
 
