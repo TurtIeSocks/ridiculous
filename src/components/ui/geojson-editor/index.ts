@@ -1,3 +1,7 @@
+export type { GeojsonEditorStore } from "./context"
+export { GeojsonEditorContext, useGeojsonEditorContext } from "./context"
+export type { GeojsonEditorProviderProps } from "./geojson-editor"
+export { GeojsonEditorProvider } from "./geojson-editor"
 export type { GeometryType } from "./geojson-editor.constants"
 export { COORD_DEPTH, GEOMETRY_TYPES } from "./geojson-editor.constants"
 export {
@@ -34,3 +38,4 @@ export type {
   PositionLiteral,
 } from "./geojson-editor.types"
 export { geojson } from "./geojson-editor.types"
+export { useGeojsonEditor } from "./use-geojson-editor"
