@@ -1,3 +1,9 @@
+export {
+  clampLat,
+  clampLon,
+  formatCoordinate,
+  parseCoordinate,
+} from "./coordinate-input.helpers"
 export type {
   CoordinateLiteral,
   IsLatitude,
