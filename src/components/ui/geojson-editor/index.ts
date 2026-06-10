@@ -1,1 +1,19 @@
-export {}
+export type {
+  Feature,
+  FeatureCollection,
+  GeoJSON,
+  GeoJsonProperties,
+  Geometry,
+  GeometryCollection,
+  GeojsonError,
+  GeojsonErrorSeverity,
+  GeojsonPath,
+  Json,
+  LineString,
+  MultiLineString,
+  MultiPoint,
+  MultiPolygon,
+  Point,
+  Polygon,
+  Position,
+} from "./geojson-editor.types"
