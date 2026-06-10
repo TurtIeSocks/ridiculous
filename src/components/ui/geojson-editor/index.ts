@@ -1,7 +1,11 @@
 export type { GeojsonEditorStore } from "./context"
 export { GeojsonEditorContext, useGeojsonEditorContext } from "./context"
-export type { GeojsonEditorProviderProps } from "./geojson-editor"
-export { GeojsonEditorProvider } from "./geojson-editor"
+export type {
+  GeojsonEditorProps,
+  GeojsonEditorProviderProps,
+  GeojsonEditorVariant,
+} from "./geojson-editor"
+export { GeojsonEditor, GeojsonEditorProvider } from "./geojson-editor"
 export type { GeometryType } from "./geojson-editor.constants"
 export { COORD_DEPTH, GEOMETRY_TYPES } from "./geojson-editor.constants"
 export {
@@ -38,6 +42,9 @@ export type {
   PositionLiteral,
 } from "./geojson-editor.types"
 export { geojson } from "./geojson-editor.types"
+export { DrillDown } from "./presets/drill-down"
+export { DualPane } from "./presets/dual-pane"
+export { Toggle } from "./presets/toggle"
 export { useGeojsonEditor } from "./use-geojson-editor"
 export { ErrorRail } from "./views/error-rail"
 export { FeatureTree } from "./views/feature-tree"

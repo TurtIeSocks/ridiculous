@@ -4,6 +4,7 @@ import type { GeoJSON } from "@/components/ui/geojson-editor"
 import {
   ErrorRail,
   FeatureTree,
+  GeojsonEditor,
   GeojsonEditorProvider,
   GeometryFields,
   PropertiesGrid,
@@ -240,5 +241,30 @@ describe("PropertiesGrid", () => {
     fireEvent.change(valueInput, { target: { value: "Plaza" } })
     fireEvent.blur(valueInput)
     expect(onChange).toHaveBeenCalled()
+  })
+})
+
+describe("GeojsonEditor presets", () => {
+  it("renders the drill-down preset by default with a feature tree + raw pane", () => {
+    const { container } = render(
+      <GeojsonEditor value={fc} onChange={() => {}} />,
+    )
+    expect(container.querySelector('[data-slot="feature-tree"]')).toBeTruthy()
+    expect(container.querySelector('[data-slot="raw-json-pane"]')).toBeTruthy()
+  })
+
+  it("renders the dual-pane preset", () => {
+    const { container } = render(
+      <GeojsonEditor value={fc} variant="dual-pane" onChange={() => {}} />,
+    )
+    expect(container.querySelector('[data-slot="raw-json-pane"]')).toBeTruthy()
+  })
+
+  it("toggle preset switches between guided and raw", () => {
+    const { getByText, container } = render(
+      <GeojsonEditor value={fc} variant="toggle" onChange={() => {}} />,
+    )
+    getByText("Raw").click()
+    expect(container.querySelector('[data-slot="raw-json-pane"]')).toBeTruthy()
   })
 })
