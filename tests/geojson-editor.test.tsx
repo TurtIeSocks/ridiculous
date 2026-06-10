@@ -1,9 +1,10 @@
-import { act, render, renderHook } from "@testing-library/react"
+import { act, fireEvent, render, renderHook } from "@testing-library/react"
 import { describe, expect, it, vi } from "vitest"
 import type { GeoJSON } from "@/components/ui/geojson-editor"
 import {
   ErrorRail,
   GeojsonEditorProvider,
+  RawJsonPane,
   useGeojsonEditor,
 } from "@/components/ui/geojson-editor"
 
@@ -71,5 +72,38 @@ describe("ErrorRail", () => {
     const item = getByText(/between -180 and 180/i)
     item.click()
     expect(onSelectionChange).toHaveBeenCalled()
+  })
+})
+
+describe("RawJsonPane", () => {
+  it("shows the formatted value and commits valid edits", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <GeojsonEditorProvider value={point} onChange={onChange}>
+        <RawJsonPane />
+      </GeojsonEditorProvider>,
+    )
+    const ta = container.querySelector("textarea") as HTMLTextAreaElement
+    expect(JSON.parse(ta.value)).toEqual(point)
+    fireEvent.change(ta, {
+      target: { value: '{"type":"Point","coordinates":[5,6]}' },
+    })
+    expect(onChange).toHaveBeenCalledWith({
+      type: "Point",
+      coordinates: [5, 6],
+    })
+  })
+
+  it("keeps invalid text in the textarea without emitting", () => {
+    const onChange = vi.fn()
+    const { container } = render(
+      <GeojsonEditorProvider value={point} onChange={onChange}>
+        <RawJsonPane />
+      </GeojsonEditorProvider>,
+    )
+    const ta = container.querySelector("textarea") as HTMLTextAreaElement
+    fireEvent.change(ta, { target: { value: "{ oops" } })
+    expect(ta.value).toBe("{ oops")
+    expect(onChange).not.toHaveBeenCalled()
   })
 })
