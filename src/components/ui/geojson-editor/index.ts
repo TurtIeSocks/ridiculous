@@ -40,4 +40,5 @@ export type {
 export { geojson } from "./geojson-editor.types"
 export { useGeojsonEditor } from "./use-geojson-editor"
 export { ErrorRail } from "./views/error-rail"
+export { FeatureTree } from "./views/feature-tree"
 export { RawJsonPane } from "./views/raw-json-pane"

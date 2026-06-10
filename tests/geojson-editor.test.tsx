@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest"
 import type { GeoJSON } from "@/components/ui/geojson-editor"
 import {
   ErrorRail,
+  FeatureTree,
   GeojsonEditorProvider,
   RawJsonPane,
   useGeojsonEditor,
@@ -105,5 +106,65 @@ describe("RawJsonPane", () => {
     fireEvent.change(ta, { target: { value: "{ oops" } })
     expect(ta.value).toBe("{ oops")
     expect(onChange).not.toHaveBeenCalled()
+  })
+})
+
+const fc: GeoJSON = {
+  type: "FeatureCollection",
+  features: [
+    {
+      type: "Feature",
+      geometry: { type: "Point", coordinates: [0, 0] },
+      properties: { name: "A" },
+    },
+    {
+      type: "Feature",
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [0, 0],
+            [1, 0],
+            [1, 1],
+            [0, 0],
+          ],
+        ],
+      },
+      properties: null,
+    },
+  ],
+}
+
+describe("FeatureTree", () => {
+  it("renders a row per feature and selects on click", () => {
+    const onSelectionChange = vi.fn()
+    const { getAllByRole } = render(
+      <GeojsonEditorProvider
+        value={fc}
+        onChange={() => {}}
+        onSelectionChange={onSelectionChange}
+      >
+        <FeatureTree />
+      </GeojsonEditorProvider>,
+    )
+    const rows = getAllByRole("button").filter((b) =>
+      b.textContent?.includes("Feature"),
+    )
+    expect(rows.length).toBeGreaterThanOrEqual(2)
+    rows[0].click()
+    expect(onSelectionChange).toHaveBeenCalledWith(["features", 0])
+  })
+
+  it("adds a feature via the add button", () => {
+    const onChange = vi.fn()
+    const { getByText } = render(
+      <GeojsonEditorProvider value={fc} onChange={onChange}>
+        <FeatureTree />
+      </GeojsonEditorProvider>,
+    )
+    getByText(/add feature/i).click()
+    expect(onChange).toHaveBeenCalled()
+    const next = onChange.mock.calls[0][0] as typeof fc
+    expect(next.type === "FeatureCollection" && next.features).toHaveLength(3)
   })
 })
