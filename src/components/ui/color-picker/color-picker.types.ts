@@ -295,6 +295,14 @@ export interface ColorStringMap {
 
 export type ColorMode = keyof ColorStringMap
 
+/**
+ * The value `onChange` emits and the element type of the recents `history`.
+ * Mode-locked pickers narrow to the exact mode string; auto pickers widen to
+ * the full `ColorString` union. Reused so onChange and history can never drift.
+ */
+export type ColorValue<TMode extends ColorMode | undefined = undefined> =
+  TMode extends ColorMode ? ColorStringMap[TMode] : ColorString
+
 // =====================================================================
 // 4. UTILITY TYPES — operate on color string literals at the type level.
 // =====================================================================

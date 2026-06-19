@@ -18,7 +18,7 @@ import {
 import type {
   ColorMode,
   ColorString,
-  ColorStringMap,
+  ColorValue,
   Oklch,
 } from "./color-picker.types"
 import { HueStrip } from "./hue-strip"
@@ -30,9 +30,7 @@ export interface ColorPickerProps<
   TMode extends ColorMode | undefined = undefined,
 > {
   value: ColorString | (string & {})
-  onChange: (
-    value: TMode extends ColorMode ? ColorStringMap[TMode] : ColorString,
-  ) => void
+  onChange: (value: ColorValue<TMode>) => void
   mode?: TMode
   native?: boolean
   className?: string
