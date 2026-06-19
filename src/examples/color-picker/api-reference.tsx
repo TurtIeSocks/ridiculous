@@ -12,7 +12,7 @@ export function ApiReference() {
       <ApiSection title="Component">
         <Signature>
           {
-            "<ColorPicker<TMode extends ColorMode | undefined>\n  value: ColorString | (string & {})\n  onChange: (next: TMode extends ColorMode ? ColorStringMap[TMode] : ColorString) => void\n  mode?: TMode\n  native?: boolean\n  className?: string\n  aria-label?: string\n/>"
+            "<ColorPicker<TMode extends ColorMode | undefined>\n  value: ColorString | (string & {})\n  onChange: (next: ColorValue<TMode>) => void\n  mode?: TMode\n  presets?: ReadonlyArray<ColorString | (string & {})>\n  history?: ReadonlyArray<ColorValue<TMode>>\n  defaultHistory?: ReadonlyArray<ColorValue<TMode>>\n  onHistoryChange?: (history: ColorValue<TMode>[]) => void\n  native?: boolean\n  className?: string\n  aria-label?: string\n/>"
           }
         </Signature>
         <PropsTable
@@ -31,6 +31,26 @@ export function ApiReference() {
               name: "mode",
               type: "ColorMode | undefined",
               desc: "Lock output format. When unset, in-picker mode switcher is shown.",
+            },
+            {
+              name: "presets",
+              type: "ReadonlyArray<ColorString | (string & {})>",
+              desc: "Preset swatches: color values or CSS vars (var(--token)). undefined = built-in palette; [] = none. Vars display resolved and emit a concrete color on click.",
+            },
+            {
+              name: "history",
+              type: "ReadonlyArray<ColorValue<TMode>>",
+              desc: "Controlled recents. Element type mirrors onChange. Pair with onHistoryChange.",
+            },
+            {
+              name: "defaultHistory",
+              type: "ReadonlyArray<ColorValue<TMode>>",
+              desc: "Uncontrolled initial recents. Ignored when history is provided.",
+            },
+            {
+              name: "onHistoryChange",
+              type: "(history: ColorValue<TMode>[]) => void",
+              desc: "Fires when recents change — a color commits on popover close (deduped, capped at 8).",
             },
             {
               name: "native",
@@ -78,6 +98,10 @@ export function ApiReference() {
             {
               name: "ColorMode",
               desc: '"oklch" | "oklab" | "hex" | "rgb" | "hsl" | "hwb"',
+            },
+            {
+              name: "ColorValue<TMode>",
+              desc: "TMode extends ColorMode ? ColorStringMap[TMode] : ColorString. The onChange payload type and the recents (history) element type.",
             },
             {
               name: "ColorLiteral<S>",
