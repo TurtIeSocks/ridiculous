@@ -534,6 +534,10 @@ describe("ColorPicker recents", () => {
     fireEvent.click(trigger()) // reopen
     const row = document.querySelector('[data-slot="color-picker-recents"]')
     expect(row?.querySelectorAll("button").length).toBe(1)
+    // Assert the committed color is the picked red (not just a count).
+    expect(
+      screen.getByLabelText("recent oklch(0.637 0.237 25.331)"),
+    ).toBeTruthy()
   })
 
   it("does not record a recent when opened without editing", () => {
@@ -564,7 +568,13 @@ describe("ColorPicker recents", () => {
     ).toBe(1) // from controlled prop
     fireEvent.click(screen.getByLabelText("preset red")) // pick -> pending
     fireEvent.click(trigger()) // close -> commit -> notify
-    expect(onHistoryChange).toHaveBeenCalled()
+    // Assert the callback carries the committed red AND preserves the existing entry.
+    expect(onHistoryChange).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        "oklch(0.637 0.237 25.331)",
+        "oklch(0.7 0.2 30)",
+      ]),
+    )
   })
 })
 
