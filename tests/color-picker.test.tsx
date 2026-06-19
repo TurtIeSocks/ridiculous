@@ -1,4 +1,11 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from "@testing-library/react"
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest"
 import { ColorPicker } from "@/components/ui/color-picker/color-picker"
 
@@ -378,5 +385,237 @@ describe("ColorPicker eyedropper", () => {
     fireEvent.click(button)
     await vi.waitFor(() => expect(open).toHaveBeenCalled())
     expect(onChange).not.toHaveBeenCalled()
+  })
+})
+
+import {
+  isCssVar,
+  normalizeCssVar,
+  pushRecent,
+  resolveCssColor,
+} from "@/components/ui/color-picker/color-picker.helpers"
+
+describe("css var helpers", () => {
+  it("isCssVar detects var() and bare custom properties", () => {
+    expect(isCssVar("var(--x)")).toBe(true)
+    expect(isCssVar("  var( --x )")).toBe(true)
+    expect(isCssVar("--x")).toBe(true)
+    expect(isCssVar("#ff0000")).toBe(false)
+    expect(isCssVar("oklch(0.5 0.1 240)")).toBe(false)
+  })
+
+  it("normalizeCssVar wraps bare custom properties only", () => {
+    expect(normalizeCssVar("--x")).toBe("var(--x)")
+    expect(normalizeCssVar("var(--x)")).toBe("var(--x)")
+    expect(normalizeCssVar("#ff0000")).toBe("#ff0000")
+  })
+
+  it("resolveCssColor parses concrete colors directly (lossless, no probe)", () => {
+    expect(resolveCssColor("#ff0000", null)?.mode).toBe("hex")
+    expect(resolveCssColor("oklch(0.7 0.2 30)", null)?.mode).toBe("oklch")
+  })
+
+  it("resolveCssColor returns null for a css var with no probe", () => {
+    expect(resolveCssColor("var(--whatever)", null)).toBeNull()
+  })
+
+  it("resolveCssColor returns null for an unresolved css var via probe", () => {
+    const probe = document.createElement("span")
+    document.body.appendChild(probe)
+    expect(resolveCssColor("var(--nope-not-defined)", probe)).toBeNull()
+    probe.remove()
+  })
+})
+
+describe("pushRecent", () => {
+  it("prepends new values", () => {
+    expect(pushRecent(["a", "b"], "c", 8)).toEqual(["c", "a", "b"])
+  })
+  it("dedups by moving an existing value to the front", () => {
+    expect(pushRecent(["a", "b", "c"], "b", 8)).toEqual(["b", "a", "c"])
+  })
+  it("caps the list length", () => {
+    expect(pushRecent(["a", "b", "c"], "d", 3)).toEqual(["d", "a", "b"])
+  })
+})
+
+import { SwatchRow } from "@/components/ui/color-picker/swatch-row"
+
+describe("SwatchRow", () => {
+  it("returns null for empty entries", () => {
+    const { container } = render(
+      <SwatchRow
+        entries={[]}
+        onPick={() => {}}
+        ariaLabelPrefix="preset"
+        dataSlot="color-picker-presets"
+      />,
+    )
+    expect(container.firstChild).toBeNull()
+  })
+
+  it("renders one swatch per entry and fires onPick with the raw value", () => {
+    const onPick = vi.fn()
+    render(
+      <SwatchRow
+        entries={[{ value: "#ff0000", label: "red" }]}
+        onPick={onPick}
+        ariaLabelPrefix="preset"
+        dataSlot="color-picker-presets"
+      />,
+    )
+    fireEvent.click(screen.getByLabelText("preset red"))
+    expect(onPick).toHaveBeenCalledWith("#ff0000")
+  })
+})
+
+describe("ColorPicker presets prop", () => {
+  function open() {
+    fireEvent.click(
+      document.querySelector(
+        '[data-slot="color-picker-trigger"]',
+      ) as HTMLElement,
+    )
+  }
+
+  it("renders the default 10-swatch palette when presets is omitted", () => {
+    render(<ColorPicker value="oklch(0.6 0.1 240)" onChange={() => {}} />)
+    open()
+    const row = document.querySelector('[data-slot="color-picker-presets"]')
+    expect(row?.querySelectorAll("button").length).toBe(10)
+    expect(screen.getByLabelText("preset red")).toBeTruthy()
+  })
+
+  it("renders supplied presets and emits the resolved color on click", () => {
+    const onChange = vi.fn()
+    render(
+      <ColorPicker
+        value="oklch(0.6 0.1 240)"
+        presets={["#ff0000"]}
+        onChange={onChange}
+      />,
+    )
+    open()
+    expect(
+      document
+        .querySelector('[data-slot="color-picker-presets"]')
+        ?.querySelectorAll("button").length,
+    ).toBe(1)
+    fireEvent.click(screen.getByLabelText("preset #ff0000"))
+    expect(onChange).toHaveBeenCalled()
+    // active mode is oklch (detected from value); resolved red emits oklch
+    expect(String(onChange.mock.calls.at(-1)?.[0])).toMatch(/^oklch\(/)
+  })
+
+  it("renders no preset row for an empty presets array", () => {
+    render(
+      <ColorPicker
+        value="oklch(0.6 0.1 240)"
+        presets={[]}
+        onChange={() => {}}
+      />,
+    )
+    open()
+    expect(
+      document.querySelector('[data-slot="color-picker-presets"]'),
+    ).toBeNull()
+  })
+})
+
+describe("ColorPicker recents", () => {
+  const trigger = () =>
+    document.querySelector('[data-slot="color-picker-trigger"]') as HTMLElement
+
+  it("records a recent on popover close and shows it on reopen (uncontrolled)", () => {
+    render(<ColorPicker value="oklch(0.6 0.1 240)" onChange={() => {}} />)
+    fireEvent.click(trigger()) // open
+    fireEvent.click(screen.getByLabelText("preset red")) // pick -> pending
+    fireEvent.click(trigger()) // close -> commit
+    fireEvent.click(trigger()) // reopen
+    const row = document.querySelector('[data-slot="color-picker-recents"]')
+    expect(row?.querySelectorAll("button").length).toBe(1)
+    // Assert the committed color is the picked red (not just a count).
+    expect(
+      screen.getByLabelText("recent oklch(0.637 0.237 25.331)"),
+    ).toBeTruthy()
+  })
+
+  it("does not record a recent when opened without editing", () => {
+    render(<ColorPicker value="oklch(0.6 0.1 240)" onChange={() => {}} />)
+    fireEvent.click(trigger()) // open
+    fireEvent.click(trigger()) // close, no edit
+    fireEvent.click(trigger()) // reopen
+    expect(
+      document.querySelector('[data-slot="color-picker-recents"]'),
+    ).toBeNull()
+  })
+
+  it("renders controlled history and calls onHistoryChange on close", () => {
+    const onHistoryChange = vi.fn()
+    render(
+      <ColorPicker
+        value="oklch(0.6 0.1 240)"
+        history={["oklch(0.7 0.2 30)"]}
+        onHistoryChange={onHistoryChange}
+        onChange={() => {}}
+      />,
+    )
+    fireEvent.click(trigger()) // open
+    expect(
+      document
+        .querySelector('[data-slot="color-picker-recents"]')
+        ?.querySelectorAll("button").length,
+    ).toBe(1) // from controlled prop
+    fireEvent.click(screen.getByLabelText("preset red")) // pick -> pending
+    fireEvent.click(trigger()) // close -> commit -> notify
+    // Assert the callback carries the committed red AND preserves the existing entry.
+    expect(onHistoryChange).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        "oklch(0.637 0.237 25.331)",
+        "oklch(0.7 0.2 30)",
+      ]),
+    )
+  })
+})
+
+import { useControllableState } from "@/components/ui/color-picker/color-picker.hooks"
+
+describe("useControllableState", () => {
+  it("uncontrolled: owns state and notifies onChange", () => {
+    const onChange = vi.fn()
+    const { result } = renderHook(() =>
+      useControllableState<number[]>({
+        prop: undefined,
+        defaultProp: [],
+        onChange,
+      }),
+    )
+    expect(result.current[0]).toEqual([])
+    act(() => result.current[1]([1, 2]))
+    expect(result.current[0]).toEqual([1, 2])
+    expect(onChange).toHaveBeenCalledWith([1, 2])
+  })
+
+  it("controlled: does not self-update but still notifies", () => {
+    const onChange = vi.fn()
+    const { result, rerender } = renderHook(
+      ({ prop }: { prop: number[] }) =>
+        useControllableState<number[]>({ prop, defaultProp: [], onChange }),
+      { initialProps: { prop: [1] } },
+    )
+    expect(result.current[0]).toEqual([1])
+    act(() => result.current[1]([1, 2]))
+    expect(result.current[0]).toEqual([1]) // prop still drives the value
+    expect(onChange).toHaveBeenCalledWith([1, 2])
+    rerender({ prop: [1, 2] })
+    expect(result.current[0]).toEqual([1, 2])
+  })
+
+  it("supports a functional updater reading the previous value", () => {
+    const { result } = renderHook(() =>
+      useControllableState<number[]>({ prop: undefined, defaultProp: [1] }),
+    )
+    act(() => result.current[1]((prev) => [...prev, 2]))
+    expect(result.current[0]).toEqual([1, 2])
   })
 })

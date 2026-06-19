@@ -6,6 +6,7 @@ export type {
   ColorMode,
   ColorString,
   ColorStringMap,
+  ColorValue,
   HexLiteral,
   HexString,
   HSLLiteral,
