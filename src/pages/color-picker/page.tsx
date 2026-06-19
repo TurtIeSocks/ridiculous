@@ -3,6 +3,8 @@ import { ApiReference } from "@/examples/color-picker/api-reference"
 import { BasicUsage } from "@/examples/color-picker/basic-usage"
 import { ModeLocked } from "@/examples/color-picker/mode-locked"
 import { Native } from "@/examples/color-picker/native"
+import { Presets } from "@/examples/color-picker/presets"
+import { Recents } from "@/examples/color-picker/recents"
 
 export default function ColorPickerPage() {
   return (
@@ -17,6 +19,8 @@ export default function ColorPickerPage() {
         <>
           <BasicUsage />
           <ModeLocked />
+          <Presets />
+          <Recents />
           <Native />
         </>
       }
