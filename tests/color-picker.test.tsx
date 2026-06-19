@@ -1,4 +1,11 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react"
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  renderHook,
+  screen,
+} from "@testing-library/react"
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest"
 import { ColorPicker } from "@/components/ui/color-picker/color-picker"
 
@@ -378,5 +385,47 @@ describe("ColorPicker eyedropper", () => {
     fireEvent.click(button)
     await vi.waitFor(() => expect(open).toHaveBeenCalled())
     expect(onChange).not.toHaveBeenCalled()
+  })
+})
+
+import { useControllableState } from "@/components/ui/color-picker/color-picker.hooks"
+
+describe("useControllableState", () => {
+  it("uncontrolled: owns state and notifies onChange", () => {
+    const onChange = vi.fn()
+    const { result } = renderHook(() =>
+      useControllableState<number[]>({
+        prop: undefined,
+        defaultProp: [],
+        onChange,
+      }),
+    )
+    expect(result.current[0]).toEqual([])
+    act(() => result.current[1]([1, 2]))
+    expect(result.current[0]).toEqual([1, 2])
+    expect(onChange).toHaveBeenCalledWith([1, 2])
+  })
+
+  it("controlled: does not self-update but still notifies", () => {
+    const onChange = vi.fn()
+    const { result, rerender } = renderHook(
+      ({ prop }: { prop: number[] }) =>
+        useControllableState<number[]>({ prop, defaultProp: [], onChange }),
+      { initialProps: { prop: [1] } },
+    )
+    expect(result.current[0]).toEqual([1])
+    act(() => result.current[1]([1, 2]))
+    expect(result.current[0]).toEqual([1]) // prop still drives the value
+    expect(onChange).toHaveBeenCalledWith([1, 2])
+    rerender({ prop: [1, 2] })
+    expect(result.current[0]).toEqual([1, 2])
+  })
+
+  it("supports a functional updater reading the previous value", () => {
+    const { result } = renderHook(() =>
+      useControllableState<number[]>({ prop: undefined, defaultProp: [1] }),
+    )
+    act(() => result.current[1]((prev) => [...prev, 2]))
+    expect(result.current[0]).toEqual([1, 2])
   })
 })

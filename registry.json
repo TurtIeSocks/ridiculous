@@ -62,6 +62,11 @@
           "target": "components/ui/color-picker/color-picker.types.ts"
         },
         {
+          "path": "src/components/ui/color-picker/color-picker.hooks.ts",
+          "type": "registry:ui",
+          "target": "components/ui/color-picker/color-picker.hooks.ts"
+        },
+        {
           "path": "src/components/ui/color-picker/alpha-strip.tsx",
           "type": "registry:ui",
           "target": "components/ui/color-picker/alpha-strip.tsx"
