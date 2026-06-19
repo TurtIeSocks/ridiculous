@@ -939,10 +939,61 @@
       ]
     },
     {
+      "name": "property-syntax-editor",
+      "type": "registry:ui",
+      "title": "@property Syntax Editor",
+      "description": "Ridiculously typed editor for a CSS @property syntax: descriptor whose strict tier validates the full <syntax> grammar (universal *, | alternation, +/# multipliers, known data types, literal idents) and — the namesake — types ONE CSS string with another: the dependent InitialValueLiteral<Syntax, V> checks a candidate initial-value against the validated syntax, so cssProperty(\"<length>\", \"red\") resolves to never before you run the code, with a chip builder beside a live green/red initial-value demo and <color> deferring to color-picker's ColorLiteral.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "color-picker",
+        "button",
+        "popover",
+        "input"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/property-syntax-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/property-syntax-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/property-syntax-editor/property-syntax-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/property-syntax-editor/property-syntax-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/property-syntax-editor/property-syntax-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/property-syntax-editor/property-syntax-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/property-syntax-editor/property-syntax-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/property-syntax-editor/property-syntax-editor.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/property-syntax-editor/syntax-chip-builder.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/property-syntax-editor/syntax-chip-builder.tsx"
+        },
+        {
+          "path": "src/components/ui/property-syntax-editor/initial-value-field.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/property-syntax-editor/initial-value-field.tsx"
+        },
+        {
+          "path": "src/components/ui/property-syntax-editor/mini-select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/property-syntax-editor/mini-select.tsx"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, query-builder, and anchor-position-editor in one command.",
+      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, query-builder, anchor-position-editor, and property-syntax-editor in one command.",
       "registryDependencies": [
         "https://ridiculous.turtlesocks.dev/r/ridiculous-type-kit.json",
         "https://ridiculous.turtlesocks.dev/r/color-picker.json",
@@ -960,7 +1011,8 @@
         "https://ridiculous.turtlesocks.dev/r/color-function.json",
         "https://ridiculous.turtlesocks.dev/r/if-function.json",
         "https://ridiculous.turtlesocks.dev/r/query-builder.json",
-        "https://ridiculous.turtlesocks.dev/r/anchor-position-editor.json"
+        "https://ridiculous.turtlesocks.dev/r/anchor-position-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/property-syntax-editor.json"
       ],
       "dependencies": [],
       "files": []
