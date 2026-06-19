@@ -33,6 +33,7 @@ export default defineConfig({
         "src/components/ui/query-builder/**",
         "src/components/ui/anchor-position-editor/**",
         "src/components/ui/property-syntax-editor/**",
+        "src/components/ui/shape-path-editor/**",
       ],
       thresholds: {
         statements: 90,

@@ -990,10 +990,67 @@
       ]
     },
     {
+      "name": "shape-path-editor",
+      "type": "registry:ui",
+      "title": "Shape Path Editor",
+      "description": "Ridiculously typed editor for a CSS shape() <basic-shape> value (clip-path / offset-path) whose strict tier dispatches each comma-separated command on its name (move / line / hline / vline / curve / smooth / arc / close) — validating the shape() wrapper, optional fill-rule, and `from <coordinate-pair>` seed, then per-command arity, the by/to direction, the with/of slot keywords, and every coordinate's <length-percentage> dimension, so an unknown command, a wrong arity, or a curve missing its `with` control resolves to never — with the registry's only Bézier-control-handle canvas (drag nodes + tethered handles + arc gizmo) and a CSS.supports-gated live preview, while hline/vline keyword positions, order-free arc flags, and calc()/var() coordinates defer to a lenient runtime parser.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "unit-input",
+        "button",
+        "popover",
+        "input",
+        "label"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/shape-path-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/shape-path-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/shape-path-editor/shape-path-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/shape-path-editor/shape-path-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/shape-path-editor/shape-path-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/shape-path-editor/shape-path-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/shape-path-editor/shape-path-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/shape-path-editor/shape-path-editor.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/shape-path-editor/shape-canvas.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/shape-path-editor/shape-canvas.tsx"
+        },
+        {
+          "path": "src/components/ui/shape-path-editor/command-row.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/shape-path-editor/command-row.tsx"
+        },
+        {
+          "path": "src/components/ui/shape-path-editor/shape-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/shape-path-editor/shape-preview.tsx"
+        },
+        {
+          "path": "src/components/ui/shape-path-editor/mini-select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/shape-path-editor/mini-select.tsx"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, query-builder, anchor-position-editor, and property-syntax-editor in one command.",
+      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, query-builder, anchor-position-editor, property-syntax-editor, and shape-path-editor in one command.",
       "registryDependencies": [
         "https://ridiculous.turtlesocks.dev/r/ridiculous-type-kit.json",
         "https://ridiculous.turtlesocks.dev/r/color-picker.json",
@@ -1012,7 +1069,8 @@
         "https://ridiculous.turtlesocks.dev/r/if-function.json",
         "https://ridiculous.turtlesocks.dev/r/query-builder.json",
         "https://ridiculous.turtlesocks.dev/r/anchor-position-editor.json",
-        "https://ridiculous.turtlesocks.dev/r/property-syntax-editor.json"
+        "https://ridiculous.turtlesocks.dev/r/property-syntax-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/shape-path-editor.json"
       ],
       "dependencies": [],
       "files": []
