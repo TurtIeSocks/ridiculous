@@ -7,7 +7,7 @@ import { defineConfig } from "vite"
 import type {} from "vite-react-ssg"
 
 export default defineConfig({
-  base: "/ridiculous/",
+  base: "/",
   publicDir: path.resolve(__dirname, "public"),
   plugins: [react(), tailwindcss()],
   resolve: {

@@ -5,7 +5,7 @@ CSS easing function picker with bezier, steps, spring/bounce/wiggle physics, pol
 ## Install
 
 ```bash
-npx shadcn add https://turtiesocks.github.io/ridiculous/r/easing-picker.json
+npx shadcn add https://ridiculous.turtlesocks.dev/r/easing-picker.json
 ```
 
 ## Components

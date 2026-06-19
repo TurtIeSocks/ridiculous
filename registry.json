@@ -1,7 +1,7 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
   "name": "ridiculous",
-  "homepage": "https://turtiesocks.github.io/ridiculous",
+  "homepage": "https://ridiculous.turtlesocks.dev",
   "items": [
     {
       "name": "ridiculous-type-kit",
@@ -882,22 +882,22 @@
       "title": "All ridiculous components",
       "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, and query-builder in one command.",
       "registryDependencies": [
-        "https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json",
-        "https://turtiesocks.github.io/ridiculous/r/color-picker.json",
-        "https://turtiesocks.github.io/ridiculous/r/unit-input.json",
-        "https://turtiesocks.github.io/ridiculous/r/gradient-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/easing-picker.json",
-        "https://turtiesocks.github.io/ridiculous/r/calc-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/transform-builder.json",
-        "https://turtiesocks.github.io/ridiculous/r/filter-builder.json",
-        "https://turtiesocks.github.io/ridiculous/r/grid-builder.json",
-        "https://turtiesocks.github.io/ridiculous/r/clip-path-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/box-shadow-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/transition-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/font-editor.json",
-        "https://turtiesocks.github.io/ridiculous/r/color-function.json",
-        "https://turtiesocks.github.io/ridiculous/r/if-function.json",
-        "https://turtiesocks.github.io/ridiculous/r/query-builder.json"
+        "https://ridiculous.turtlesocks.dev/r/ridiculous-type-kit.json",
+        "https://ridiculous.turtlesocks.dev/r/color-picker.json",
+        "https://ridiculous.turtlesocks.dev/r/unit-input.json",
+        "https://ridiculous.turtlesocks.dev/r/gradient-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/easing-picker.json",
+        "https://ridiculous.turtlesocks.dev/r/calc-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/transform-builder.json",
+        "https://ridiculous.turtlesocks.dev/r/filter-builder.json",
+        "https://ridiculous.turtlesocks.dev/r/grid-builder.json",
+        "https://ridiculous.turtlesocks.dev/r/clip-path-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/box-shadow-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/transition-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/font-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/color-function.json",
+        "https://ridiculous.turtlesocks.dev/r/if-function.json",
+        "https://ridiculous.turtlesocks.dev/r/query-builder.json"
       ],
       "dependencies": [],
       "files": []
