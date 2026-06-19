@@ -6,8 +6,7 @@ import { TierIntellisense } from "@/examples/color-picker/tier-intellisense"
 import { TierStrict } from "@/examples/color-picker/tier-strict"
 import { NAV } from "@/generated/nav"
 
-const REGISTRY_TEMPLATE =
-  "https://turtiesocks.github.io/ridiculous/r/{name}.json"
+const REGISTRY_TEMPLATE = "https://ridiculous.turtlesocks.dev/r/{name}.json"
 
 export default function IndexPage() {
   return (

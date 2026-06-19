@@ -62,7 +62,7 @@ export default function RidiculousTypeKitPage() {
         description="Usually pulled in transitively, but you can install the kit on its own."
       />
       <div className="mt-6">
-        <InstallCta args="add https://turtiesocks.github.io/ridiculous/r/ridiculous-type-kit.json" />
+        <InstallCta args="add https://ridiculous.turtlesocks.dev/r/ridiculous-type-kit.json" />
       </div>
     </>
   )

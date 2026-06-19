@@ -20,16 +20,16 @@ ergonomic escape hatches when you just want JavaScript.
 ## Install
 
 ```bash
-npx shadcn add https://turtiesocks.github.io/ridiculous/r/color-picker.json
+npx shadcn add https://ridiculous.turtlesocks.dev/r/color-picker.json
 ```
 
-Browse the live demo at <https://turtiesocks.github.io/ridiculous>.
+Browse the live demo at <https://ridiculous.turtlesocks.dev>.
 
 ## Development
 
 ```bash
 pnpm install
-pnpm dev               # demo at http://localhost:5173/ridiculous/
+pnpm dev               # demo at http://localhost:5173/
 pnpm test              # vitest with jsdom + canvas mock
 pnpm typecheck         # tsc -b
 pnpm check             # biome lint + format check
