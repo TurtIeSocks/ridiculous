@@ -38,17 +38,19 @@ shape()             = shape( <fill-rule>? from <coordinate-pair> , <shape-comman
 ### 1.2 Examples (strict tier)
 
 ```ts
-// accepted
-cssShape("shape(from 0 0, line to 100px 0, close)")
-cssShape("shape(from 0% 0%, curve to 100px 100px with 50px 0, close)")
-cssShape("shape(evenodd from 0 0, hline by 50px, vline by 50px, close)")
+// accepted (coordinates are <length-percentage> — units required, like every
+// ridiculous component; bare `0` is rejected, use `0px` / `0%`)
+cssShape("shape(from 0px 0px, line to 100px 0px, close)")
+cssShape("shape(from 0% 0%, curve to 100px 100px with 50px 0px, close)")
+cssShape("shape(evenodd from 0px 0px, hline by 50px, vline by 50px, close)")
 cssShape("shape(from 10px 10px, smooth to 90px 90px, close)")
-cssShape("shape(from 0 0, arc to 100px 0 of 50px, close)")
+cssShape("shape(from 0px 0px, arc to 100px 0px of 50px, close)")
 // rejected (→ never)
-cssShape("shape(from 0 0, wiggle to 10px 10px)")   // unknown command
-cssShape("shape(from 0 0, line to 100px)")         // line needs a coordinate PAIR
-cssShape("shape(from 0 0, curve to 10px 10px)")    // curve needs a `with` control point
-cssShape("rotate(90deg)")                           // not shape()
+cssShape("shape(from 0px 0px, wiggle to 10px 10px)")  // unknown command
+cssShape("shape(from 0px 0px, line to 100px)")        // line needs a coordinate PAIR
+cssShape("shape(from 0px 0px, curve to 10px 10px)")   // curve needs a `with` control point
+cssShape("shape(from 0 0, close)")                     // bare 0 has no unit
+cssShape("rotate(90deg)")                              // not shape()
 ```
 
 ---
