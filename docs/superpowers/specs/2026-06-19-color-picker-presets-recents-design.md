@@ -173,9 +173,16 @@ not a `ColorString`). The single bridge is the pre-existing
 ### Render layout
 
 - A reusable `SwatchRow` component (renamed from `preset-palette.tsx` →
-  `swatch-row.tsx`) renders a row of color swatches from raw strings, css-var
-  aware, returning `null` when empty. Used for **both** presets and recents
-  (intra-component DRY is allowed; only cross-component DRY is forbidden).
+  `swatch-row.tsx`) renders a row of color swatches, css-var aware, returning
+  `null` when empty. Entry shape:
+  `entries: ReadonlyArray<{ value: string; label: string }>` plus
+  `onPick: (value: string) => void` and a `data-slot` / `aria-label` prefix.
+  `value` is the raw color/var string (drives `backgroundColor` and the pick
+  callback); `label` is the accessible name. Used for **both** presets and
+  recents (intra-component DRY is allowed; only cross-component DRY is
+  forbidden). The component maps: default presets → `{value: "oklch(...)",
+  label: name}`; custom presets → `{value: entry, label: entry}`; recents →
+  `{value: entry, label: entry}`.
 - Presets row keeps its current position (in the eyedropper row,
   `data-slot="color-picker-presets"`). Recents row renders directly below,
   `data-slot="color-picker-recents"`, only when non-empty.
@@ -196,7 +203,7 @@ not a `ColorString`). The single bridge is the pre-existing
 | `color-picker.hooks.ts` | **NEW** — `useControllableState<T>` (~25 lines: memoized setter via `useCallback`, ref to avoid stale `onChange`/value, functional-updater support) |
 | `color-picker.helpers.ts` | add `isCssVar(s)`, `normalizeCssVar(s)`, `resolveCssColor(raw, probe)` (SSR-guarded, parseColor-first) |
 | `color-picker.constants.ts` | add `MAX_RECENTS = 8` |
-| `preset-palette.tsx` → `swatch-row.tsx` | generalize to `SwatchRow` (raw strings, css-var-aware display, `onPick(raw)`, `null` when empty) |
+| `preset-palette.tsx` → `swatch-row.tsx` | generalize to `SwatchRow` (`{value,label}[]` entries, css-var-aware display, `onPick(value)`, `null` when empty) |
 | `index.ts` | export `ColorValue` type |
 | `registry.json` | swap `preset-palette.tsx` → `swatch-row.tsx`; add `color-picker.hooks.ts` to the color-picker `files` array |
 | `color-picker.spec.tsx` | **NEW** — jsdom spec locking dedup/cap + controlled/uncontrolled history logic |
