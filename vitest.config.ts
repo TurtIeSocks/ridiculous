@@ -31,6 +31,7 @@ export default defineConfig({
         "src/components/ui/color-function/**",
         "src/components/ui/if-function/**",
         "src/components/ui/query-builder/**",
+        "src/components/ui/anchor-position-editor/**",
       ],
       thresholds: {
         statements: 90,

@@ -877,10 +877,72 @@
       ]
     },
     {
+      "name": "anchor-position-editor",
+      "type": "registry:ui",
+      "title": "Anchor Position Editor",
+      "description": "Ridiculously typed editor for CSS anchor-positioning values (mode prop) whose strict tier enforces the position-area cross-axis rule — a keyword pair must sit on two different axes of the same coordinate system, rejecting same-axis pairs (top bottom) and physical↔logical mixes (left block-start) — plus the anchor()/anchor-size() side and <length-percentage> fallback grammar and every position-try fallback, with a clickable 3×3 placement grid, logical/physical + span toggles, and a live snap preview, while ambiguous start/end keywords and calc()/var() fallbacks defer to a lenient runtime parser.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "unit-input",
+        "button",
+        "popover",
+        "input",
+        "label"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/anchor-position-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/anchor-position-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/anchor-position-editor/anchor-position-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/anchor-position-editor/anchor-position-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/anchor-position-editor/anchor-position-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/anchor-position-editor/anchor-position-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/anchor-position-editor/anchor-position-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/anchor-position-editor/anchor-position-editor.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/anchor-position-editor/mini-select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/anchor-position-editor/mini-select.tsx"
+        },
+        {
+          "path": "src/components/ui/anchor-position-editor/position-area-grid.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/anchor-position-editor/position-area-grid.tsx"
+        },
+        {
+          "path": "src/components/ui/anchor-position-editor/anchor-expr-fields.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/anchor-position-editor/anchor-expr-fields.tsx"
+        },
+        {
+          "path": "src/components/ui/anchor-position-editor/try-fallback-chain.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/anchor-position-editor/try-fallback-chain.tsx"
+        },
+        {
+          "path": "src/components/ui/anchor-position-editor/anchor-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/anchor-position-editor/anchor-preview.tsx"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, and query-builder in one command.",
+      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, query-builder, and anchor-position-editor in one command.",
       "registryDependencies": [
         "https://ridiculous.turtlesocks.dev/r/ridiculous-type-kit.json",
         "https://ridiculous.turtlesocks.dev/r/color-picker.json",
@@ -897,7 +959,8 @@
         "https://ridiculous.turtlesocks.dev/r/font-editor.json",
         "https://ridiculous.turtlesocks.dev/r/color-function.json",
         "https://ridiculous.turtlesocks.dev/r/if-function.json",
-        "https://ridiculous.turtlesocks.dev/r/query-builder.json"
+        "https://ridiculous.turtlesocks.dev/r/query-builder.json",
+        "https://ridiculous.turtlesocks.dev/r/anchor-position-editor.json"
       ],
       "dependencies": [],
       "files": []
