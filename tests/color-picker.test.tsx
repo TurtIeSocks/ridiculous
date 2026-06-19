@@ -439,6 +439,89 @@ describe("pushRecent", () => {
   })
 })
 
+import { SwatchRow } from "@/components/ui/color-picker/swatch-row"
+
+describe("SwatchRow", () => {
+  it("returns null for empty entries", () => {
+    const { container } = render(
+      <SwatchRow
+        entries={[]}
+        onPick={() => {}}
+        ariaLabelPrefix="preset"
+        dataSlot="color-picker-presets"
+      />,
+    )
+    expect(container.firstChild).toBeNull()
+  })
+
+  it("renders one swatch per entry and fires onPick with the raw value", () => {
+    const onPick = vi.fn()
+    render(
+      <SwatchRow
+        entries={[{ value: "#ff0000", label: "red" }]}
+        onPick={onPick}
+        ariaLabelPrefix="preset"
+        dataSlot="color-picker-presets"
+      />,
+    )
+    fireEvent.click(screen.getByLabelText("preset red"))
+    expect(onPick).toHaveBeenCalledWith("#ff0000")
+  })
+})
+
+describe("ColorPicker presets prop", () => {
+  function open() {
+    fireEvent.click(
+      document.querySelector(
+        '[data-slot="color-picker-trigger"]',
+      ) as HTMLElement,
+    )
+  }
+
+  it("renders the default 10-swatch palette when presets is omitted", () => {
+    render(<ColorPicker value="oklch(0.6 0.1 240)" onChange={() => {}} />)
+    open()
+    const row = document.querySelector('[data-slot="color-picker-presets"]')
+    expect(row?.querySelectorAll("button").length).toBe(10)
+    expect(screen.getByLabelText("preset red")).toBeTruthy()
+  })
+
+  it("renders supplied presets and emits the resolved color on click", () => {
+    const onChange = vi.fn()
+    render(
+      <ColorPicker
+        value="oklch(0.6 0.1 240)"
+        presets={["#ff0000"]}
+        onChange={onChange}
+      />,
+    )
+    open()
+    expect(
+      document
+        .querySelector('[data-slot="color-picker-presets"]')
+        ?.querySelectorAll("button").length,
+    ).toBe(1)
+    fireEvent.click(screen.getByLabelText("preset #ff0000"))
+    expect(onChange).toHaveBeenCalled()
+    // active mode is oklch (detected from value); resolved red emits oklch
+    expect(String(onChange.mock.calls.at(-1)?.[0])).toMatch(/^oklch\(/)
+  })
+
+  it("renders no preset row for an empty presets array", () => {
+    render(
+      <ColorPicker
+        value="oklch(0.6 0.1 240)"
+        presets={[]}
+        onChange={() => {}}
+      />,
+    )
+    open()
+    expect(
+      document.querySelector('[data-slot="color-picker-presets"]'),
+    ).toBeNull()
+  })
+})
+
 import { useControllableState } from "@/components/ui/color-picker/color-picker.hooks"
 
 describe("useControllableState", () => {

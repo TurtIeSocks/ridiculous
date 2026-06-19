@@ -92,9 +92,9 @@
           "target": "components/ui/color-picker/mode-button-group.tsx"
         },
         {
-          "path": "src/components/ui/color-picker/preset-palette.tsx",
+          "path": "src/components/ui/color-picker/swatch-row.tsx",
           "type": "registry:ui",
-          "target": "components/ui/color-picker/preset-palette.tsx"
+          "target": "components/ui/color-picker/swatch-row.tsx"
         }
       ]
     },
