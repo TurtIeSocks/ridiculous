@@ -522,6 +522,52 @@ describe("ColorPicker presets prop", () => {
   })
 })
 
+describe("ColorPicker recents", () => {
+  const trigger = () =>
+    document.querySelector('[data-slot="color-picker-trigger"]') as HTMLElement
+
+  it("records a recent on popover close and shows it on reopen (uncontrolled)", () => {
+    render(<ColorPicker value="oklch(0.6 0.1 240)" onChange={() => {}} />)
+    fireEvent.click(trigger()) // open
+    fireEvent.click(screen.getByLabelText("preset red")) // pick -> pending
+    fireEvent.click(trigger()) // close -> commit
+    fireEvent.click(trigger()) // reopen
+    const row = document.querySelector('[data-slot="color-picker-recents"]')
+    expect(row?.querySelectorAll("button").length).toBe(1)
+  })
+
+  it("does not record a recent when opened without editing", () => {
+    render(<ColorPicker value="oklch(0.6 0.1 240)" onChange={() => {}} />)
+    fireEvent.click(trigger()) // open
+    fireEvent.click(trigger()) // close, no edit
+    fireEvent.click(trigger()) // reopen
+    expect(
+      document.querySelector('[data-slot="color-picker-recents"]'),
+    ).toBeNull()
+  })
+
+  it("renders controlled history and calls onHistoryChange on close", () => {
+    const onHistoryChange = vi.fn()
+    render(
+      <ColorPicker
+        value="oklch(0.6 0.1 240)"
+        history={["oklch(0.7 0.2 30)"]}
+        onHistoryChange={onHistoryChange}
+        onChange={() => {}}
+      />,
+    )
+    fireEvent.click(trigger()) // open
+    expect(
+      document
+        .querySelector('[data-slot="color-picker-recents"]')
+        ?.querySelectorAll("button").length,
+    ).toBe(1) // from controlled prop
+    fireEvent.click(screen.getByLabelText("preset red")) // pick -> pending
+    fireEvent.click(trigger()) // close -> commit -> notify
+    expect(onHistoryChange).toHaveBeenCalled()
+  })
+})
+
 import { useControllableState } from "@/components/ui/color-picker/color-picker.hooks"
 
 describe("useControllableState", () => {

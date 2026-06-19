@@ -20,6 +20,9 @@ export const HUE_GRADIENT = `linear-gradient(to right, oklch(0.7 0.18 0), oklch(
 
 export const CHECKER_BG = `conic-gradient(#bbb 25%, #fff 0 50%, #bbb 0 75%, #fff 0) 0 0 / 10px 10px`
 
+/** Max recents kept in the history row (fits one popover-width swatch row). */
+export const MAX_RECENTS = 8
+
 export const PRESETS: ReadonlyArray<{
   l: number
   c: number

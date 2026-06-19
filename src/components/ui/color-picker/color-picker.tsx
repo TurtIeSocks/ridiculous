@@ -8,15 +8,17 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { AlphaStrip } from "./alpha-strip"
-import { PRESETS } from "./color-picker.constants"
+import { MAX_RECENTS, PRESETS } from "./color-picker.constants"
 import {
   formatColor,
   formatHex,
   parseColor,
   parseHex,
+  pushRecent,
   resolveCssColor,
   srgbToOklch,
 } from "./color-picker.helpers"
+import { useControllableState } from "./color-picker.hooks"
 import type {
   ColorMode,
   ColorString,
@@ -45,6 +47,16 @@ export interface ColorPickerProps<
    * resolve to an sRGB-representable color (wide-gamut P3 tokens are skipped).
    */
   presets?: ReadonlyArray<ColorString | (string & {})>
+  /** Controlled recents. When provided, the component does not own this state. */
+  history?: ReadonlyArray<ColorValue<TMode>>
+  /** Uncontrolled initial recents. Ignored when `history` is provided. */
+  defaultHistory?: ReadonlyArray<ColorValue<TMode>>
+  /**
+   * Fired when recents change (a color committed on popover close). Fires in
+   * both modes. Passing `history` without `onHistoryChange` yields a frozen,
+   * read-only recents row.
+   */
+  onHistoryChange?: (history: ColorValue<TMode>[]) => void
 }
 
 export function ColorPicker<TMode extends ColorMode | undefined>({
@@ -55,6 +67,9 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
   className,
   "aria-label": ariaLabel = "Pick a color",
   presets,
+  history,
+  defaultHistory,
+  onHistoryChange,
 }: ColorPickerProps<TMode>) {
   const parsedFromValue = parseColor(value)
 
@@ -73,6 +88,17 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
   const lastEmittedRef = useRef<string | null>(null)
   const probeRef = useRef<HTMLSpanElement>(null)
   const [hasEyeDropper, setHasEyeDropper] = useState(false)
+  const [open, setOpen] = useState(false)
+  const pendingRef = useRef<string | null>(null)
+  // History is stored internally as string[]; every ColorValue<TMode> member is
+  // a string, so the single boundary cast below is sound.
+  const [recents, setRecents] = useControllableState<readonly string[]>({
+    prop: history as readonly string[] | undefined,
+    defaultProp: (defaultHistory as readonly string[] | undefined) ?? [],
+    onChange: onHistoryChange as
+      | ((next: readonly string[]) => void)
+      | undefined,
+  })
 
   useEffect(() => {
     if (value === lastEmittedRef.current) return
@@ -137,7 +163,24 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
     if (modeProp == null && mode !== internalMode) setInternalMode(mode)
     const formatted = formatColor(next, mode)
     lastEmittedRef.current = formatted
+    pendingRef.current = formatted
     onChange(formatted as Parameters<typeof onChange>[0])
+  }
+
+  const commitRecent = (formatted: string) => {
+    setRecents((prev) => pushRecent(prev, formatted, MAX_RECENTS))
+  }
+
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next)
+    if (next) {
+      pendingRef.current = null // start a fresh session
+      return
+    }
+    if (pendingRef.current) {
+      commitRecent(pendingRef.current)
+      pendingRef.current = null
+    }
   }
 
   const handlePickString = (raw: string) => {
@@ -173,7 +216,7 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
   }
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <button
           type="button"
@@ -236,6 +279,12 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
               />
             </div>
           )}
+          <SwatchRow
+            entries={recents.map((c) => ({ value: c, label: c }))}
+            onPick={handlePickString}
+            ariaLabelPrefix="recent"
+            dataSlot="color-picker-recents"
+          />
           <LcPad
             l={internal.l}
             c={internal.c}
