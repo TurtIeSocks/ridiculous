@@ -469,3 +469,47 @@ export function formatColor(oklch: Oklch, mode: ColorMode): string {
       return formatHwb(oklch)
   }
 }
+
+// ---------------------------------------------------------------------------
+// CSS variable presets + recents
+// ---------------------------------------------------------------------------
+
+/** True for `var(--x)` / `var( --x )` and bare `--x` custom-property refs. */
+export function isCssVar(s: string): boolean {
+  return /^\s*(var\(\s*--|--)/.test(s)
+}
+
+/** A bare `--x` is wrapped to `var(--x)` for use as a CSS value; else passthrough. */
+export function normalizeCssVar(s: string): string {
+  const trimmed = s.trim()
+  return trimmed.startsWith("--") ? `var(${trimmed})` : s
+}
+
+/**
+ * Resolve a preset/recent entry to a concrete color.
+ * - Concrete colors parse directly (lossless; preserves wide-gamut oklch).
+ * - CSS vars need the live cascade: set them on a mounted `probe` element and
+ *   read the browser-serialized computed `color`, then parse that. Returns null
+ *   when unresolvable (undefined var, no probe / server render). parseColor has
+ *   no `color()` branch, so wide-gamut P3 tokens resolve to null by design.
+ */
+export function resolveCssColor(
+  raw: string,
+  probe: HTMLElement | null,
+): ParseResult | null {
+  if (!isCssVar(raw)) return parseColor(raw)
+  if (!probe) return null
+  probe.style.color = normalizeCssVar(raw)
+  const resolved = getComputedStyle(probe).color
+  probe.style.color = ""
+  return resolved ? parseColor(resolved) : null
+}
+
+/** Prepend `value`, drop any prior copy (move-to-front dedup), cap at `max`. */
+export function pushRecent(
+  prev: readonly string[],
+  value: string,
+  max: number,
+): string[] {
+  return [value, ...prev.filter((c) => c !== value)].slice(0, max)
+}

@@ -388,6 +388,57 @@ describe("ColorPicker eyedropper", () => {
   })
 })
 
+import {
+  isCssVar,
+  normalizeCssVar,
+  pushRecent,
+  resolveCssColor,
+} from "@/components/ui/color-picker/color-picker.helpers"
+
+describe("css var helpers", () => {
+  it("isCssVar detects var() and bare custom properties", () => {
+    expect(isCssVar("var(--x)")).toBe(true)
+    expect(isCssVar("  var( --x )")).toBe(true)
+    expect(isCssVar("--x")).toBe(true)
+    expect(isCssVar("#ff0000")).toBe(false)
+    expect(isCssVar("oklch(0.5 0.1 240)")).toBe(false)
+  })
+
+  it("normalizeCssVar wraps bare custom properties only", () => {
+    expect(normalizeCssVar("--x")).toBe("var(--x)")
+    expect(normalizeCssVar("var(--x)")).toBe("var(--x)")
+    expect(normalizeCssVar("#ff0000")).toBe("#ff0000")
+  })
+
+  it("resolveCssColor parses concrete colors directly (lossless, no probe)", () => {
+    expect(resolveCssColor("#ff0000", null)?.mode).toBe("hex")
+    expect(resolveCssColor("oklch(0.7 0.2 30)", null)?.mode).toBe("oklch")
+  })
+
+  it("resolveCssColor returns null for a css var with no probe", () => {
+    expect(resolveCssColor("var(--whatever)", null)).toBeNull()
+  })
+
+  it("resolveCssColor returns null for an unresolved css var via probe", () => {
+    const probe = document.createElement("span")
+    document.body.appendChild(probe)
+    expect(resolveCssColor("var(--nope-not-defined)", probe)).toBeNull()
+    probe.remove()
+  })
+})
+
+describe("pushRecent", () => {
+  it("prepends new values", () => {
+    expect(pushRecent(["a", "b"], "c", 8)).toEqual(["c", "a", "b"])
+  })
+  it("dedups by moving an existing value to the front", () => {
+    expect(pushRecent(["a", "b", "c"], "b", 8)).toEqual(["b", "a", "c"])
+  })
+  it("caps the list length", () => {
+    expect(pushRecent(["a", "b", "c"], "d", 3)).toEqual(["d", "a", "b"])
+  })
+})
+
 import { useControllableState } from "@/components/ui/color-picker/color-picker.hooks"
 
 describe("useControllableState", () => {
