@@ -75,6 +75,8 @@ This is the **deepest type in the registry** (blocks × declarations × per-valu
 - If `tsc` spikes → **dial back**: keep color/opacity/length/easing strict (cheap), validate `transform`/`filter` values **leniently** (the two most expensive recursive literals), documenting the reduced boundary here. The skeleton (selectors + property recognition) stays strict either way.
 The decision + the measured number are recorded in this spec's §3.1 at implementation time. Precedent: calc-editor measured `tsc` before committing to full dimensional analysis.
 
+**Resolution (measured 2026-06-19):** full-project `tsc --noEmit` = **~1.2s wall** with the FULL dispatch wired (transform/filter/color/easing/opacity/length all strict). Well within budget — **the full dispatch ships**; no downgrade needed. The two-level fold adds negligible cost because the per-value literals short-circuit on the property-name `extends` ladder before recursing.
+
 ### 3.2 Validated vs deferred
 **Validates:** block structure (`sel { decls }`), selector range (from/to/0–100%), and the KNOWN-property values via dispatch.
 **Defers (lenient):** unknown properties' values; `background`/`background-image` (gradient-editor exports suggestion strings, not a strict `GradientLiteral`) → lenient; `!important`; `var()`/`env()`/`calc()` values → `never` in strict (undecidable), casual/runtime accept; nested `{}` (not valid in keyframes anyway); monotonic-ordering of stops (not checked — the UI sorts).
