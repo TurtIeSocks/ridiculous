@@ -34,6 +34,7 @@ export default defineConfig({
         "src/components/ui/anchor-position-editor/**",
         "src/components/ui/property-syntax-editor/**",
         "src/components/ui/shape-path-editor/**",
+        "src/components/ui/keyframes-editor/**",
       ],
       thresholds: {
         statements: 90,

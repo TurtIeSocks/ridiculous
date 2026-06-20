@@ -1047,6 +1047,67 @@
       ]
     },
     {
+      "name": "keyframes-editor",
+      "type": "registry:ui",
+      "title": "Keyframes Editor",
+      "description": "Ridiculously typed editor for the body of a CSS @keyframes rule whose two-level strict tier validates each from | to | 0–100% block selector and dispatches every declaration value on its property name into that property’s own validator — transform → TransformLiteral, filter/backdrop-filter → FilterLiteral, color properties → ColorLiteral, *-timing-function → EasingLiteral, opacity → 0–1, length properties → <length-percentage> — the registry’s composition flagship, with a 0–100% timeline that embeds the real TransformBuilder / FilterBuilder / ColorPicker / GradientEditor / EasingPicker / UnitInput per declaration and a scrubbed play head that interpolates a live preview, while unknown properties, background, and calc()/var() values defer to a lenient runtime parser.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "transform-builder",
+        "filter-builder",
+        "color-picker",
+        "gradient-editor",
+        "easing-picker",
+        "unit-input",
+        "button",
+        "popover",
+        "input"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/keyframes-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/keyframes-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/keyframes-editor/keyframes-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/keyframes-editor/keyframes-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/keyframes-editor/keyframes-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/keyframes-editor/keyframes-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/keyframes-editor/keyframes-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/keyframes-editor/keyframes-editor.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/keyframes-editor/keyframe-timeline.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/keyframes-editor/keyframe-timeline.tsx"
+        },
+        {
+          "path": "src/components/ui/keyframes-editor/declaration-row.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/keyframes-editor/declaration-row.tsx"
+        },
+        {
+          "path": "src/components/ui/keyframes-editor/keyframe-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/keyframes-editor/keyframe-preview.tsx"
+        },
+        {
+          "path": "src/components/ui/keyframes-editor/mini-select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/keyframes-editor/mini-select.tsx"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
@@ -1070,7 +1131,8 @@
         "https://ridiculous.turtlesocks.dev/r/query-builder.json",
         "https://ridiculous.turtlesocks.dev/r/anchor-position-editor.json",
         "https://ridiculous.turtlesocks.dev/r/property-syntax-editor.json",
-        "https://ridiculous.turtlesocks.dev/r/shape-path-editor.json"
+        "https://ridiculous.turtlesocks.dev/r/shape-path-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/keyframes-editor.json"
       ],
       "dependencies": [],
       "files": []
