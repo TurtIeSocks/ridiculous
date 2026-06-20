@@ -60,10 +60,11 @@ export function AnchorPreview({ value, className }: AnchorPreviewProps) {
           className="relative grid h-28 place-items-center rounded-md bg-muted/30"
         >
           {/* The mock anchor — registers an anchor name the box references.
-              `anchor-name` / `position-anchor` / `position-area` are written as
-              string-keyed CSS props (not yet in React's CSSProperties). */}
+              `anchorName` / `positionAnchor` / `positionArea` are camelCased
+              (React serializes them to kebab-case CSS) and cast because they
+              are not yet in React's CSSProperties. */}
           <div
-            style={{ "anchor-name": "--preview-anchor" } as React.CSSProperties}
+            style={{ anchorName: "--preview-anchor" } as React.CSSProperties}
             className="size-10 rounded border-2 border-primary/50 border-dashed bg-primary/5"
           />
           {/* The positioned box — snaps to the chosen position-area. */}
@@ -71,8 +72,8 @@ export function AnchorPreview({ value, className }: AnchorPreviewProps) {
             style={
               {
                 position: "absolute",
-                "position-anchor": "--preview-anchor",
-                "position-area": value || "center",
+                positionAnchor: "--preview-anchor",
+                positionArea: value || "center",
               } as React.CSSProperties
             }
             className="size-5 rounded bg-primary"
