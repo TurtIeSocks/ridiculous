@@ -232,6 +232,118 @@ describe("parseShape — errors", () => {
     const r = parseShape("shape(from 0px 0px, line 10px 10px)")
     expect(r.error).not.toBeNull()
   })
+
+  test("a bare (unitless) coordinate is rejected", () => {
+    const r = parseShape("shape(from 0 0, close)")
+    expect(r.error).not.toBeNull()
+  })
+
+  test("a fill-rule followed by a malformed from seed errors", () => {
+    const r = parseShape("shape(nonzero from 10px, close)")
+    expect(r.error).not.toBeNull()
+  })
+
+  test("an hline with a non-length value errors", () => {
+    const r = parseShape("shape(from 0px 0px, hline by ten, close)")
+    expect(r.error).not.toBeNull()
+  })
+
+  test("an hline with the wrong arity errors", () => {
+    const r = parseShape("shape(from 0px 0px, hline by 10px 20px, close)")
+    expect(r.error).not.toBeNull()
+  })
+
+  test("a curve with a 'with' but a non-length control errors", () => {
+    const r = parseShape(
+      "shape(from 0px 0px, curve to 10px 10px with foo 0px, close)",
+    )
+    expect(r.error).not.toBeNull()
+  })
+
+  test("a curve missing the literal 'with' keyword errors", () => {
+    const r = parseShape(
+      "shape(from 0px 0px, curve to 10px 10px wth 5px 5px, close)",
+    )
+    expect(r.error).not.toBeNull()
+  })
+
+  test("a cubic curve tail without the '/' separator errors", () => {
+    const r = parseShape(
+      "shape(from 0px 0px, curve to 10px 10px with 1px 1px 2px 2px 3px, close)",
+    )
+    expect(r.error).not.toBeNull()
+  })
+
+  test("a cubic curve with a non-length second control errors", () => {
+    const r = parseShape(
+      "shape(from 0px 0px, curve to 10px 10px with 1px 1px / bad 2px, close)",
+    )
+    expect(r.error).not.toBeNull()
+  })
+
+  test("a smooth with a 'with' but non-length control errors", () => {
+    const r = parseShape(
+      "shape(from 0px 0px, smooth to 10px 10px with bad 0px, close)",
+    )
+    expect(r.error).not.toBeNull()
+  })
+
+  test("a smooth with an unsupported arity errors", () => {
+    const r = parseShape(
+      "shape(from 0px 0px, smooth to 10px 10px with 1px, close)",
+    )
+    expect(r.error).not.toBeNull()
+  })
+
+  test("an arc with a non-length radius errors", () => {
+    const r = parseShape("shape(from 0px 0px, arc to 10px 10px of huge, close)")
+    expect(r.error).not.toBeNull()
+  })
+
+  test("an arc missing the 'of' keyword errors", () => {
+    const r = parseShape("shape(from 0px 0px, arc to 10px 10px off 5px, close)")
+    expect(r.error).not.toBeNull()
+  })
+
+  test("an arc with too few tokens errors", () => {
+    const r = parseShape("shape(from 0px 0px, arc to 10px 10px, close)")
+    expect(r.error).not.toBeNull()
+  })
+
+  test("a close with trailing tokens errors", () => {
+    const r = parseShape("shape(from 0px 0px, close now)")
+    expect(r.error).not.toBeNull()
+  })
+
+  test("an empty command segment between commas is skipped, not an error", () => {
+    // splitComma drops empty parts, so a doubled comma is tolerated.
+    const r = parseShape("shape(from 0px 0px, line to 10px 10px, , close)")
+    expect(r.error).toBeNull()
+    expect(r.commands.map((c) => c.kind)).toEqual(["line", "close"])
+  })
+
+  test("a shape() with only the seed (no commands) parses cleanly", () => {
+    const r = parseShape("shape(from 5px 5px)")
+    expect(r.error).toBeNull()
+    expect(r.commands).toEqual([])
+  })
+
+  test("an empty shape() body errors", () => {
+    const r = parseShape("shape()")
+    expect(r.error).not.toBeNull()
+  })
+
+  test("a non-shape() function name is rejected case-insensitively", () => {
+    const r = parseShape("SHAPE(from 0px 0px, close)")
+    // Wrapper matched case-insensitively → parses fine.
+    expect(r.error).toBeNull()
+  })
+
+  test("percentage and rem units are accepted as lengths", () => {
+    const r = parseShape("shape(from 1rem 2rem, line to 50% 50%, close)")
+    expect(r.error).toBeNull()
+    expect(r.from).toEqual({ x: "1rem", y: "2rem" })
+  })
 })
 
 // ===========================================================================
@@ -415,5 +527,80 @@ describe("updatePoint", () => {
     const next = updatePoint(r, control.id, 10, 10)
     const nextPts = shapeToPoints(next)
     expect(nextPts.find((p) => p.role === "control")?.id).toBe(control.id)
+  })
+
+  test("moves a cubic curve's second control handle independently", () => {
+    const r = parseShape(
+      "shape(from 0px 0px, curve to 100px 100px with 20px 0px / 80px 100px, close)",
+    )
+    const pts = shapeToPoints(r)
+    const control2 = pts.find((p) => p.role === "control2" && p.cmdIndex === 0)
+    if (control2 === undefined) throw new Error("no control2")
+    const next = updatePoint(r, control2.id, 60, 70)
+    const cmd = next.commands[0]
+    expect(cmd.kind).toBe("curve")
+    if (cmd.kind === "curve") {
+      expect(cmd.control2).toEqual({ x: "60px", y: "70px" })
+      // control + endpoint untouched
+      expect(cmd.control).toEqual({ x: "20px", y: "0px" })
+      expect(cmd.to).toEqual({ x: "100px", y: "100px" })
+    }
+  })
+
+  test("a control2 id on a quadratic curve (no control2) is a no-op", () => {
+    const r = parseShape(
+      "shape(from 0px 0px, curve to 100px 100px with 50px 0px, close)",
+    )
+    // Forge the control2 id for a curve that has no second control point.
+    const next = updatePoint(r, "0:control2", 10, 10)
+    expect(next.commands).toEqual(r.commands)
+  })
+
+  test("an endpoint id on an hline command (no point geometry) is a no-op", () => {
+    const r = parseShape("shape(from 0px 0px, hline by 50px, close)")
+    const next = updatePoint(r, "0:endpoint", 10, 10)
+    expect(next.commands).toEqual(r.commands)
+  })
+
+  test("a control role on a non-curve command is a no-op", () => {
+    const r = parseShape("shape(from 0px 0px, line to 50px 50px, close)")
+    const next = updatePoint(r, "0:control", 10, 10)
+    expect(next.commands).toEqual(r.commands)
+  })
+
+  test("an out-of-range command index is a no-op", () => {
+    const r = parseShape("shape(from 0px 0px, line to 50px 50px, close)")
+    const next = updatePoint(r, "99:endpoint", 10, 10)
+    expect(next.commands).toEqual(r.commands)
+  })
+
+  test("a negative (non-seed) command index is a no-op", () => {
+    const r = parseShape("shape(from 0px 0px, line to 50px 50px, close)")
+    // -1:control is not the seed endpoint id, and cmdIndex < 0 → no-op.
+    const next = updatePoint(r, "-1:control", 10, 10)
+    expect(next.commands).toEqual(r.commands)
+    expect(next.from).toEqual(r.from)
+  })
+
+  test("a non-integer command index is a no-op", () => {
+    const r = parseShape("shape(from 0px 0px, line to 50px 50px, close)")
+    const next = updatePoint(r, "x:endpoint", 10, 10)
+    expect(next.commands).toEqual(r.commands)
+  })
+
+  test("moves an arc endpoint, leaving its radius intact", () => {
+    const r = parseShape(
+      "shape(from 0px 0px, arc to 100px 0px of 50px 30px, close)",
+    )
+    const pts = shapeToPoints(r)
+    const endpoint = pts.find((p) => p.role === "endpoint" && p.cmdIndex === 0)
+    if (endpoint === undefined) throw new Error("no endpoint")
+    const next = updatePoint(r, endpoint.id, 80, 40)
+    const cmd = next.commands[0]
+    expect(cmd.kind).toBe("arc")
+    if (cmd.kind === "arc") {
+      expect(cmd.to).toEqual({ x: "80px", y: "40px" })
+      expect(cmd.radius).toEqual({ x: "50px", y: "30px" })
+    }
   })
 })

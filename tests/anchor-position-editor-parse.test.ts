@@ -225,6 +225,14 @@ describe("parseAnchor", () => {
   test("empty args returns null", () => {
     expect(parseAnchor("anchor()")).toBeNull()
   })
+
+  test("a trailing comma with an empty fallback returns null", () => {
+    expect(parseAnchor("anchor(--btn bottom,)")).toBeNull()
+  })
+
+  test("a head with three or more tokens returns null", () => {
+    expect(parseAnchor("anchor(--btn bottom extra)")).toBeNull()
+  })
 })
 
 // ===========================================================================

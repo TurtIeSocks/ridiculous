@@ -131,6 +131,42 @@ describe("parseKeyframes — errors", () => {
     const r = parseKeyframes("{ opacity: 0 }")
     expect(r.error).not.toBeNull()
   })
+
+  test("a header of only commas errors (selectors filter to empty)", () => {
+    // The header is non-empty (passes the `header === ""` guard) but every
+    // comma-split segment trims to "" → the filtered selector list is empty.
+    const r = parseKeyframes(",, { opacity: 0 }")
+    expect(r.error).toBe("a keyframe block needs a selector")
+    expect(r.blocks).toHaveLength(0)
+  })
+
+  test("trailing non-block text after a valid block errors", () => {
+    const r = parseKeyframes("from { opacity: 0 } trailing")
+    expect(r.error).not.toBeNull()
+    // the first block parsed before the error surfaced.
+    expect(r.blocks).toHaveLength(1)
+  })
+
+  test("a segment with no colon is skipped", () => {
+    const r = parseKeyframes("from { opacity: 0; busted }")
+    expect(r.error).toBeNull()
+    expect(r.blocks[0].declarations).toEqual([
+      { property: "opacity", value: "0" },
+    ])
+  })
+
+  test("a segment with an empty property name is skipped", () => {
+    const r = parseKeyframes("from { : 0; opacity: 1 }")
+    expect(r.error).toBeNull()
+    expect(r.blocks[0].declarations).toEqual([
+      { property: "opacity", value: "1" },
+    ])
+  })
+
+  test("whitespace-only source errors as empty", () => {
+    const r = parseKeyframes("   \n  ")
+    expect(r.error).toBe("empty keyframes body")
+  })
 })
 
 // ===========================================================================
@@ -213,6 +249,11 @@ describe("selectorToPercent", () => {
   test("surrounding whitespace is tolerated", () => {
     expect(selectorToPercent("  to  ")).toBe(100)
     expect(selectorToPercent(" 25% ")).toBe(25)
+  })
+
+  test("a non-numeric / unknown selector falls back to 0", () => {
+    expect(selectorToPercent("bogus")).toBe(0)
+    expect(selectorToPercent("")).toBe(0)
   })
 })
 

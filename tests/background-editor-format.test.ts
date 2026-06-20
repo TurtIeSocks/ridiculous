@@ -85,6 +85,13 @@ describe("formatBackground", () => {
     ).toBe("url(x.png) fixed padding-box content-box")
   })
 
+  test("a size with no position emits a leading slash", () => {
+    // No position but a size → the `/ size` else-branch in formatLayer.
+    expect(
+      formatBackground([layer({ image: "url(x.png)", size: "cover" })]),
+    ).toBe("url(x.png) / cover")
+  })
+
   test("an empty layer list serializes to the empty string", () => {
     expect(formatBackground([])).toBe("")
   })

@@ -150,6 +150,14 @@ describe("parseBackground", () => {
     expect(r.error).not.toBeNull()
   })
 
+  test("an empty comma group (trailing comma) is an error", () => {
+    // The first layer parses; the second comma group is empty → parseLayer
+    // reports "an empty background layer".
+    const r = parseBackground("url(x.png) center, ")
+    expect(r.error).not.toBeNull()
+    expect(r.error).toMatch(/empty/i)
+  })
+
   test("a color in a NON-final layer is an error", () => {
     const r = parseBackground("#f00 center, url(x.png)")
     expect(r.error).not.toBeNull()
