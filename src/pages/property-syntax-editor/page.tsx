@@ -13,7 +13,7 @@ export default function PropertySyntaxEditorPage() {
       meta={{
         title: "@property Syntax Editor",
         description:
-          'Edit a CSS @property syntax: descriptor — the meta type-grammar that declares what values a registered custom property accepts ("<length>+", "<color>", "<length> | auto", "*") — with compile-time validation. The namesake spectacle is ONE CSS string typing another: the dependent validator InitialValueLiteral<Syntax, V> checks a candidate initial-value V against an already-validated Syntax, and the call-site helper cssProperty(syntax, initialValue) type-checks ONLY when the initial value satisfies the declared syntax (cssProperty("<length>", "red") → never). The controlled value is the syntax string; the panel\'s initial-value field is a live demo of the dependency that turns green/red in real time as matchesSyntax runs. The strict tier validates the full <syntax> grammar (universal *, | alternation, +/# multipliers, known data types, literal idents) and the initial-value against the syntax for the dimensional types, <color> (deferred to color-picker\'s ColorLiteral — color-picker forms like #ff0000 / oklch(...), not the 148 named colors), idents, alternation, and multipliers. <integer> is checked as <number> at the type level; <image>/<url>/<transform-*> and calc()/var() initial values defer to the lenient runtime parser.',
+          'Ridiculously typed editor for the CSS @property syntax: descriptor. The namesake types one CSS string with another — InitialValueLiteral<Syntax, V> checks an initial-value against the validated syntax, so cssProperty("<length>", "red") is a compile error. A chip builder sits beside a live green/red demo.',
         slug: "property-syntax-editor",
       }}
       examples={

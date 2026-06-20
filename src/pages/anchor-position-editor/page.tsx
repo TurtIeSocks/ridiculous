@@ -13,7 +13,7 @@ export default function AnchorPositionEditorPage() {
       meta={{
         title: "Anchor Position Editor",
         description:
-          "Edit CSS anchor-positioning values with compile-time grammar validation. A mode prop ('position-area' | 'anchor' | 'position-try', default 'position-area') selects the dialect. The namesake is the cross-axis rule: the strict tier validates that a position-area keyword pair sits on two DIFFERENT axes of the SAME coordinate system — rejecting both same-axis pairs (top bottom → never) and physical↔logical mixes (left block-start → never), a positional-tuple constraint new to the registry. anchor mode validates the anchor()/anchor-size() function name, side/size keyword, and <length-percentage> fallback (anchor(top, red) → never); position-try mode validates each comma-separated fallback (none | a position-area | a dashed-ident + try-tactic), so flip-diagonal → never. The visual hero is a clickable 3×3 placement grid with logical/physical + span toggles and a live snap preview that edits one coordinate system at a time — guaranteeing the cross-axis rule by construction in the UI. The ambiguous start/end keywords (axis depends on writing-mode), <dashed-ident> grammar beyond the -- prefix, and calc()/var() fallbacks are deferred to the lenient runtime parser.",
+          "Ridiculously typed editor for CSS anchor positioning (mode prop). The strict tier enforces the position-area cross-axis rule — a keyword pair must sit on two different axes of the same coordinate system. The hero is a clickable 3×3 placement grid with a live snap preview.",
         slug: "anchor-position-editor",
       }}
       examples={
