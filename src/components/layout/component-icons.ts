@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Aperture,
   Axis3d,
   Blend,
@@ -6,10 +7,13 @@ import {
   Calculator,
   Clapperboard,
   Component,
+  Film,
   GitBranch,
   Grid3x3,
+  Layers,
   type LucideIcon,
   MonitorSmartphone,
+  PenTool,
   Pipette,
   Ruler,
   Scissors,
@@ -17,6 +21,7 @@ import {
   SquareStack,
   SwatchBook,
   Type,
+  Variable,
 } from "lucide-react"
 
 /**
@@ -44,6 +49,11 @@ export const COMPONENT_ICONS: Record<string, LucideIcon> = {
   "color-function": SwatchBook,
   "if-function": GitBranch,
   "query-builder": MonitorSmartphone,
+  "anchor-position-editor": Anchor,
+  "property-syntax-editor": Variable,
+  "shape-path-editor": PenTool,
+  "keyframes-editor": Film,
+  "background-editor": Layers,
 }
 
 /**

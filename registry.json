@@ -1108,6 +1108,69 @@
       ]
     },
     {
+      "name": "background-editor",
+      "type": "registry:ui",
+      "title": "Background Editor",
+      "description": "Ridiculously typed editor for the CSS background shorthand whose strict tier splits the value into comma-stacked layers and folds them with an index-aware head/tail recursion that permits a <color> token ONLY on the final layer — so a color in any non-final layer (#f00 center, url(x.png)) resolves to never, a positional-list invariant new to the registry — while validating recognized per-layer token membership (image / position / size / repeat / attachment / box / <length-percentage>) and the final color via color-picker's ColorLiteral, with a reorderable layer stack that embeds the real GradientEditor per layer, a 2D crosshair position pad, and a final-layer-only ColorPicker over a live composite preview tile, and the color re-homes onto the last layer after any reorder, while the || ordering / cardinality, gradient internals, and calc()/var() values defer to a lenient runtime parser.",
+      "registryDependencies": [
+        "ridiculous-type-kit",
+        "color-picker",
+        "gradient-editor",
+        "unit-input",
+        "button",
+        "popover",
+        "input"
+      ],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/background-editor/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/background-editor/index.ts"
+        },
+        {
+          "path": "src/components/ui/background-editor/background-editor.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/background-editor/background-editor.tsx"
+        },
+        {
+          "path": "src/components/ui/background-editor/background-editor.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/background-editor/background-editor.types.ts"
+        },
+        {
+          "path": "src/components/ui/background-editor/background-editor.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/background-editor/background-editor.helpers.ts"
+        },
+        {
+          "path": "src/components/ui/background-editor/layer-stack.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/background-editor/layer-stack.tsx"
+        },
+        {
+          "path": "src/components/ui/background-editor/layer-card.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/background-editor/layer-card.tsx"
+        },
+        {
+          "path": "src/components/ui/background-editor/position-pad.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/background-editor/position-pad.tsx"
+        },
+        {
+          "path": "src/components/ui/background-editor/background-preview.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/background-editor/background-preview.tsx"
+        },
+        {
+          "path": "src/components/ui/background-editor/mini-select.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/background-editor/mini-select.tsx"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
@@ -1132,7 +1195,8 @@
         "https://ridiculous.turtlesocks.dev/r/anchor-position-editor.json",
         "https://ridiculous.turtlesocks.dev/r/property-syntax-editor.json",
         "https://ridiculous.turtlesocks.dev/r/shape-path-editor.json",
-        "https://ridiculous.turtlesocks.dev/r/keyframes-editor.json"
+        "https://ridiculous.turtlesocks.dev/r/keyframes-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/background-editor.json"
       ],
       "dependencies": [],
       "files": []
