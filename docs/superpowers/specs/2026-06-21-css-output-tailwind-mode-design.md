@@ -241,6 +241,7 @@ Each editor passes `value` (its already-formatted string) and the correct `prope
 | easing-picker | `"transition-timing-function"` | **replace `OutputPanel`**, drop tw-v3 (§7) | `ease-[…]` + `--ease-*` |
 | gradient-editor | `"background-image"` | **Add** readout (none today) | `bg-[…]` |
 | background-editor | `"background"` | swap `LiveString` | shorthand → `[background:…]` |
+| font-editor | `"font"` | swap readout | `font` shorthand → generic `[font:…]` (no named utility for the whole shorthand) |
 | filter-builder | `mode==="backdrop"? "backdrop-filter" : "filter"` | swap `LiveString` | `filter-[…]` / `[backdrop-filter:…]` |
 | transform-builder | `"transform"` | swap readout | `transform-[…]` |
 | transition-editor | `mode==="animation"? "animation" : "transition"` | swap `LiveString` | animation → `animate-[…]` + token; transition shorthand → `[transition:…]` |
@@ -329,7 +330,7 @@ css-output (registry:ui)  │ pure call
 
 1. `cssToTailwind()` + `tailwind.test.ts` in `ridiculous-type-kit` (pure, fully tested first — it's the contract everything else depends on).
 2. `<CssOutput>` primitive + component tests; register `css-output` in `registry.json` + nav + `all` bundle.
-3. Roll out to editors in waves: (a) simple single-property swaps (box-shadow, transform, color-function), (b) mode-dependent (grid, transition, filter, clip-path, shape-path, anchor, background), (c) **add** to color-picker & gradient-editor, (d) css-only swaps (keyframes, property-syntax, query, if, calc), (e) easing-picker reconciliation (§7).
+3. Roll out to editors in waves: (a) simple single-property swaps (box-shadow, transform, color-function, background, font), (b) mode-dependent (grid, transition, filter, clip-path, shape-path, anchor), (c) **add** to color-picker & gradient-editor, (d) css-only swaps (keyframes, property-syntax, query, if, calc), (e) easing-picker reconciliation (§7).
 4. Each wave: add `css-output` to the component's `registryDependencies`, run `pnpm registry:build` + typecheck + tests.
 
 ---
