@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -149,7 +150,7 @@ export function TransformBuilderPanel({
         ))}
       </div>
       <AddFunctionMenu onAdd={add} />
-      <LiveString value={formatTransform(items)} />
+      <CssOutput value={formatTransform(items)} property="transform" />
       <TransformPreview3D
         value={formatTransform(items)}
         onChange={(str) => {
@@ -224,17 +225,5 @@ export function TransformFunctionRow({
         <span aria-hidden="true">×</span>
       </button>
     </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// LiveString (internal)
-// ---------------------------------------------------------------------------
-
-function LiveString({ value }: { value: string }) {
-  return (
-    <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-      {value}
-    </code>
   )
 }

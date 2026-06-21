@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -159,22 +160,9 @@ export function BackgroundEditorPanel({
         <LayerStack layers={layers} onChange={commit} />
       </div>
 
-      <LiveString value={produced} />
+      <CssOutput value={produced} property="background" />
 
       <BackgroundPreview value={produced} />
     </fieldset>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// LiveString — the produced `background` value in a `<code>` (internal helper,
-// exported for parity with the sibling sub-components and demos).
-// ---------------------------------------------------------------------------
-
-export function LiveString({ value }: { value: string }) {
-  return (
-    <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-      {value || " "}
-    </code>
   )
 }

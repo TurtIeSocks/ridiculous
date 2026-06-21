@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -139,7 +140,7 @@ export function BoxShadowEditorPanel({
         ))}
       </div>
       <AddLayerButton onAdd={add} />
-      <LiveString value={formatBoxShadow(layers)} />
+      <CssOutput value={formatBoxShadow(layers)} property="box-shadow" />
       <BoxShadowPreview
         value={formatBoxShadow(layers)}
         onChange={(str) => {
@@ -173,17 +174,5 @@ export function AddLayerButton({ onAdd, className }: AddLayerButtonProps) {
     >
       + add layer
     </button>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// LiveString (internal)
-// ---------------------------------------------------------------------------
-
-function LiveString({ value }: { value: string }) {
-  return (
-    <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-      {value}
-    </code>
   )
 }

@@ -7,7 +7,7 @@
       "name": "ridiculous-type-kit",
       "type": "registry:lib",
       "title": "Ridiculous Type Kit",
-      "description": "Shared template-literal type machinery powering every ridiculous component. Provides char/number primitives, CSS dimension validators (IsLength/IsAngle/IsTime/…), DimensionOf, and paren-aware parser combinators.",
+      "description": "Shared template-literal type machinery powering every ridiculous component. Provides char/number primitives, CSS dimension validators (IsLength/IsAngle/IsTime/\u2026), DimensionOf, and paren-aware parser combinators.",
       "dependencies": [],
       "registryDependencies": [],
       "files": [
@@ -37,7 +37,7 @@
       "name": "color-picker",
       "type": "registry:ui",
       "title": "Color Picker",
-      "description": "Ridiculously typed color picker with oklch L×C pad, hue/alpha strips, and 6-mode round-trip (oklch, oklab, hex, rgb, hsl, hwb).",
+      "description": "Ridiculously typed color picker with oklch L\u00d7C pad, hue/alpha strips, and 6-mode round-trip (oklch, oklab, hex, rgb, hsl, hwb).",
       "registryDependencies": ["button", "popover"],
       "dependencies": [],
       "files": [
@@ -257,7 +257,7 @@
       "name": "calc-editor",
       "type": "registry:ui",
       "title": "Calc Editor",
-      "description": "Ridiculously typed CSS math editor for calc/clamp/min/max with compile-time dimensional analysis (length±length ✓, length±angle ✗, ÷ by non-number ✗). Ships a full runtime parser/evaluator and a fluid-type clamp() playground.",
+      "description": "Ridiculously typed CSS math editor for calc/clamp/min/max with compile-time dimensional analysis (length\u00b1length \u2713, length\u00b1angle \u2717, \u00f7 by non-number \u2717). Ships a full runtime parser/evaluator and a fluid-type clamp() playground.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "button",
@@ -292,14 +292,15 @@
       "name": "transform-builder",
       "type": "registry:ui",
       "title": "Transform Builder",
-      "description": "Ridiculously typed CSS transform editor — a space-separated function list with compile-time function-name dispatch (per-function arity and per-argument dimension typing: rotate wants an angle, translateX a length-%). Ships a tolerant runtime parser and a live 3D-preview card driven by the typed string.",
+      "description": "Ridiculously typed CSS transform editor \u2014 a space-separated function list with compile-time function-name dispatch (per-function arity and per-argument dimension typing: rotate wants an angle, translateX a length-%). Ships a tolerant runtime parser and a live 3D-preview card driven by the typed string.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "button",
         "popover",
         "input",
         "label",
-        "slider"
+        "slider",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -344,7 +345,7 @@
       "name": "filter-builder",
       "type": "registry:ui",
       "title": "Filter Builder",
-      "description": "Ridiculously typed CSS filter / backdrop-filter editor — a space-separated function list with compile-time per-function arity and dimension typing, plus a drop-shadow color validated against the color-picker ColorLiteral. Ships a tolerant runtime parser and a live preview with a filter ↔ backdrop-filter toggle.",
+      "description": "Ridiculously typed CSS filter / backdrop-filter editor \u2014 a space-separated function list with compile-time per-function arity and dimension typing, plus a drop-shadow color validated against the color-picker ColorLiteral. Ships a tolerant runtime parser and a live preview with a filter \u2194 backdrop-filter toggle.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "color-picker",
@@ -572,7 +573,7 @@
       "name": "box-shadow-editor",
       "type": "registry:ui",
       "title": "Box Shadow Editor",
-      "description": "Ridiculously typed CSS box-shadow editor — a comma-separated list of shadow layers, each validated at compile time (2–4 lengths, at most one inset, an optional trailing color). Ships a live preview with a draggable light source and elevation scrubber.",
+      "description": "Ridiculously typed CSS box-shadow editor \u2014 a comma-separated list of shadow layers, each validated at compile time (2\u20134 lengths, at most one inset, an optional trailing color). Ships a live preview with a draggable light source and elevation scrubber.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "color-picker",
@@ -581,7 +582,8 @@
         "popover",
         "input",
         "label",
-        "slider"
+        "slider",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -626,7 +628,7 @@
       "name": "transition-editor",
       "type": "registry:ui",
       "title": "Transition + Animation Editor",
-      "description": "Ridiculously typed CSS transition + animation editor (mode prop) — a comma-separated layer list with per-kind token typing and cardinality caps. Live preview that actually animates, with an embedded easing picker and duration scrubber.",
+      "description": "Ridiculously typed CSS transition + animation editor (mode prop) \u2014 a comma-separated layer list with per-kind token typing and cardinality caps. Live preview that actually animates, with an embedded easing picker and duration scrubber.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "easing-picker",
@@ -680,7 +682,7 @@
       "name": "font-editor",
       "type": "registry:ui",
       "title": "Font Editor",
-      "description": "Ridiculously typed CSS font-shorthand editor with a compile-time strict-order parse — an order-free style/variant/weight/stretch prefix, a mandatory <font-size>, optional / <line-height>, and a mandatory <font-family> list, or a system-font keyword. Ships the cssFont helper, parseFont/formatFont, and a live text preview rendered with the built font.",
+      "description": "Ridiculously typed CSS font-shorthand editor with a compile-time strict-order parse \u2014 an order-free style/variant/weight/stretch prefix, a mandatory <font-size>, optional / <line-height>, and a mandatory <font-family> list, or a system-font keyword. Ships the cssFont helper, parseFont/formatFont, and a live text preview rendered with the built font.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "unit-input",
@@ -688,7 +690,8 @@
         "popover",
         "input",
         "label",
-        "select"
+        "select",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -718,7 +721,7 @@
       "name": "color-function",
       "type": "registry:ui",
       "title": "Color Function",
-      "description": "Ridiculously typed editor for the modern CSS color functions — color-mix(), light-dark(), and relative color — each with its own compile-time grammar and per-space channel strictness. Reuses color-picker and ships a result-swatch preview.",
+      "description": "Ridiculously typed editor for the modern CSS color functions \u2014 color-mix(), light-dark(), and relative color \u2014 each with its own compile-time grammar and per-space channel strictness. Reuses color-picker and ships a result-swatch preview.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "color-picker",
@@ -727,7 +730,8 @@
         "input",
         "label",
         "select",
-        "slider"
+        "slider",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -770,11 +774,6 @@
           "path": "src/components/ui/color-function/light-dark-editor.tsx",
           "type": "registry:ui",
           "target": "components/ui/color-function/light-dark-editor.tsx"
-        },
-        {
-          "path": "src/components/ui/color-function/live-string.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/color-function/live-string.tsx"
         },
         {
           "path": "src/components/ui/color-function/relative-color-editor.tsx",
@@ -880,7 +879,7 @@
       "name": "anchor-position-editor",
       "type": "registry:ui",
       "title": "Anchor Position Editor",
-      "description": "Ridiculously typed editor for CSS anchor positioning (mode prop). The strict tier enforces the position-area cross-axis rule — a keyword pair must sit on two different axes of the same coordinate system. The hero is a clickable 3×3 placement grid with a live snap preview.",
+      "description": "Ridiculously typed editor for CSS anchor positioning (mode prop). The strict tier enforces the position-area cross-axis rule \u2014 a keyword pair must sit on two different axes of the same coordinate system. The hero is a clickable 3\u00d73 placement grid with a live snap preview.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "unit-input",
@@ -942,7 +941,7 @@
       "name": "property-syntax-editor",
       "type": "registry:ui",
       "title": "@property Syntax Editor",
-      "description": "Ridiculously typed editor for the CSS @property syntax: descriptor. The namesake types one CSS string with another — InitialValueLiteral<Syntax, V> checks an initial-value against the validated syntax, so cssProperty(\"<length>\", \"red\") is a compile error. A chip builder sits beside a live green/red demo.",
+      "description": "Ridiculously typed editor for the CSS @property syntax: descriptor. The namesake types one CSS string with another \u2014 InitialValueLiteral<Syntax, V> checks an initial-value against the validated syntax, so cssProperty(\"<length>\", \"red\") is a compile error. A chip builder sits beside a live green/red demo.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "color-picker",
@@ -993,7 +992,7 @@
       "name": "shape-path-editor",
       "type": "registry:ui",
       "title": "Shape Path Editor",
-      "description": "Ridiculously typed editor for the CSS shape() function (clip-path / offset-path). The strict tier dispatches each command on its name (move/line/curve/arc/…), checking arity, direction, and every coordinate. Ships the registry's only Bézier-control-handle canvas with a live preview.",
+      "description": "Ridiculously typed editor for the CSS shape() function (clip-path / offset-path). The strict tier dispatches each command on its name (move/line/curve/arc/\u2026), checking arity, direction, and every coordinate. Ships the registry's only B\u00e9zier-control-handle canvas with a live preview.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "unit-input",
@@ -1050,7 +1049,7 @@
       "name": "keyframes-editor",
       "type": "registry:ui",
       "title": "Keyframes Editor",
-      "description": "Ridiculously typed editor for a CSS @keyframes body — the composition flagship. A two-level type validates each stop selector and dispatches every declaration into its property's own validator (transform, filter, color, easing, …). A timeline embeds the real editors per stop, with a scrubbed preview.",
+      "description": "Ridiculously typed editor for a CSS @keyframes body \u2014 the composition flagship. A two-level type validates each stop selector and dispatches every declaration into its property's own validator (transform, filter, color, easing, \u2026). A timeline embeds the real editors per stop, with a scrubbed preview.",
       "registryDependencies": [
         "ridiculous-type-kit",
         "transform-builder",
@@ -1119,7 +1118,8 @@
         "unit-input",
         "button",
         "popover",
-        "input"
+        "input",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -1174,7 +1174,7 @@
       "name": "css-output",
       "type": "registry:ui",
       "title": "CSS Output",
-      "description": "Shared readout for every ridiculous editor: shows the produced value as raw CSS or a Tailwind v4 class (inline arbitrary value, with an optional @theme token for color/shadow/easing/animation) and a copy button. Adapts automatically — values with no Tailwind class form fall back to css-only.",
+      "description": "Shared readout for every ridiculous editor: shows the produced value as raw CSS or a Tailwind v4 class (inline arbitrary value, with an optional @theme token for color/shadow/easing/animation) and a copy button. Adapts automatically \u2014 values with no Tailwind class form fall back to css-only.",
       "registryDependencies": ["button"],
       "dependencies": [],
       "files": [
@@ -1204,7 +1204,7 @@
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
-      "description": "Bundle — installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, query-builder, anchor-position-editor, property-syntax-editor, shape-path-editor, keyframes-editor, and background-editor in one command.",
+      "description": "Bundle \u2014 installs color-picker, gradient-editor, unit-input, easing-picker, calc-editor, transform-builder, filter-builder, grid-builder, clip-path-editor, box-shadow-editor, transition-editor, font-editor, color-function, if-function, query-builder, anchor-position-editor, property-syntax-editor, shape-path-editor, keyframes-editor, and background-editor in one command.",
       "registryDependencies": [
         "https://ridiculous.turtlesocks.dev/r/ridiculous-type-kit.json",
         "https://ridiculous.turtlesocks.dev/r/color-picker.json",
