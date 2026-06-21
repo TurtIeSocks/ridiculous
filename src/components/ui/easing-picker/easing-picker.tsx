@@ -24,7 +24,6 @@ import type {
 import { BasisControls } from "./panel/basis-controls"
 import { PreviewSection } from "./panel/preview-section"
 import type { PreviewProperty } from "./preview/easing-preview"
-import type { OutputFormat } from "./preview/output-panel"
 
 // ---------------------------------------------------------------------------
 // Public re-exports — keep the barrel surface stable for tests + examples.
@@ -78,7 +77,6 @@ export function EasingPicker<
   value,
   onChange,
   basis,
-  output,
   className,
   "aria-label": ariaLabel = "Pick an easing",
 }: EasingPickerProps<TBasis>) {
@@ -99,12 +97,7 @@ export function EasingPicker<
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" align="start">
-        <EasingPanel
-          value={value}
-          onChange={onChange}
-          basis={basis}
-          output={output}
-        />
+        <EasingPanel value={value} onChange={onChange} basis={basis} />
       </PopoverContent>
     </Popover>
   )
@@ -165,7 +158,6 @@ export interface EasingPanelProps<
     value: TBasis extends EasingBasis ? EasingStringMap[TBasis] : EasingString,
   ) => void
   basis?: TBasis
-  output?: OutputFormat
   className?: string
   "aria-label"?: string
 }
@@ -176,13 +168,11 @@ export function EasingPanel<
   value,
   onChange,
   basis: basisProp,
-  output: outputProp = "css",
   className,
   "aria-label": ariaLabel = "Pick an easing",
 }: EasingPanelProps<TBasis>) {
   const parsed = parseEasing(value) ?? DEFAULT_BEZIER_STATE
   const [internal, setInternal] = useState<EasingState>(parsed)
-  const [outputFormat, setOutputFormat] = useState<OutputFormat>(outputProp)
   const [previewProperty, setPreviewProperty] =
     useState<PreviewProperty>("moveX")
   const lastEmittedRef = useRef<string | null>(null)
@@ -232,8 +222,6 @@ export function EasingPanel<
         easing={easing}
         previewProperty={previewProperty}
         onPreviewPropertyChange={setPreviewProperty}
-        outputFormat={outputFormat}
-        onOutputFormatChange={setOutputFormat}
       />
     </fieldset>
   )

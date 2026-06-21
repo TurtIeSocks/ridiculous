@@ -12,7 +12,7 @@ export function ApiReference() {
       <ApiSection title="EasingPicker">
         <Signature>
           {
-            "<EasingPicker\n  value: EasingString | (string & {})\n  onChange: (next: EasingString | string) => void\n  basis?: EasingBasis\n  output?: 'css' | 'tailwind-v3' | 'tailwind-v4'\n  className?: string\n  aria-label?: string\n/>"
+            "<EasingPicker\n  value: EasingString | (string & {})\n  onChange: (next: EasingString | string) => void\n  basis?: EasingBasis\n  className?: string\n  aria-label?: string\n/>"
           }
         </Signature>
         <p className="text-muted-foreground text-sm">
@@ -34,11 +34,6 @@ export function ApiReference() {
               name: "basis",
               type: "EasingBasis?",
               desc: 'Lock the wizard to "bezier" | "spring" | "bounce" | "wiggle" | "steps". Narrows onChange.',
-            },
-            {
-              name: "output",
-              type: "'css' | 'tailwind-v3' | 'tailwind-v4'",
-              desc: "Default snippet format in the OutputPanel.",
             },
             {
               name: "className",

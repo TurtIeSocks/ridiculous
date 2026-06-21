@@ -1,12 +1,10 @@
+import { CssOutput } from "@/components/ui/css-output"
 import { EasingPreview, type PreviewProperty } from "../preview/easing-preview"
-import { type OutputFormat, OutputPanel } from "../preview/output-panel"
 
 interface PreviewSectionProps {
   easing: string
   previewProperty: PreviewProperty
   onPreviewPropertyChange: (property: PreviewProperty) => void
-  outputFormat: OutputFormat
-  onOutputFormatChange: (format: OutputFormat) => void
 }
 
 /**
@@ -17,8 +15,6 @@ export function PreviewSection({
   easing,
   previewProperty,
   onPreviewPropertyChange,
-  outputFormat,
-  onOutputFormatChange,
 }: PreviewSectionProps) {
   return (
     <>
@@ -43,10 +39,10 @@ export function PreviewSection({
         </select>
       </div>
       <EasingPreview easing={easing} property={previewProperty} />
-      <OutputPanel
-        easing={easing}
-        format={outputFormat}
-        onFormatChange={onOutputFormatChange}
+      <CssOutput
+        value={easing}
+        property="transition-timing-function"
+        output="both"
       />
     </>
   )
