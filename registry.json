@@ -68,7 +68,7 @@
       "type": "registry:ui",
       "title": "Color Picker",
       "description": "Ridiculously typed color picker with oklch L×C pad, hue/alpha strips, and 6-mode round-trip (oklch, oklab, hex, rgb, hsl, hwb).",
-      "registryDependencies": ["button", "popover"],
+      "registryDependencies": ["button", "popover", "css-output"],
       "dependencies": [],
       "files": [
         {
@@ -162,7 +162,8 @@
         "button",
         "popover",
         "color-picker",
-        "unit-input"
+        "unit-input",
+        "css-output"
       ],
       "dependencies": [],
       "files": [

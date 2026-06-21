@@ -6,6 +6,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { CssOutput } from "@/components/ui/css-output"
 import { cn } from "@/lib/utils"
 import { AlphaStrip } from "./alpha-strip"
 import { MAX_RECENTS, PRESETS } from "./color-picker.constants"
@@ -309,6 +310,7 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
               overflow: "hidden",
             }}
           />
+          <CssOutput value={formatColor(internal, activeMode)} property="color" />
         </div>
       </PopoverContent>
     </Popover>
