@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 import { CssOutput } from "@/components/ui/css-output"
@@ -29,7 +29,7 @@ describe("CssOutput core", () => {
   it("pins to tailwind when output='tailwind'", () => {
     render(<CssOutput value="blur(4px)" property="filter" output="tailwind" />)
     expect(screen.getByText("filter-[blur(4px)]")).toBeInTheDocument()
-    expect(screen.queryByRole("button", { name: /^css$/i })).toBeNull()
+    expect(screen.queryByRole("tab", { name: /^css$/i })).toBeNull()
   })
 
   it("copies the currently shown string", async () => {
@@ -42,8 +42,8 @@ describe("CssOutput core", () => {
       <CssOutput value="0 4px 8px #000" property="box-shadow" output="css" />,
     )
     fireEvent.click(screen.getByRole("button", { name: /copy/i }))
-    // Give the async copy function time to resolve
-    await new Promise((resolve) => setTimeout(resolve, 50))
-    expect(writeText).toHaveBeenCalledWith("0 4px 8px #000")
+    await waitFor(() =>
+      expect(writeText).toHaveBeenCalledWith("0 4px 8px #000"),
+    )
   })
 })
