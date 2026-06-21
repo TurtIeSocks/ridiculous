@@ -1171,6 +1171,36 @@
       ]
     },
     {
+      "name": "css-output",
+      "type": "registry:ui",
+      "title": "CSS Output",
+      "description": "Shared readout for every ridiculous editor: shows the produced value as raw CSS or a Tailwind v4 class (inline arbitrary value, with an optional @theme token for color/shadow/easing/animation) and a copy button. Adapts automatically — values with no Tailwind class form fall back to css-only.",
+      "registryDependencies": ["button"],
+      "dependencies": [],
+      "files": [
+        {
+          "path": "src/components/ui/css-output/index.ts",
+          "type": "registry:ui",
+          "target": "components/ui/css-output/index.ts"
+        },
+        {
+          "path": "src/components/ui/css-output/css-output.tsx",
+          "type": "registry:ui",
+          "target": "components/ui/css-output/css-output.tsx"
+        },
+        {
+          "path": "src/components/ui/css-output/css-output.types.ts",
+          "type": "registry:ui",
+          "target": "components/ui/css-output/css-output.types.ts"
+        },
+        {
+          "path": "src/components/ui/css-output/css-output.helpers.ts",
+          "type": "registry:ui",
+          "target": "components/ui/css-output/css-output.helpers.ts"
+        }
+      ]
+    },
+    {
       "name": "all",
       "type": "registry:ui",
       "title": "All ridiculous components",
@@ -1196,7 +1226,8 @@
         "https://ridiculous.turtlesocks.dev/r/property-syntax-editor.json",
         "https://ridiculous.turtlesocks.dev/r/shape-path-editor.json",
         "https://ridiculous.turtlesocks.dev/r/keyframes-editor.json",
-        "https://ridiculous.turtlesocks.dev/r/background-editor.json"
+        "https://ridiculous.turtlesocks.dev/r/background-editor.json",
+        "https://ridiculous.turtlesocks.dev/r/css-output.json"
       ],
       "dependencies": [],
       "files": []
