@@ -10,7 +10,6 @@ export type {
 } from "./shape-path-editor"
 export {
   CommandRow,
-  LiveString,
   MiniSelect,
   ShapeCanvas,
   ShapePathEditor,

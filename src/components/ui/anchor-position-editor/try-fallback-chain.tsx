@@ -1,5 +1,6 @@
 "use client"
 
+import { CssOutput } from "@/components/ui/css-output"
 import { cn } from "@/lib/utils"
 import { formatPositionTry, tryTactics } from "./anchor-position-editor.helpers"
 import type { TryFallback } from "./anchor-position-editor.types"
@@ -115,9 +116,7 @@ export function TryFallbackChain({
         + add fallback
       </button>
 
-      <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-        {formatPositionTry(fallbacks) || " "}
-      </code>
+      <CssOutput value={formatPositionTry(fallbacks)} property={null} />
     </div>
   )
 }

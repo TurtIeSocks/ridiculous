@@ -5,7 +5,6 @@ import {
   AnchorPositionEditor,
   AnchorPositionEditorPanel,
   AnchorPreview,
-  LiveString,
   MiniSelect,
   PositionAreaGrid,
   TryFallbackChain,
@@ -50,18 +49,30 @@ test("cssPositionTry returns its argument unchanged at runtime", () => {
   expect(cssPositionTry("flip-block, none")).toBe("flip-block, none")
 })
 
-describe("LiveString", () => {
-  test("renders the value when present", () => {
-    render(<LiveString value="anchor(--btn top)" />)
-    expect(screen.getByText("anchor(--btn top)")).toBeInTheDocument()
+describe("CssOutput readout (via AnchorPositionEditorPanel)", () => {
+  test("renders the produced value in a code block", () => {
+    render(
+      <AnchorPositionEditorPanel
+        value="top left"
+        onChange={() => {}}
+        mode="position-area"
+      />,
+    )
+    expect(screen.getByText("top left")).toBeInTheDocument()
   })
 
-  test("renders a non-breaking blank for an empty value", () => {
-    const { container } = render(<LiveString value="" />)
+  test("renders the default readout when value is empty", () => {
+    const { container } = render(
+      <AnchorPositionEditorPanel
+        value=""
+        onChange={() => {}}
+        mode="position-area"
+      />,
+    )
+    // empty value → grid defaults to center cell → CssOutput shows "center"
     const code = container.querySelector("code")
     expect(code).not.toBeNull()
-    // the `value || " "` fallback keeps a single-space placeholder
-    expect(code?.textContent).toBe(" ")
+    expect(code?.textContent).toBe("center")
   })
 })
 
