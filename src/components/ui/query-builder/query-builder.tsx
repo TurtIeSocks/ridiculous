@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -24,7 +25,6 @@ import {
   AddTestButton,
   ContainerNameInput,
   JoinerSelect,
-  LiveString,
   MediaTypeSelect,
   NotToggle,
 } from "./query-builder-fields"
@@ -200,7 +200,7 @@ export function QueryBuilderPanel({
       </div>
 
       <AddTestButton onAdd={add} />
-      <LiveString value={liveString} />
+      <CssOutput value={liveString} property={null} />
       <QueryPreview value={liveString} mode={mode} />
     </fieldset>
   )

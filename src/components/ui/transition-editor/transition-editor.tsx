@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -205,7 +206,10 @@ export function TransitionEditorPanel<TMode extends EditorMode = "transition">({
         ))}
       </div>
       <AddLayerButton onAdd={add} />
-      <LiveString value={live} />
+      <CssOutput
+        value={live}
+        property={mode === "animation" ? "animation" : "transition"}
+      />
       <TransitionPreview
         mode={mode}
         value={live}
@@ -268,18 +272,6 @@ export function TransitionLayerRow({
         <span aria-hidden="true">×</span>
       </button>
     </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// LiveString (internal)
-// ---------------------------------------------------------------------------
-
-function LiveString({ value }: { value: string }) {
-  return (
-    <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-      {value}
-    </code>
   )
 }
 

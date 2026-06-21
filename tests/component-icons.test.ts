@@ -18,10 +18,21 @@ const registry = JSON.parse(
   readFileSync(resolve(process.cwd(), "registry.json"), "utf8"),
 ) as { items: RegistryItem[] }
 
+// Shared infrastructure primitives: shipped registry items that are NOT
+// standalone gallery components (no demo page, no nav entry, no icon) —
+// kept in sync with the INFRASTRUCTURE set in scripts/build-nav.mjs.
+const INFRASTRUCTURE = new Set(["css-output"])
+
 // Real components are the registry items that ship files (excludes meta-bundles
-// like "all"). build-nav.mjs uses the same filter to populate the site NAV.
+// like "all" and infrastructure primitives). build-nav.mjs uses the same filter
+// to populate the site NAV.
 const componentNames = registry.items
-  .filter((it) => Array.isArray(it.files) && it.files.length > 0)
+  .filter(
+    (it) =>
+      Array.isArray(it.files) &&
+      it.files.length > 0 &&
+      !INFRASTRUCTURE.has(it.name),
+  )
   .map((it) => it.name)
 
 describe("component icon map", () => {

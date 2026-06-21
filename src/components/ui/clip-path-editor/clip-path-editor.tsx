@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -25,7 +26,6 @@ import type {
 import { ShapeControls } from "./controls/shape-controls"
 import { ClipPathPreview } from "./preview/clip-path-preview"
 import { GeometryBoxSelect } from "./primitives/geometry-box-select"
-import { LiveString } from "./primitives/live-string"
 import { ShapeSelect } from "./primitives/shape-select"
 
 // ---------------------------------------------------------------------------
@@ -190,7 +190,10 @@ export function ClipPathEditorPanel({
         </p>
       )}
 
-      <LiveString value={formatClipPath(state)} />
+      <CssOutput
+        value={formatClipPath(state)}
+        property={mode === "shape-outside" ? "shape-outside" : "clip-path"}
+      />
 
       <ClipPathPreview
         value={formatClipPath(state)}

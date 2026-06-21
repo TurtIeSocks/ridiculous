@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ColorPicker } from "@/components/ui/color-picker"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -266,6 +267,10 @@ function GradientEditorBody({
                 interpolation: { ...internal.interpolation, hueMethod },
               })
             }
+          />
+          <CssOutput
+            value={formatGradient(internal)}
+            property="background-image"
           />
         </div>
       </PopoverContent>

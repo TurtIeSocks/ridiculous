@@ -59,8 +59,8 @@ export function ApiReference() {
           desc="The local compact <select> chrome. Each component owns its copy (registry self-containment) — it is not imported from query-builder."
         />
         <ApiRow
-          signature="<LiveString value />"
-          desc="The produced @keyframes body rendered in a <code> block."
+          signature="<CssOutput value property />"
+          desc="The shared readout (from css-output): the produced value with a copy button (css-only — keyframes have no Tailwind class form)."
         />
       </ApiSection>
 

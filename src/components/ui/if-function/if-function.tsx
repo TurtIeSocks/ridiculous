@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import { Input } from "@/components/ui/input"
 import {
   Popover,
@@ -162,7 +163,7 @@ export function IfFunctionPanel({
         ))}
       </div>
       <AddBranchButton onAdd={add} />
-      <LiveString value={formatIf(branches)} />
+      <CssOutput value={formatIf(branches)} property={null} />
       <IfPreview value={formatIf(branches)} />
     </fieldset>
   )
@@ -315,18 +316,6 @@ export function AddBranchButton({ onAdd, className }: AddBranchButtonProps) {
     >
       + add branch
     </button>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// LiveString (internal)
-// ---------------------------------------------------------------------------
-
-function LiveString({ value }: { value: string }) {
-  return (
-    <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-      {value}
-    </code>
   )
 }
 

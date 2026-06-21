@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -22,7 +23,6 @@ import { ColorFunctionPreview } from "./color-function-preview"
 import { ColorMixEditor } from "./color-mix-editor"
 import { FamilySelect } from "./family-select"
 import { LightDarkEditor } from "./light-dark-editor"
-import { LiveString } from "./live-string"
 import { RelativeColorEditor } from "./relative-color-editor"
 
 export type { ColorFunctionPreviewProps } from "./color-function-preview"
@@ -160,7 +160,7 @@ export function ColorFunctionPanel<
         <LightDarkEditor state={state} onChange={commit} />
       )}
 
-      <LiveString value={formatColorFunction(state)} />
+      <CssOutput value={formatColorFunction(state)} property="color" />
       <ColorFunctionPreview value={formatColorFunction(state)} />
     </fieldset>
   )

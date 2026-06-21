@@ -12,7 +12,6 @@ export {
   AnchorPositionEditor,
   AnchorPositionEditorPanel,
   AnchorPreview,
-  LiveString,
   MiniSelect,
   PositionAreaGrid,
   TryFallbackChain,

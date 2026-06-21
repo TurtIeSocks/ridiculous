@@ -36,6 +36,7 @@ export default defineConfig({
         "src/components/ui/shape-path-editor/**",
         "src/components/ui/keyframes-editor/**",
         "src/components/ui/background-editor/**",
+        "src/components/ui/css-output/**",
       ],
       thresholds: {
         statements: 90,

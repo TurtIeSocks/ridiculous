@@ -238,62 +238,42 @@ describe("EasingPicker popover", () => {
   })
 })
 
-describe("OutputPanel via EasingPanel", () => {
-  test("CSS format shows the raw easing string", () => {
+describe("CssOutput readout via EasingPanel", () => {
+  test("CSS tab shows the raw easing value", () => {
     render(
       <EasingPanel
         value="cubic-bezier(0.42, 0, 0.58, 1)"
         onChange={() => {}}
-        output="css"
       />,
     )
-    // The OutputPanel <pre> shows the snippet
+    // CssOutput defaults to css format — raw value is visible in the code block
     expect(
       screen.getByText("cubic-bezier(0.42, 0, 0.58, 1)"),
     ).toBeInTheDocument()
   })
 
-  test("Tailwind v3 format wraps with class= and replaces spaces with _", () => {
+  test("no v3 toggle exists — only css and tailwind buttons", () => {
     render(
       <EasingPanel
         value="cubic-bezier(0.42, 0, 0.58, 1)"
         onChange={() => {}}
-        output="tailwind-v3"
       />,
     )
-    expect(
-      screen.getByText('class="ease-[cubic-bezier(0.42,0,0.58,1)]"'),
-    ).toBeInTheDocument()
+    expect(screen.queryByRole("tab", { name: /v3/i })).toBeNull()
+    expect(screen.getByRole("tab", { name: "css" })).toBeInTheDocument()
+    expect(screen.getByRole("tab", { name: "tailwind" })).toBeInTheDocument()
   })
 
-  test("copy button writes the snippet to clipboard", async () => {
-    const writeText = vi.fn().mockResolvedValue(undefined)
-    Object.defineProperty(navigator, "clipboard", {
-      value: { writeText },
-      configurable: true,
-    })
+  test("clicking tailwind tab shows ease-[...] arbitrary class", () => {
     render(
       <EasingPanel
         value="cubic-bezier(0.42, 0, 0.58, 1)"
         onChange={() => {}}
-        output="css"
       />,
     )
-    fireEvent.click(screen.getByRole("button", { name: /copy/i }))
-    expect(writeText).toHaveBeenCalledWith("cubic-bezier(0.42, 0, 0.58, 1)")
-  })
-
-  test("clicking a format-toggle button updates the snippet", async () => {
-    render(
-      <EasingPanel
-        value="cubic-bezier(0.42, 0, 0.58, 1)"
-        onChange={() => {}}
-        output="css"
-      />,
-    )
-    fireEvent.click(screen.getByRole("button", { name: "tailwind-v3" }))
+    fireEvent.click(screen.getByRole("tab", { name: "tailwind" }))
     expect(
-      screen.getByText('class="ease-[cubic-bezier(0.42,0,0.58,1)]"'),
+      screen.getByText("ease-[cubic-bezier(0.42,0,0.58,1)]"),
     ).toBeInTheDocument()
   })
 })

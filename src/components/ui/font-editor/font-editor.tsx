@@ -3,6 +3,7 @@
 import type { ReactNode } from "react"
 import { useEffect, useId, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import { Input } from "@/components/ui/input"
 import {
   Popover,
@@ -187,7 +188,7 @@ export function FontEditorPanel({
         />
       )}
 
-      <LiveString value={formatFont(parts)} />
+      <CssOutput value={formatFont(parts)} property="font" />
       <FontPreview value={formatFont(parts)} />
     </fieldset>
   )
@@ -592,18 +593,6 @@ export function FamilyEditor({
         </optgroup>
       </select>
     </div>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// LiveString (internal)
-// ---------------------------------------------------------------------------
-
-function LiveString({ value }: { value: string }) {
-  return (
-    <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-      {`font: ${value};`}
-    </code>
   )
 }
 

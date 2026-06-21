@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -195,18 +196,17 @@ export function AnchorPositionEditorPanel({
             col={areaState.col}
             onChange={commitArea}
           />
-          <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-            {formatPositionArea(stateToKeywords(areaState)) || " "}
-          </code>
+          <CssOutput
+            value={formatPositionArea(stateToKeywords(areaState))}
+            property="position-area"
+          />
         </>
       )}
 
       {mode === "anchor" && (
         <>
           <AnchorExprFields expr={anchorExpr} onChange={commitAnchor} />
-          <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-            {formatAnchor(anchorExpr) || " "}
-          </code>
+          <CssOutput value={formatAnchor(anchorExpr)} property={null} />
           <AnchorPreview value="center" />
         </>
       )}
@@ -215,18 +215,5 @@ export function AnchorPositionEditorPanel({
         <TryFallbackChain fallbacks={tryChain} onChange={commitTry} />
       )}
     </fieldset>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// LiveString — the produced value in a `<code>` (internal helper, exported
-// for parity with the sibling sub-components and demos).
-// ---------------------------------------------------------------------------
-
-export function LiveString({ value }: { value: string }) {
-  return (
-    <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-      {value || " "}
-    </code>
   )
 }

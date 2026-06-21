@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -138,9 +139,7 @@ export function PropertySyntaxEditorPanel({
         }
       />
 
-      <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-        {liveString || " "}
-      </code>
+      <CssOutput value={liveString} property={null} />
 
       <div className="border-input border-t pt-3">
         <p className="mb-2 font-mono text-[10px] text-muted-foreground uppercase">

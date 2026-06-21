@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -308,6 +309,10 @@ export function ColorPicker<TMode extends ColorMode | undefined>({
               width: 0,
               overflow: "hidden",
             }}
+          />
+          <CssOutput
+            value={formatColor(internal, activeMode)}
+            property="color"
           />
         </div>
       </PopoverContent>

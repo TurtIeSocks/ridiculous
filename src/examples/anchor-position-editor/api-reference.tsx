@@ -66,8 +66,8 @@ export function ApiReference() {
           desc="The local compact <select> chrome. Each component owns its copy (registry self-containment) — it is not imported from query-builder."
         />
         <ApiRow
-          signature="<LiveString value />"
-          desc="The produced value rendered in a <code> block."
+          signature="<CssOutput value property />"
+          desc="The shared readout (from css-output): the produced value as raw CSS or a Tailwind v4 class, with a copy button."
         />
       </ApiSection>
 

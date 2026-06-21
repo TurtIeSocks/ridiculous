@@ -12,7 +12,6 @@ export {
   KeyframesEditor,
   KeyframesEditorPanel,
   KeyframeTimeline,
-  LiveString,
   MiniSelect,
 } from "./keyframes-editor"
 export {

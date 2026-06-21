@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -160,8 +161,15 @@ export function GridBuilderPanel({
         <TrackListEditor tokens={tokens} onChange={commitTracks} />
       )}
 
-      <LiveString
+      <CssOutput
         value={mode === "areas" ? formatAreas(matrix) : formatTracks(tokens)}
+        property={
+          mode === "columns"
+            ? "grid-template-columns"
+            : mode === "rows"
+              ? "grid-template-rows"
+              : "grid-template-areas"
+        }
       />
       <GridPreview
         mode={mode}
@@ -170,17 +178,5 @@ export function GridBuilderPanel({
         areas={formatAreas(matrix)}
       />
     </fieldset>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// LiveString (internal)
-// ---------------------------------------------------------------------------
-
-function LiveString({ value }: { value: string }) {
-  return (
-    <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-      {value}
-    </code>
   )
 }
