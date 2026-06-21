@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { describe, expect, it, vi } from "vitest"
 import { CssOutput } from "@/components/ui/css-output"
@@ -51,9 +51,11 @@ describe("CssOutput adaptive", () => {
     // Click the copy button
     const copyBtn = screen.getByRole("button", { name: /copy token/i })
     fireEvent.click(copyBtn)
-    // The writeText should have been called synchronously
-    expect(writeText).toHaveBeenCalledWith(
-      "@theme {\n  --color-custom: red;\n}",
+    // Await the writeText call via waitFor
+    await waitFor(() =>
+      expect(writeText).toHaveBeenCalledWith(
+        "@theme {\n  --color-custom: red;\n}",
+      ),
     )
   })
 })

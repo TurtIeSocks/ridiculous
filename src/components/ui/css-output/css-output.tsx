@@ -98,7 +98,7 @@ export function CssOutput({
         )}
         <button
           type="button"
-          onClick={() => canCopy && copyText(shown)}
+          onClick={() => copyText(shown)}
           disabled={!canCopy}
           aria-label={copied ? "Copied" : "Copy"}
           className="ml-auto rounded border border-white/10 px-2 py-0.5 text-muted-foreground text-xs hover:text-foreground disabled:opacity-40"
