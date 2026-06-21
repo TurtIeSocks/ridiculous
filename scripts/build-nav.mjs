@@ -16,9 +16,20 @@ if (!Array.isArray(registry.items)) {
   throw new Error("build-nav: registry.json is missing an `items` array")
 }
 
+// Shared infrastructure primitives: shipped registry items (so `shadcn add`
+// pulls them as registryDependencies of other components) that are NOT
+// standalone gallery components and have no demo page — analogous to the
+// shadcn base primitives (button/input). Excluded from the site NAV.
+const INFRASTRUCTURE = new Set(["css-output"])
+
 // Items with no `files` are meta-bundles (e.g. "all"), not actual components.
 const items = registry.items
-  .filter((it) => Array.isArray(it.files) && it.files.length > 0)
+  .filter(
+    (it) =>
+      Array.isArray(it.files) &&
+      it.files.length > 0 &&
+      !INFRASTRUCTURE.has(it.name),
+  )
   .map((it) => ({
     name: it.name,
     title: it.title,
