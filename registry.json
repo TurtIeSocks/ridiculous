@@ -821,7 +821,8 @@
         "ridiculous-type-kit",
         "button",
         "popover",
-        "input"
+        "input",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -859,7 +860,8 @@
         "popover",
         "input",
         "label",
-        "select"
+        "select",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -978,7 +980,8 @@
         "color-picker",
         "button",
         "popover",
-        "input"
+        "input",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -1092,7 +1095,8 @@
         "unit-input",
         "button",
         "popover",
-        "input"
+        "input",
+        "css-output"
       ],
       "dependencies": [],
       "files": [

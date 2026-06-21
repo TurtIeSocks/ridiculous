@@ -1,13 +1,13 @@
 import { fireEvent, render, screen, within } from "@testing-library/react"
 import { useState } from "react"
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   DeclarationRow,
   KeyframePreview,
   KeyframesEditor,
   KeyframesEditorPanel,
   KeyframeTimeline,
-  LiveString,
 } from "@/components/ui/keyframes-editor/keyframes-editor"
 import { cssKeyframes } from "@/components/ui/keyframes-editor/keyframes-editor.types"
 
@@ -886,21 +886,20 @@ describe("controlled value", () => {
 })
 
 // ===========================================================================
-// LiveString — the produced-body <code> mirror
+// CssOutput (readout) — the produced-body <code> mirror
 // ===========================================================================
 
-describe("LiveString", () => {
+describe("CssOutput (readout)", () => {
   test("renders the produced body string", () => {
-    render(<LiveString value="from { opacity: 0 }" />)
+    render(<CssOutput value="from { opacity: 0 }" property={null} />)
     expect(screen.getByText("from { opacity: 0 }")).toBeInTheDocument()
   })
 
-  test("an empty value renders a non-breaking placeholder (no crash)", () => {
-    const { container } = render(<LiveString value="" />)
-    // `value || " "` → a single space keeps the <code> box from collapsing.
+  test("an empty value renders a <code> element without crashing", () => {
+    const { container } = render(<CssOutput value="" property={null} />)
     const code = container.querySelector("code")
     expect(code).not.toBeNull()
-    expect(code?.textContent).toBe(" ")
+    expect(code?.textContent).toBe("")
   })
 })
 

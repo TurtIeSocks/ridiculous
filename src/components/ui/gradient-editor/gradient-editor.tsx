@@ -3,13 +3,13 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { ColorPicker } from "@/components/ui/color-picker"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { UnitInput } from "@/components/ui/unit-input"
-import { CssOutput } from "@/components/ui/css-output"
 import { cn } from "@/lib/utils"
 import {
   formatGradient,
@@ -268,7 +268,10 @@ function GradientEditorBody({
               })
             }
           />
-          <CssOutput value={formatGradient(internal)} property="background-image" />
+          <CssOutput
+            value={formatGradient(internal)}
+            property="background-image"
+          />
         </div>
       </PopoverContent>
     </Popover>
