@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
+import { CssOutput } from "@/components/ui/css-output"
 import {
   Popover,
   PopoverContent,
@@ -148,7 +149,10 @@ export function FilterBuilderPanel({
         ))}
       </div>
       <AddFilterMenu onAdd={add} />
-      <LiveString value={formatFilter(items)} />
+      <CssOutput
+        value={formatFilter(items)}
+        property={mode === "backdrop-filter" ? "backdrop-filter" : "filter"}
+      />
       <FilterPreview
         value={formatFilter(items)}
         mode={mode}
@@ -188,17 +192,5 @@ export function AddFilterMenu({ onAdd, className }: AddFilterMenuProps) {
       <option value="">+ add function…</option>
       <FunctionOptions />
     </select>
-  )
-}
-
-// ---------------------------------------------------------------------------
-// LiveString (internal)
-// ---------------------------------------------------------------------------
-
-function LiveString({ value }: { value: string }) {
-  return (
-    <code className="block overflow-x-auto rounded bg-muted/50 px-2 py-1.5 font-mono text-foreground text-xs">
-      {value}
-    </code>
   )
 }

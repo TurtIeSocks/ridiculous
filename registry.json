@@ -353,7 +353,8 @@
         "popover",
         "input",
         "label",
-        "slider"
+        "slider",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -405,7 +406,8 @@
         "button",
         "popover",
         "input",
-        "label"
+        "label",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -463,7 +465,8 @@
         "popover",
         "input",
         "label",
-        "select"
+        "select",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
@@ -558,11 +561,6 @@
           "target": "components/ui/clip-path-editor/primitives/labeled-field.tsx"
         },
         {
-          "path": "src/components/ui/clip-path-editor/primitives/live-string.tsx",
-          "type": "registry:ui",
-          "target": "components/ui/clip-path-editor/primitives/live-string.tsx"
-        },
-        {
           "path": "src/components/ui/clip-path-editor/primitives/shape-select.tsx",
           "type": "registry:ui",
           "target": "components/ui/clip-path-editor/primitives/shape-select.tsx"
@@ -637,7 +635,8 @@
         "popover",
         "input",
         "label",
-        "select"
+        "select",
+        "css-output"
       ],
       "dependencies": [],
       "files": [
